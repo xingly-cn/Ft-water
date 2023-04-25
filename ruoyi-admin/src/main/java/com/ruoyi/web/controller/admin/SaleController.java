@@ -1,10 +1,10 @@
 package com.ruoyi.web.controller.admin;
 
 
-import com.ruoyi.web.controller.request.SaleRequest;
-import com.ruoyi.web.entity.FtSale;
-import com.ruoyi.web.service.FtSaleService;
-import com.ruoyi.web.utils.Result;
+import com.ruoyi.system.request.SaleRequest;
+import com.ruoyi.system.entity.FtSale;
+import com.ruoyi.system.service.FtSaleService;
+import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;

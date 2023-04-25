@@ -1,10 +1,10 @@
 package com.ruoyi.web.controller.admin;
 
 
-import com.ruoyi.web.controller.request.HomeRequest;
-import com.ruoyi.web.entity.FtHome;
-import com.ruoyi.web.service.FtHomeService;
-import com.ruoyi.web.utils.Result;
+import com.ruoyi.system.request.HomeRequest;
+import com.ruoyi.system.entity.FtHome;
+import com.ruoyi.system.service.FtHomeService;
+import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,7 @@
 package com.ruoyi.web.exception;
 
-import com.asugar.ftwaterdelivery.utils.Result;
+
+import com.ruoyi.system.utils.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;

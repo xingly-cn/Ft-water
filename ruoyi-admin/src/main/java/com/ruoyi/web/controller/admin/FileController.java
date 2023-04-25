@@ -1,9 +1,9 @@
 package com.ruoyi.web.controller.admin;
 
-import com.asugar.ftwaterdelivery.utils.CommonUtils;
-import com.asugar.ftwaterdelivery.utils.Result;
+
+import com.ruoyi.system.utils.CommonUtils;
+import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

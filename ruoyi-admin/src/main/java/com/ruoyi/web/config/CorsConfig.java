@@ -1,7 +1,6 @@
 package com.ruoyi.web.config;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -12,7 +11,7 @@ import org.springframework.web.filter.CorsFilter;
  * @Author : 志敏.罗
  * @create 2022/8/18 13:49
  */
-@Configuration
+
 public class CorsConfig {
 
     @Bean

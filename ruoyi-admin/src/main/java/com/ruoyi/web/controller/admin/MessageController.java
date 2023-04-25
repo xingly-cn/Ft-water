@@ -1,8 +1,9 @@
 package com.ruoyi.web.controller.admin;
 
-import com.asugar.ftwaterdelivery.controller.request.MessageRequest;
-import com.asugar.ftwaterdelivery.service.FtMessageService;
-import com.asugar.ftwaterdelivery.utils.Result;
+
+import com.ruoyi.system.request.MessageRequest;
+import com.ruoyi.system.service.FtMessageService;
+import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

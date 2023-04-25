@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurationSelector;
-import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -23,9 +21,8 @@ import java.time.Duration;
  * @Author : 镜像
  * @create 2023/3/2 14:22
  */
-@Configuration
-@EnableCaching
-@SuppressWarnings({"unchecked", "rawtypes"})
+
+
 public class RedisConfig extends CachingConfigurationSelector {
 
     @Bean

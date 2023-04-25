@@ -1,9 +1,9 @@
 package com.ruoyi.web.controller.admin;
 
-import com.asugar.ftwaterdelivery.controller.request.OrderRequest;
-import com.asugar.ftwaterdelivery.entity.FtOrder;
-import com.asugar.ftwaterdelivery.service.FtOrderService;
-import com.asugar.ftwaterdelivery.utils.Result;
+import com.ruoyi.system.request.OrderRequest;
+import com.ruoyi.system.entity.FtOrder;
+import com.ruoyi.system.service.FtOrderService;
+import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;

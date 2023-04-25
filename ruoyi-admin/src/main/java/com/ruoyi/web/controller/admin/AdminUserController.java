@@ -1,11 +1,11 @@
 package com.ruoyi.web.controller.admin;
 
 
-import com.ruoyi.web.controller.request.LoginRequest;
-import com.ruoyi.web.controller.request.UserRequest;
-import com.ruoyi.web.entity.FtUser;
-import com.ruoyi.web.service.FtUserService;
-import com.ruoyi.web.utils.Result;
+import com.ruoyi.system.request.LoginRequest;
+import com.ruoyi.system.request.UserRequest;
+import com.ruoyi.system.entity.FtUser;
+import com.ruoyi.system.service.FtUserService;
+import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;

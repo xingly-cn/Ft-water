@@ -1,0 +1,31 @@
+package com.ruoyi.system.service;
+
+
+import com.ruoyi.system.entity.FtHome;
+import com.ruoyi.system.request.HomeRequest;
+import com.ruoyi.system.response.HomeResponse;
+
+import java.util.List;
+
+/**
+ * Created by IntelliJ IDEA.
+ * @Author : 镜像
+ * @create 2023/4/18 21:41
+ */
+public interface FtHomeService {
+    List<HomeResponse> homeTree();
+
+    Boolean deleteByPrimaryKey(Long id);
+
+    Boolean addHome(FtHome record);
+
+    Boolean updateHome(FtHome record);
+
+    Boolean addNumber(HomeRequest request);
+
+    HomeResponse selectByPrimaryKey(Long id);
+
+    Boolean addUser(HomeRequest request);
+
+    Boolean addNumberByHomeId(Long homeId, Integer number);
+}

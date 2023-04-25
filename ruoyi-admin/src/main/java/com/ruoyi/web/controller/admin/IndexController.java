@@ -1,8 +1,9 @@
 package com.ruoyi.web.controller.admin;
 
-import com.asugar.ftwaterdelivery.controller.request.IndexRequest;
-import com.asugar.ftwaterdelivery.service.IndexService;
-import com.asugar.ftwaterdelivery.utils.Result;
+
+import com.ruoyi.system.request.IndexRequest;
+import com.ruoyi.system.service.IndexService;
+import com.ruoyi.system.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

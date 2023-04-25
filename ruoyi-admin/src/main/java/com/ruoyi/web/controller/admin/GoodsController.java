@@ -1,10 +1,10 @@
 package com.ruoyi.web.controller.admin;
 
 
-import com.ruoyi.web.controller.request.GoodRequest;
-import com.ruoyi.web.entity.FtGoods;
-import com.ruoyi.web.service.FtGoodsService;
-import com.ruoyi.web.utils.Result;
+import com.ruoyi.system.request.GoodRequest;
+import com.ruoyi.system.entity.FtGoods;
+import com.ruoyi.system.service.FtGoodsService;
+import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
