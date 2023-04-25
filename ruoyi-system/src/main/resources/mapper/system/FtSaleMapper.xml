@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asugar.ftwaterdelivery.dao.FtSaleMapper">
+    <resultMap id="BaseResultMap" type="com.asugar.ftwaterdelivery.entity.FtSale">
+        <!--@mbg.generated-->
+        <!--@Table ft_sale-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="uId" jdbcType="VARCHAR" property="uid"/>
+        <result column="num" jdbcType="INTEGER" property="num"/>
+        <result column="operate_id" jdbcType="VARCHAR" property="operateId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id,
+        `uId`,
+        num,
+        operate_id,
+        create_time,
+        deleted
+    </sql>
+
+    <sql id="Base_User_List">
+        select fs.id,
+               fs.create_time,
+               fs.uId,
+               fs.num,
+               fs.operate_id,
+               fu.name  as userName,
+               fu2.name as operatorName
+        from ft_sale fs
+                 inner join ft_user fu on fs.uid = fu.id
+                 inner join ft_user fu2 on fs.operate_id = fu2.id
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_sale
+        where id = #{id}
+    </select>
+
+    <select id="selectPage" resultType="com.asugar.ftwaterdelivery.controller.response.SaleResponse">
+        <include refid="Base_User_List"/>
+        where fs.deleted = 0
+          and fu.deleted = 0
+          and fu2.deleted = 0
+        <if test="sale.keyword != null and sale.keyword != ''">
+            and (
+                    fu2.name like concat('%', #{sale.keyword}, '%')
+                    or fu.name like concat('%', #{sale.keyword}, '%')
+                )
+        </if>
+        order by fs.id desc
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        <!--@mbg.generated-->
+        <!--    delete from ft_sale-->
+        <!--    where id = #{id}-->
+        update ft_sale
+        set deleted = 1
+        where id = #{id}
+    </delete>
+
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.asugar.ftwaterdelivery.entity.FtSale">
+        <!--@mbg.generated-->
+        insert into ft_sale
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="uid != null and uid != ''">
+                `uId`,
+            </if>
+            <if test="num != null">
+                num,
+            </if>
+            <if test="operateId != null and operateId != ''">
+                operate_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                #{id},
+            </if>
+            <if test="uid != null and uid != ''">
+                #{uid,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                #{num,jdbcType=INTEGER},
+            </if>
+            <if test="operateId != null and operateId != ''">
+                #{operateId,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.asugar.ftwaterdelivery.entity.FtSale">
+        <!--@mbg.generated-->
+        update ft_sale
+        <set>
+            <if test="uid != null and uid != ''">
+                `uId` = #{uid,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                num = #{num,jdbcType=INTEGER},
+            </if>
+            <if test="operateId != null and operateId != ''">
+                operate_id = #{operateId,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.asugar.ftwaterdelivery.entity.FtSale">
+        <!--@mbg.generated-->
+        update ft_sale
+        set `uId`      = #{uid,jdbcType=VARCHAR},
+            num        = #{num,jdbcType=INTEGER},
+            operate_id = #{operateId,jdbcType=VARCHAR}
+        where id = #{id}
+    </update>
+
+    <select id="selectList" resultType="com.asugar.ftwaterdelivery.controller.response.SaleResponse">
+        <include refid="Base_User_List"/>
+        where fs.deleted = 0
+        and fu.deleted = 0
+        and fu2.deleted = 0
+        <if test="sale.keyword != null and sale.keyword != ''">
+            and (
+            fu2.name like concat('%', #{sale.keyword}, '%')
+            or fu.name like concat('%', #{sale.keyword}, '%')
+            )
+        </if>
+        order by fs.id desc
+    </select>
+</mapper>

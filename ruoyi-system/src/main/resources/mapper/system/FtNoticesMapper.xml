@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asugar.ftwaterdelivery.dao.FtNoticesMapper">
+    <resultMap id="BaseResultMap" type="com.asugar.ftwaterdelivery.entity.FtNotices">
+        <!--@mbg.generated-->
+        <!--@Table ft_notices-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="type" jdbcType="TINYINT" property="type"/>
+        <result column="school_id" jdbcType="BIGINT" property="schoolId"/>
+        <result column="home_id" jdbcType="BIGINT" property="homeId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="number" jdbcType="INTEGER" property="number"/>
+        <result column="residue" jdbcType="INTEGER" property="residue"/>
+        <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="VARCHAR" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id,
+        `type`,
+        school_id,
+        home_id,
+        user_id,
+        `number`,
+        residue,
+        deleted,
+        create_by,
+        update_by,
+        create_time,
+        update_time
+    </sql>
+
+    <sql id="Base_Column_List_With_School_Home_User">
+        <!--@mbg.generated-->
+        select n.id,
+        n.type,
+        n.school_id,
+        n.home_id,
+        n.user_id,
+        n.number,
+        n.residue,
+        n.deleted,
+        n.create_by,
+        n.update_by,
+        n.create_time,
+        n.update_time,
+        s.school_name as schoolName,
+        h.name        as homeName,
+        u.name        as userName
+        from ft_notices n
+        inner join ft_school s on n.school_id = s.id
+        inner join ft_home h on n.home_id = h.id
+        inner join ft_user u on n.user_id = u.id
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.asugar.ftwaterdelivery.controller.response.NoticesResponse">
+        <!--@mbg.generated-->
+        <include refid="Base_Column_List_With_School_Home_User"/>
+        where n.id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        <!--@mbg.generated-->
+        delete
+        from ft_notices
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.asugar.ftwaterdelivery.entity.FtNotices"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into ft_notices (`type`, school_id, home_id,
+                                user_id, `number`, residue,
+                                deleted, create_by, update_by,
+                                create_time, update_time)
+        values (#{type,jdbcType=TINYINT}, #{schoolId,jdbcType=BIGINT}, #{homeId,jdbcType=BIGINT},
+                #{userId,jdbcType=BIGINT}, #{number,jdbcType=INTEGER}, #{residue,jdbcType=INTEGER},
+                #{deleted,jdbcType=BOOLEAN}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id"
+            parameterType="com.asugar.ftwaterdelivery.entity.FtNotices" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into ft_notices
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="schoolId != null">
+                school_id,
+            </if>
+            <if test="homeId != null">
+                home_id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="number != null">
+                `number`,
+            </if>
+            <if test="residue != null">
+                residue,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null and updateTime != ''">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="type != null">
+                #{type,jdbcType=TINYINT},
+            </if>
+            <if test="schoolId != null">
+                #{schoolId,jdbcType=BIGINT},
+            </if>
+            <if test="homeId != null">
+                #{homeId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="number != null">
+                #{number,jdbcType=INTEGER},
+            </if>
+            <if test="residue != null">
+                #{residue,jdbcType=INTEGER},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=BOOLEAN},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null and updateTime != ''">
+                #{updateTime,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.asugar.ftwaterdelivery.entity.FtNotices">
+        <!--@mbg.generated-->
+        update ft_notices
+        <set>
+            <if test="type != null">
+                `type` = #{type,jdbcType=TINYINT},
+            </if>
+            <if test="schoolId != null">
+                school_id = #{schoolId,jdbcType=BIGINT},
+            </if>
+            <if test="homeId != null">
+                home_id = #{homeId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="number != null">
+                `number` = #{number,jdbcType=INTEGER},
+            </if>
+            <if test="residue != null">
+                residue = #{residue,jdbcType=INTEGER},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=BOOLEAN},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null and updateTime != ''">
+                update_time = #{updateTime,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.asugar.ftwaterdelivery.entity.FtNotices">
+        <!--@mbg.generated-->
+        update ft_notices
+        set `type`      = #{type,jdbcType=TINYINT},
+            school_id   = #{schoolId,jdbcType=BIGINT},
+            home_id     = #{homeId,jdbcType=BIGINT},
+            user_id     = #{userId,jdbcType=BIGINT},
+            `number`    = #{number,jdbcType=INTEGER},
+            residue     = #{residue,jdbcType=INTEGER},
+            deleted     = #{deleted,jdbcType=BOOLEAN},
+            create_by   = #{createBy,jdbcType=BIGINT},
+            update_by   = #{updateBy,jdbcType=BIGINT},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectPage" resultType="com.asugar.ftwaterdelivery.controller.response.NoticesResponse">
+        <!--  school home user  -->
+        <include refid="Base_Column_List_With_School_Home_User"/>
+        where n.deleted = 0
+        <if test="notices.homeId != null">
+            and n.home_id = #{notices.homeId}
+        </if>
+        <if test="notices.schoolId != null">
+            and n.school_id = #{notices.schoolId}
+        </if>
+        <if test="notices.userId != null">
+            and n.user_id = #{notices.userId}
+        </if>
+        order by n.id desc
+    </select>
+</mapper>

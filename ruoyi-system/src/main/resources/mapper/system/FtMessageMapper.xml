@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asugar.ftwaterdelivery.dao.FtMessageMapper">
+    <resultMap id="BaseResultMap" type="com.asugar.ftwaterdelivery.entity.FtMessage">
+        <!--@mbg.generated-->
+        <!--@Table ft_message-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
+        <result column="number" jdbcType="INTEGER" property="number"/>
+        <result column="home_id" jdbcType="BIGINT" property="homeId"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="confirm" jdbcType="BOOLEAN" property="confirm"/>
+        <result column="create_by" jdbcType="BIGINT" property="createBy"/>
+        <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id,
+        deleted,
+        number,
+        home_id,
+        user_id,
+        confirm,
+        create_by,
+        update_by,
+        create_time,
+        update_time
+    </sql>
+
+    <sql id="Base_Column_List_With_Home_User">
+        <!--@mbg.generated-->
+        select m.id,
+        m.deleted,
+        m.number,
+        m.home_id,
+        m.user_id,
+        m.confirm,
+        m.create_by,
+        m.update_by,
+        m.create_time,
+        m.update_time,
+        h.name as homeName,
+        u.name as userName
+        from ft_message m
+        inner join ft_home h on m.home_id = h.id
+        inner join ft_user u on m.user_id = u.id
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.asugar.ftwaterdelivery.controller.response.MessageResponse">
+        <!--@mbg.generated-->
+        <include refid="Base_Column_List_With_Home_User"/>
+        where m.id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        <!--@mbg.generated-->
+        delete
+        from ft_message
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.asugar.ftwaterdelivery.entity.FtMessage"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into ft_message (number,deleted, home_id, user_id,
+                                confirm, create_by, update_by,
+                                create_time, update_time)
+        values (#{number,jdbcType=INTEGER},#{deleted,jdbcType=BOOLEAN}, #{homeId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT},
+                #{confirm,jdbcType=BOOLEAN}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+
+    <insert id="insertSelective" keyColumn="id" keyProperty="id"
+            parameterType="com.asugar.ftwaterdelivery.entity.FtMessage" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into ft_message
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="number != null">
+                number,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="homeId != null">
+                home_id,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+            <if test="confirm != null">
+                confirm,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            <if test="updateBy != null">
+                update_by,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="number != null">
+                #{number,jdbcType=INTEGER},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=BOOLEAN},
+            </if>
+            <if test="homeId != null">
+                #{homeId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="confirm != null">
+                #{confirm,jdbcType=BOOLEAN},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.asugar.ftwaterdelivery.entity.FtMessage">
+        <!--@mbg.generated-->
+        update ft_message
+        <set>
+            <if test="number != null">
+                number = #{number,jdbcType=INTEGER},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=BOOLEAN},
+            </if>
+            <if test="homeId != null">
+                home_id = #{homeId,jdbcType=BIGINT},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=BIGINT},
+            </if>
+            <if test="confirm != null">
+                confirm = #{confirm,jdbcType=BOOLEAN},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=BIGINT},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.asugar.ftwaterdelivery.entity.FtMessage">
+        <!--@mbg.generated-->
+        update ft_message
+        set deleted     = #{deleted,jdbcType=BOOLEAN},
+            number      = #{number,jdbcType=INTEGER},
+            home_id     = #{homeId,jdbcType=BIGINT},
+            user_id     = #{userId,jdbcType=BIGINT},
+            confirm     = #{confirm,jdbcType=BOOLEAN},
+            create_by   = #{createBy,jdbcType=BIGINT},
+            update_by   = #{updateBy,jdbcType=BIGINT},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <insert id="insertBatch">
+        <!--@mbg.generated-->
+        insert into ft_message (number,home_id, user_id,
+                                confirm, create_by, update_by,
+                                create_time, update_time)
+        values
+        <foreach collection="messages" item="item" index="index" separator=",">
+            (#{item.number,jdbcType=INTEGER}, #{item.homeId,jdbcType=BIGINT}, #{item.userId,jdbcType=BIGINT},
+             #{item.confirm,jdbcType=BOOLEAN}, #{item.createBy,jdbcType=BIGINT}, #{item.updateBy,jdbcType=BIGINT},
+             #{item.createTime,jdbcType=TIMESTAMP}, now())
+        </foreach>
+    </insert>
+
+    <update id="updateBatch" parameterType="java.util.List">
+        <!--@mbg.generated-->
+        update ft_message
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="number = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.number,jdbcType=INTEGER}
+                </foreach>
+            </trim>
+            <trim prefix="deleted = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.deleted,jdbcType=BOOLEAN}
+                </foreach>
+            </trim>
+            <trim prefix="home_id = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.homeId,jdbcType=BIGINT}
+                </foreach>
+            </trim>
+            <trim prefix="user_id = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.userId,jdbcType=BIGINT}
+                </foreach>
+            </trim>
+            <trim prefix="confirm = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.confirm,jdbcType=BOOLEAN}
+                </foreach>
+            </trim>
+            <trim prefix="create_by = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.createBy,jdbcType=BIGINT}
+                </foreach>
+            </trim>
+            <trim prefix="update_by = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.updateBy,jdbcType=BIGINT}
+                </foreach>
+            </trim>
+            <trim prefix="create_time = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.createTime,jdbcType=TIMESTAMP}
+                </foreach>
+            </trim>
+            <trim prefix="update_time = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.updateTime,jdbcType=TIMESTAMP}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach close=")" collection="messages" item="item" open="(" separator=", ">
+            #{item.id,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <update id="confirms">
+        <!--@mbg.generated-->
+        update ft_message
+        set confirm = 1,update_by = #{userId,jdbcType=BIGINT},update_time = now()
+        where home_id = #{homeId,jdbcType=BIGINT}
+          and confirm = 0
+    </update>
+
+    <select id="selectPage" resultType="com.asugar.ftwaterdelivery.controller.response.MessageResponse">
+        <!--@mbg.generated-->
+        <include refid="Base_Column_List_With_Home_User"/>
+        <where>
+            m.deleted = 0
+            <if test="message.homeId != null">
+                and m.home_id = #{message.homeId,jdbcType=BIGINT}
+            </if>
+            <if test="message.userId != null">
+                and m.user_id = #{message.userId,jdbcType=BIGINT}
+            </if>
+            <if test="message.confirm != null">
+                and m.confirm = #{message.confirm,jdbcType=BOOLEAN}
+            </if>
+        </where>
+        order by m.id desc
+    </select>
+</mapper>

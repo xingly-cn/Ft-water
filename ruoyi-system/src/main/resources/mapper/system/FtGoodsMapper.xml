@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asugar.ftwaterdelivery.dao.FtGoodsMapper">
+    <resultMap id="BaseResultMap" type="com.asugar.ftwaterdelivery.entity.FtGoods">
+        <!--@mbg.generated-->
+        <!--@Table ft_goods-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id,
+        title,
+        price,
+        remark,
+        avatar,
+        deleted
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_goods
+        where id = #{id}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        <!--@mbg.generated-->
+        <!--        delete-->
+        <!--        from ft_goods-->
+        <!--        where id = #{id}-->
+        update ft_goods
+        set deleted = 1
+        where id = #{id}
+    </delete>
+    <insert id="insert" parameterType="com.asugar.ftwaterdelivery.entity.FtGoods">
+        <!--@mbg.generated-->
+        insert into ft_goods (id, title, price,
+                              remark, avatar, deleted)
+        values (#{id}, #{title,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR},
+                #{avatar,jdbcType=VARCHAR}, #{deleted,jdbcType=BOOLEAN})
+    </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.asugar.ftwaterdelivery.entity.FtGoods">
+        <!--@mbg.generated-->
+        insert into ft_goods
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="title != null and title != ''">
+                title,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="remark != null and remark != ''">
+                remark,
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                #{id},
+            </if>
+            <if test="title != null and title != ''">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="price != null">
+                #{price,jdbcType=DECIMAL},
+            </if>
+            <if test="remark != null and remark != ''">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=BOOLEAN},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.asugar.ftwaterdelivery.entity.FtGoods">
+        <!--@mbg.generated-->
+        update ft_goods
+        <set>
+            <if test="title != null and title != ''">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="price != null">
+                price = #{price,jdbcType=DECIMAL},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar = #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=BOOLEAN},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.asugar.ftwaterdelivery.entity.FtGoods">
+        <!--@mbg.generated-->
+        update ft_goods
+        set title   = #{title,jdbcType=VARCHAR},
+            price   = #{price,jdbcType=DECIMAL},
+            remark  = #{remark,jdbcType=VARCHAR},
+            avatar  = #{avatar,jdbcType=VARCHAR},
+            deleted = #{deleted,jdbcType=BOOLEAN}
+        where id = #{id}
+    </update>
+
+    <select id="selectPage" resultType="com.asugar.ftwaterdelivery.controller.response.GoodsResponse">
+        select
+        <include refid="Base_Column_List"/>
+        from ft_goods
+        where deleted = 0
+        <if test="goods.title != null and goods.title != ''">
+            and title like concat('%', #{goods.title}, '%')
+        </if>
+        order by id desc
+    </select>
+</mapper>

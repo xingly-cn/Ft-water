@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asugar.ftwaterdelivery.dao.FtHomeMapper">
+    <resultMap id="BaseResultMap" type="com.asugar.ftwaterdelivery.entity.FtHome">
+        <!--@mbg.generated-->
+        <!--@Table ft_home-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="school_id" jdbcType="BIGINT" property="schoolId"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="longitude" jdbcType="DOUBLE" property="longitude"/>
+        <result column="latitude" jdbcType="DOUBLE" property="latitude"/>
+        <result column="number" jdbcType="INTEGER" property="number"/>
+        <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id,
+        school_id,
+        parent_id,
+        `name`,
+        remark,
+        longitude,
+        latitude,
+        `number`,
+        deleted
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_home
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        <!--@mbg.generated-->
+<!--        delete-->
+<!--        from ft_home-->
+<!--        where id = #{id,jdbcType=BIGINT}-->
+        update ft_home
+        set deleted = true
+        where id = #{id,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.asugar.ftwaterdelivery.entity.FtHome"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into ft_home (school_id, parent_id, `name`, remark,
+                             `number`, longitude, latitude, deleted)
+        values (#{schoolId,jdbcType=BIGINT}, #{parentId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR},
+                #{remark,jdbcType=VARCHAR},#{number,jdbcType=INTEGER},
+                #{longitude,jdbcType=DOUBLE}, #{latitude,jdbcType=DOUBLE} , #{deleted,jdbcType=BOOLEAN})
+    </insert>
+
+    <insert id="insertSelective" keyColumn="id" keyProperty="id"
+            parameterType="com.asugar.ftwaterdelivery.entity.FtHome"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into ft_home
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="schoolId != null">
+                school_id,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="name != null and name != ''">
+                `name`,
+            </if>
+            <if test="remark != null and remark != ''">
+                remark,
+            </if>
+            <if test="latitude !=null">
+                latitude,
+            </if>
+            <if test="longitude !=null">
+                longitude,
+            </if>
+
+            <if test="number != null">
+                `number`,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="schoolId != null">
+                #{schoolId,jdbcType=BIGINT},
+            </if>
+            <if test="parentId != null">
+                #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="name != null and name != ''">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark != ''">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="latitude !=null">
+                #{latitude,jdbcType=DOUBLE},
+            </if>
+            <if test="longitude !=null">
+                #{longitude,jdbcType=DOUBLE}
+            </if>
+            <if test="number != null">
+                #{number,jdbcType=INTEGER},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=BOOLEAN},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.asugar.ftwaterdelivery.entity.FtHome">
+        <!--@mbg.generated-->
+        update ft_home
+        <set>
+            <if test="schoolId != null">
+                school_id = #{schoolId,jdbcType=BIGINT},
+            </if>
+            <if test="parentId != null">
+                parent_id = #{parentId,jdbcType=BIGINT},
+            </if>
+            <if test="name != null and name != ''">
+                `name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="latitude !=null">
+                latitude = #{latitude,jdbcType=DOUBLE},
+            </if>
+            <if test="longitude !=null">
+                longitude = #{longitude,jdbcType=DOUBLE},
+            </if>
+            <if test="number != null">
+                `number` = #{number,jdbcType=INTEGER},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=BOOLEAN},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.asugar.ftwaterdelivery.entity.FtHome">
+        <!--@mbg.generated-->
+        update ft_home
+        set school_id = #{schoolId,jdbcType=BIGINT},
+            parent_id = #{parentId,jdbcType=BIGINT},
+            `name`    = #{name,jdbcType=VARCHAR},
+            remark    = #{remark,jdbcType=VARCHAR},
+            longitude = #{longitude,jdbcType=DOUBLE},
+            latitude  = #{latitude,jdbcType=DOUBLE},
+            `number`  = #{number,jdbcType=INTEGER},
+            deleted   = #{deleted,jdbcType=BOOLEAN}
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

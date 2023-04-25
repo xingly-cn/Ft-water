@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asugar.ftwaterdelivery.dao.FtUserMapper">
+    <resultMap id="BaseResultMap" type="com.asugar.ftwaterdelivery.entity.FtUser">
+        <!--@mbg.generated-->
+        <!--@Table ft_user-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="open_id" jdbcType="VARCHAR" property="openId"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="sex" jdbcType="VARCHAR" property="sex"/>
+        <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="user_type" jdbcType="INTEGER" property="userType"/>
+        <result column="water_num" jdbcType="INTEGER" property="waterNum"/>
+        <result column="dorm_type" jdbcType="BOOLEAN" property="dormType"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id,
+        open_id,
+        name,
+        phone,
+        avatar,
+        sex,
+        password,
+        deleted,
+        create_time,
+        user_type,
+        dorm_type,
+        water_num
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_user
+        where id = #{id}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        update ft_user set deleted = 1 where id = #{id}
+    </delete>
+
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.asugar.ftwaterdelivery.entity.FtUser">
+        <!--@mbg.generated-->
+        insert into ft_user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                id,
+            </if>
+            <if test="name != null and name != ''">
+                name,
+            </if>
+            <if test="openId != null and openId != ''">
+                open_id,
+            </if>
+            <if test="phone != null and phone != ''">
+                phone,
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar,
+            </if>
+            <if test="sex != null and sex != ''">
+                sex,
+            </if>
+            <if test="password != null and password != ''">
+                password,
+            </if>
+            <if test="deleted != null">
+                deleted,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="userType != null">
+                user_type,
+            </if>
+
+            <if test="waterNum != null">
+                water_num,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null and id != ''">
+                #{id},
+            </if>
+            <if test="name != null and name != ''">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="openId != null and openId != ''">
+                #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null and sex != ''">
+                #{sex,jdbcType=VARCHAR}
+            </if>
+            <if test="password != null and password != ''">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                #{deleted,jdbcType=BOOLEAN},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userType != null">
+                #{userType,jdbcType=INTEGER},
+            </if>
+
+            <if test="waterNum != null">
+                #{waterNum,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.asugar.ftwaterdelivery.entity.FtUser">
+        <!--@mbg.generated-->
+        update ft_user
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="openId != null and openId != ''">
+                open_id = #{openId,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar = #{avatar,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null and sex != ''">
+                sex = #{sex,jdbcType=VARCHAR}
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted,jdbcType=BOOLEAN},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userType != null">
+                user_type = #{userType,jdbcType=INTEGER},
+            </if>
+            <if test="waterNum != null">
+                water_num = #{waterNum,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.asugar.ftwaterdelivery.entity.FtUser">
+        <!--@mbg.generated-->
+        update ft_user
+        set open_id     = #{openId,jdbcType=VARCHAR},
+            phone      = #{phone,jdbcType=VARCHAR},
+            avatar=#{avatar,jdbcType=VARCHAR},
+            sex=#{sex,jdbcType=VARCHAR},
+            password   = #{password,jdbcType=VARCHAR},
+            deleted    = #{deleted,jdbcType=BOOLEAN},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            user_type   = #{userType,jdbcType=INTEGER},
+            water_num   = #{waterNum,jdbcType=INTEGER},
+            name       = #{name,jdbcType=VARCHAR}
+        where id = #{id}
+    </update>
+
+    <update id="updateOpenIdByPhone">
+        update ft_user set open_id = #{openId} where phone = #{phone}
+    </update>
+
+    <update id="updatePasswordByPhone">
+        update ft_user set password = #{password} where phone = #{phone}
+    </update>
+
+    <update id="updateAddressByPhone">
+        update ft_user set address = #{address} where phone = #{phone}
+    </update>
+
+    <select id="getUserByHomeId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ft_user
+        where home_id = #{homeId} and deleted = 0 and find_in_set(#{type},user_type)
+    </select>
+
+    <select id="getUserByUserId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ft_user
+        where id = #{userId} and deleted = 0 and find_in_set(#{type},user_type)
+    </select>
+
+    <update id="updateUserHomeId">
+        update ft_user set user_type=concat(user_type,',1'),home_id=#{homeId} where id = #{userId}
+    </update>
+
+    <select id="getUsersFindByType" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ft_user
+        where deleted = 0 and home_id is not null and find_in_set(#{type},user_type)
+    </select>
+
+    <select id="selectPage" resultType="com.asugar.ftwaterdelivery.controller.response.UserResponse">
+        <!-- 后面多表查询 -->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_user
+        where deleted = 0
+        <if test="user.name != null and user.name != ''">
+            and name like concat('%',#{user.name},'%')
+        </if>
+        <if test="user.phone != null and user.phone != ''">
+            and phone like concat('%',#{user.phone},'%')
+        </if>
+        <if test="user.type != null and user.type != ''">
+            and find_in_set(#{user.type},user_type)
+        </if>
+        order by id desc
+    </select>
+</mapper>
