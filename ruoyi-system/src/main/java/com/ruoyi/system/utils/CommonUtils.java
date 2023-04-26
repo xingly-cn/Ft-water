@@ -3,7 +3,7 @@ package com.ruoyi.system.utils;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectRequest;
-import com.ruoyi.web.config.ApplicationContextProvider;
+import com.ruoyi.system.config.ApplicationContextProvider;
 import com.ruoyi.system.service.impl.ConfigServiceImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

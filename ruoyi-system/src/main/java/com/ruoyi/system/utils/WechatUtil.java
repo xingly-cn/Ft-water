@@ -2,8 +2,8 @@ package com.ruoyi.system.utils;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.ruoyi.web.config.ApplicationContextProvider;
-import com.ruoyi.web.exception.ServiceException;
+import com.ruoyi.system.config.ApplicationContextProvider;
+import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.service.impl.ConfigServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;

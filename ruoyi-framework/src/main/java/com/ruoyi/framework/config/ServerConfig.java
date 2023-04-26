@@ -1,8 +1,9 @@
 package com.ruoyi.framework.config;
 
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import com.ruoyi.common.utils.ServletUtils;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 服务相关配置
@@ -26,7 +27,7 @@ public class ServerConfig
     public static String getDomain(HttpServletRequest request)
     {
         StringBuffer url = request.getRequestURL();
-        String contextPath = request.getServletContext().getContextPath();
+        String contextPath = request.getContextPath();
         return url.delete(url.length() - request.getRequestURI().length(), url.length()).append(contextPath).toString();
     }
 }

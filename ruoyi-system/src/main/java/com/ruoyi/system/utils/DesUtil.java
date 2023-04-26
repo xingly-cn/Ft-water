@@ -1,6 +1,6 @@
 package com.ruoyi.system.utils;
 
-import com.ruoyi.web.config.ApplicationContextProvider;
+import com.ruoyi.system.config.ApplicationContextProvider;
 import com.ruoyi.system.service.impl.ConfigServiceImpl;
 
 import javax.crypto.Cipher;

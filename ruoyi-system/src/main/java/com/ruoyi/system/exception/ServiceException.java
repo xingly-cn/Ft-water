@@ -1,4 +1,4 @@
-package com.ruoyi.web.exception;
+package com.ruoyi.system.exception;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

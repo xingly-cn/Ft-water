@@ -1,4 +1,4 @@
-package com.ruoyi.web.config;
+package com.ruoyi.system.config;
 
 
 import org.springframework.beans.BeansException;

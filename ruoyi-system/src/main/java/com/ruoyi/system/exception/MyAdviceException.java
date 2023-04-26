@@ -1,4 +1,4 @@
-package com.ruoyi.web.exception;
+package com.ruoyi.system.exception;
 
 
 import com.ruoyi.system.utils.Result;

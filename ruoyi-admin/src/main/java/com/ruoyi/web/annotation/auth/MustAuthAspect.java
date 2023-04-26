@@ -1,7 +1,7 @@
 package com.ruoyi.web.annotation.auth;
 
 
-import com.ruoyi.web.exception.ServiceException;
+import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.utils.JwtUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;

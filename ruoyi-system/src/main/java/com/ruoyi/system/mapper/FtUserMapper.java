@@ -4,9 +4,10 @@ package com.ruoyi.system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.web.controller.request.UserRequest;
-import com.ruoyi.web.controller.response.UserResponse;
+
 import com.ruoyi.system.entity.FtUser;
+import com.ruoyi.system.request.UserRequest;
+import com.ruoyi.system.response.UserResponse;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
