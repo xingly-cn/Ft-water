@@ -44,6 +44,10 @@
                     <artifactId>javax.servlet-api</artifactId>
                     <groupId>javax.servlet</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 

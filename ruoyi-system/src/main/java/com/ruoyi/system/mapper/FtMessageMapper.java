@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.entity.FtMessage;
 import com.ruoyi.system.request.MessageRequest;
 import com.ruoyi.system.response.MessageResponse;
-import io.lettuce.core.dynamic.annotation.Param;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 

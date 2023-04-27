@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.entity.FtGoods;
 import com.ruoyi.system.request.GoodRequest;
 import com.ruoyi.system.response.GoodsResponse;
-import io.lettuce.core.dynamic.annotation.Param;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 /**

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.asugar.ftwaterdelivery.dao.FtSchoolMapper">
-    <resultMap id="BaseResultMap" type="com.asugar.ftwaterdelivery.entity.FtSchool">
+<mapper namespace="com.ruoyi.system.mapper.FtSchoolMapper">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.entity.FtSchool">
         <!--@mbg.generated-->
         <!--@Table ft_school-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -34,7 +34,7 @@
         set deleted = 1
         where id = #{id}
     </delete>
-    <insert id="insert" parameterType="com.asugar.ftwaterdelivery.entity.FtSchool">
+    <insert id="insert" parameterType="com.ruoyi.system.entity.FtSchool">
         <!--@mbg.generated-->
         insert into ft_school (id, deleted, school_name,
                                longitude, latitude, remark)
@@ -42,7 +42,7 @@
                 #{longitude,jdbcType=DOUBLE}, #{latitude,jdbcType=DOUBLE}, #{remark,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
-            parameterType="com.asugar.ftwaterdelivery.entity.FtSchool">
+            parameterType="com.ruoyi.system.entity.FtSchool">
         <!--@mbg.generated-->
         insert into ft_school
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -86,7 +86,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.asugar.ftwaterdelivery.entity.FtSchool">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.entity.FtSchool">
         <!--@mbg.generated-->
         update ft_school
         <set>
@@ -109,7 +109,7 @@
         where id = #{id}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="com.asugar.ftwaterdelivery.entity.FtSchool">
+    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.entity.FtSchool">
         <!--@mbg.generated-->
         update ft_school
         set deleted     = #{deleted,jdbcType=BOOLEAN},
@@ -120,7 +120,7 @@
         where id = #{id}
     </update>
 
-    <select id="countIndex" resultType="com.asugar.ftwaterdelivery.controller.response.IndexCountResponse">
+    <select id="countIndex" resultType="com.ruoyi.system.response.IndexCountResponse">
         SELECT fc.school_name schoolName,
                fc.id          schoolId,
                any_value(DATE_FORMAT(fo.create_time, '%Y-%m-%d')) time,
@@ -149,7 +149,7 @@
             '%Y-%M-%d')
     </select>
 
-    <select id="selectPage" resultType="com.asugar.ftwaterdelivery.controller.response.SchoolResponse">
+    <select id="selectPage" resultType="com.ruoyi.system.response.SchoolResponse">
         <!--  学校  -->
         select
         <include refid="Base_Column_List"/>

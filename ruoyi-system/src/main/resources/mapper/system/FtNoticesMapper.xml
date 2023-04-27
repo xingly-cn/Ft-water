@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.asugar.ftwaterdelivery.dao.FtNoticesMapper">
-    <resultMap id="BaseResultMap" type="com.asugar.ftwaterdelivery.entity.FtNotices">
+<mapper namespace="com.ruoyi.system.mapper.FtNoticesMapper">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.entity.FtNotices">
         <!--@mbg.generated-->
         <!--@Table ft_notices-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -57,7 +57,7 @@
         inner join ft_user u on n.user_id = u.id
     </sql>
 
-    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.asugar.ftwaterdelivery.controller.response.NoticesResponse">
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.ruoyi.system.response.NoticesResponse">
         <!--@mbg.generated-->
         <include refid="Base_Column_List_With_School_Home_User"/>
         where n.id = #{id,jdbcType=BIGINT}
@@ -68,7 +68,7 @@
         from ft_notices
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.asugar.ftwaterdelivery.entity.FtNotices"
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.entity.FtNotices"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into ft_notices (`type`, school_id, home_id,
@@ -81,7 +81,7 @@
                 #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" keyColumn="id" keyProperty="id"
-            parameterType="com.asugar.ftwaterdelivery.entity.FtNotices" useGeneratedKeys="true">
+            parameterType="com.ruoyi.system.entity.FtNotices" useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into ft_notices
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -155,7 +155,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.asugar.ftwaterdelivery.entity.FtNotices">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.entity.FtNotices">
         <!--@mbg.generated-->
         update ft_notices
         <set>
@@ -196,7 +196,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="com.asugar.ftwaterdelivery.entity.FtNotices">
+    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.entity.FtNotices">
         <!--@mbg.generated-->
         update ft_notices
         set `type`      = #{type,jdbcType=TINYINT},
@@ -213,7 +213,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="selectPage" resultType="com.asugar.ftwaterdelivery.controller.response.NoticesResponse">
+    <select id="selectPage" resultType="com.ruoyi.system.response.NoticesResponse">
         <!--  school home user  -->
         <include refid="Base_Column_List_With_School_Home_User"/>
         where n.deleted = 0

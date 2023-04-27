@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.asugar.ftwaterdelivery.dao.ConfigMapper">
+<mapper namespace="com.ruoyi.system.mapper.ConfigMapper">
     <resultMap id="BaseResultMap" type="com.ruoyi.system.entity.Config">
         <!--@mbg.generated-->
         <!--@Table config-->
@@ -30,14 +30,14 @@
         where id = #{id}
     </delete>
 
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.asugar.ftwaterdelivery.entity.Config"
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.entity.Config"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into config (config_key, config_value, remark)
         values (#{configKey,jdbcType=VARCHAR}, #{configValue,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
     </insert>
 
-    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.asugar.ftwaterdelivery.entity.Config"
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.entity.Config"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into config
@@ -64,7 +64,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.asugar.ftwaterdelivery.entity.Config">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.entity.Config">
         <!--@mbg.generated-->
         update config
         <set>
@@ -81,7 +81,7 @@
         where id = #{id}
     </update>
     
-    <update id="updateByPrimaryKey" parameterType="com.asugar.ftwaterdelivery.entity.Config">
+    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.entity.Config">
         <!--@mbg.generated-->
         update config
         set config_key   = #{configKey,jdbcType=VARCHAR},

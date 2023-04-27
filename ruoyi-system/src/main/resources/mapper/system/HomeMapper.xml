@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.asugar.ftwaterdelivery.dao.FtHomeMapper">
-    <resultMap id="BaseResultMap" type="com.asugar.ftwaterdelivery.entity.FtHome">
+<mapper namespace="com.ruoyi.system.mapper.FtHomeMapper">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.entity.FtHome">
         <!--@mbg.generated-->
         <!--@Table ft_home-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -46,7 +46,7 @@
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.asugar.ftwaterdelivery.entity.FtHome"
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.entity.FtHome"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into ft_home (school_id, parent_id, `name`, remark,
@@ -57,7 +57,7 @@
     </insert>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id"
-            parameterType="com.asugar.ftwaterdelivery.entity.FtHome"
+            parameterType="com.ruoyi.system.entity.FtHome"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into ft_home
@@ -116,7 +116,7 @@
         </trim>
     </insert>
 
-    <update id="updateByPrimaryKeySelective" parameterType="com.asugar.ftwaterdelivery.entity.FtHome">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.entity.FtHome">
         <!--@mbg.generated-->
         update ft_home
         <set>
@@ -148,7 +148,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="com.asugar.ftwaterdelivery.entity.FtHome">
+    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.entity.FtHome">
         <!--@mbg.generated-->
         update ft_home
         set school_id = #{schoolId,jdbcType=BIGINT},
