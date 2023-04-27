@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.system.entity.FtOrder;
 import com.ruoyi.system.entity.FtUser;
+import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.mapper.FtUserMapper;
 import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.UserRequest;
@@ -27,9 +29,11 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,6 +47,9 @@ public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, User
 
     @Resource
     private FtUserMapper ftUserMapper;
+
+    @Resource
+    private FtOrderMapper ftOrderMapper;
 
     @Override
     @CacheEvict(value = "user", key = "#id")
@@ -185,6 +192,35 @@ public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, User
     public FtUser getUserInfo(HttpServletRequest rq) {
         String userId = getCurrentUser().get("userId");
         return ftUserMapper.selectOne(new QueryWrapper<FtUser>().eq("open_id", userId));
+    }
+
+    @Override
+    public List<FtUser> getUserBySearch(String str) {
+
+        if (str.indexOf(0) >= 'a' && str.indexOf(0) <= 'z') {
+            return baseMapper.selectList(new QueryWrapper<FtUser>().eq("smallName", str));
+        }
+
+        List<FtUser> result = new LinkedList<>();
+        result.add(ftUserMapper.selectOne(new QueryWrapper<FtUser>().eq("id", str)));
+
+        return result;
+    }
+
+    @Override
+    public Object checkCoupon(HttpServletRequest rq) {
+        String userId = getCurrentUser().get("userId");
+        List<FtOrder> ftOrders = ftOrderMapper.selectList(new QueryWrapper<FtOrder>().eq("uid", userId));
+        int totalNum = 0;
+        for (FtOrder ftOrder : ftOrders) {
+            totalNum += ftOrder.getNum();
+        }
+        FtUser ftUser = ftUserMapper.selectById(userId);
+        Integer waterNum = ftUser.getWaterNum();
+        ConcurrentHashMap<String, Integer> result = new ConcurrentHashMap<String, Integer>();
+        result.put("usedNum", totalNum - waterNum);
+        result.put("unUsedNum", waterNum);
+        return result;
     }
 
     @Override

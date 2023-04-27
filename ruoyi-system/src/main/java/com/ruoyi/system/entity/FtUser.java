@@ -48,6 +48,10 @@ public class FtUser extends BaseEntry implements Serializable {
     @ApiModelProperty(value = "密码")
     private String password;
 
+
+    @ApiModelProperty(value = "名称缩写")
+    private String smallName;
+
     @ApiModelProperty(value = "宿舍类型 男0 女1")
     private Integer dormType;
 

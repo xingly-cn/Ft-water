@@ -66,6 +66,8 @@ public class FtGoodsServiceImpl extends BaseMapperImpl<FtGoods, GoodsResponse, G
         return ftGoodsMapper.selectByPrimaryKey(id);
     }
 
+
+
     @Override
     protected void customSelectPage(IPage<GoodsResponse> page, GoodRequest request) {
         ftGoodsMapper.selectPage(page, request);

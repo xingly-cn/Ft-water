@@ -18,10 +18,16 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("v1/admin/order")
 @Api(tags = "后台-订单")
-public class AdminOrderController {
+public class OrderController {
 
     @Resource
     private FtOrderService orderService;
+
+    @GetMapping("/search")
+    @ApiOperation("订单搜索")
+    public Result<?> OrderSearch (String phone) {
+        return Result.success(orderService.searchByPhone(phone));
+    }
 
     @GetMapping("/page")
     @ApiOperation("订单列表-分页")
@@ -34,6 +40,18 @@ public class AdminOrderController {
     public Result<?> getOrderDetail(@RequestParam(value = "id") Long id) {
         return Result.success(orderService.selectByPrimaryKey(id));
     }
+
+    @GetMapping("/couponNum")
+    @ApiOperation("套餐卷商品销量")
+    public Result<?> getCouponNum(String str) {
+        return Result.success(orderService.getCouponNum(str));
+    }
+
+//    @GetMapping("/goodNum")       // 缺订单表
+//    @ApiOperation("水商品销量")
+//    public Result<?> getGoodsNum(GoodRequest goodRequest) {
+//        return Result.success(goodsService.getGoodsPage(goodRequest));
+//    }
 
     @PostMapping("/insert")
     @ApiOperation("新增订单")

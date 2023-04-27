@@ -25,11 +25,11 @@ public class GoodsController {
     private FtGoodsService goodsService;
 
     @GetMapping("/page")
-    @ApiOperation("商品列表-分页")
-    public Result<?> getGoodsList(GoodRequest goodRequest)
-    {
+    @ApiOperation("商品列表-已上架")
+    public Result<?> getGoodsList(GoodRequest goodRequest) {
         return Result.success(goodsService.getGoodsPage(goodRequest));
     }
+
 
     @GetMapping("/detail")
     @ApiOperation("商品详情")
@@ -38,7 +38,7 @@ public class GoodsController {
     }
 
     @PostMapping("/insert")
-    @ApiOperation("新增商品")
+    @ApiOperation("商品上架")
     public Result<?> addGoods(@RequestBody FtGoods Goods) {
         return Result.success(goodsService.addGoods(Goods));
     }
@@ -56,7 +56,7 @@ public class GoodsController {
     }
 
     @DeleteMapping("/remove")
-    @ApiOperation("删除商品")
+    @ApiOperation("商品下架")
     public Result<?> delete(@RequestParam Long id) {
         return Result.success(goodsService.deleteByPrimaryKey(id));
     }

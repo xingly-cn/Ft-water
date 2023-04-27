@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @Desc 用户
@@ -20,7 +21,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("v1/admin/user")
 @Api(tags = "后台-用户")
-public class AdminUserController {
+public class UserController {
 
     @Resource
     private FtUserService userService;
@@ -29,6 +30,18 @@ public class AdminUserController {
     @ApiOperation("用户列表-分页")
     public Result<?> getUserList(UserRequest userRequest) {
         return Result.success(userService.getUserPage(userRequest));
+    }
+
+    @GetMapping("/search")
+    @ApiOperation("用户搜索-缩写")
+    public Result<?> getUserBySearch(String str) {
+        return Result.success(userService.getUserBySearch(str));
+    }
+
+    @GetMapping("/coupon")
+    @ApiOperation("券包")
+    public Result<?> getUserDetail(HttpServletRequest request) {
+        return Result.success(userService.checkCoupon(request));
     }
 
     @GetMapping("/detail")

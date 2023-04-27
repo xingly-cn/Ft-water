@@ -49,4 +49,8 @@ public interface FtUserService{
     String changeUserPhone(UserRequest request);
 
     FtUser getUserInfo(HttpServletRequest rq);
+
+    List<FtUser> getUserBySearch(String str);
+
+    Object checkCoupon(HttpServletRequest request);
 }

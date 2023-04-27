@@ -28,4 +28,7 @@ public interface FtNoticesService {
     int updateByPrimaryKey(FtNotices record);
 
     Map<String, Object> getNoticesPage(NoticesRequest request);
+
+
+    Map<String, Object> getNoticesByInput(long cur, long size);
 }

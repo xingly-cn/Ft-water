@@ -46,7 +46,7 @@ public class FtSchool extends BaseEntry implements Serializable {
     /**
      * 备用字段
      */
-    @ApiModelProperty(value = "备用字段")
+    @ApiModelProperty(value = "名称缩写")
     private String remark;
 
 }

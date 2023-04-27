@@ -20,20 +20,26 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("v1/admin/notices")
-@Api(tags = "通知")
+@Api(tags = "库存变化表")
 public class NoticesController {
 
     @Autowired
     private FtNoticesService noticesService;
 
     @GetMapping("/page")
-    @ApiOperation("通知列表-分页")
+    @ApiOperation("库存记录列表-分页")
     public Result<?> getNoticesList(NoticesRequest request) {
         return Result.success(noticesService.getNoticesPage(request));
     }
 
+    @GetMapping("/input")
+    @ApiOperation("入库查询")
+    public Result<?> getNoticesByInput(long cur, long size) {
+        return Result.success(noticesService.getNoticesByInput(cur, size));
+    }
+
     @GetMapping("/detail")
-    @ApiOperation("通知详情")
+    @ApiOperation("库存详情")
     public Result<?> getNoticesDetail(@RequestParam(value = "id") Long id) {
         return Result.success(noticesService.selectByPrimaryKey(id));
     }

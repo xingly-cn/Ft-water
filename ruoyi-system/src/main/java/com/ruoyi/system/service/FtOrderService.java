@@ -29,4 +29,8 @@ public interface FtOrderService {
     List<OrderResponse> selectOrderList(OrderRequest order);
 
     Boolean payOrder(Long id);
+
+    List<FtOrder> searchByPhone(String phone);
+
+    List<FtOrder> getCouponNum(String str);
 }

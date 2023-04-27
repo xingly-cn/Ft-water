@@ -25,4 +25,6 @@ public interface FtGoodsService{
     List<FtGoods> selectGoodsList(FtGoods Goods);
 
     FtGoods selectByPrimaryKey(Long id);
+
+
 }

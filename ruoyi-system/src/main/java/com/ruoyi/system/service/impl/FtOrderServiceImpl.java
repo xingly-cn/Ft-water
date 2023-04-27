@@ -1,9 +1,14 @@
 package com.ruoyi.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.entity.FtOrder;
+import com.ruoyi.system.entity.FtSchool;
+import com.ruoyi.system.entity.FtUser;
 import com.ruoyi.system.mapper.FtOrderMapper;
+import com.ruoyi.system.mapper.FtSchoolMapper;
+import com.ruoyi.system.mapper.FtUserMapper;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;
@@ -17,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +50,12 @@ public class FtOrderServiceImpl extends BaseMapperImpl<FtOrder, OrderResponse, O
 
     @Autowired
     private FtSchoolServiceImpl schoolService;
+
+    @Autowired
+    private FtUserMapper ftUserMapper;
+
+    @Autowired
+    private FtSchoolMapper ftSchoolMapper;
 
     @Override
     @CacheEvict(value = "order", key = "#id")
@@ -96,6 +108,30 @@ public class FtOrderServiceImpl extends BaseMapperImpl<FtOrder, OrderResponse, O
         String schoolName = schoolService.selectByPrimaryKey(ftOrder.getSchoolId()).getSchoolName();
         orderWebSocket.sendMessage(userName + "在" + schoolName + "购买了" + goodsName + ftOrder.getNum() + "个");
         return updateOrder(ftOrder);
+    }
+
+    @Override
+    public List<FtOrder> searchByPhone(String phone) {
+        List<FtOrder> result = new LinkedList<>();
+        List<FtOrder> ftOrders = ftOrderMapper.selectList(new QueryWrapper<>());
+        // todo 不应该在循环里查询，后面用sql连表查
+        ftOrders.forEach(i -> {
+            Long uid = i.getUid();
+            FtUser ftUser = ftUserMapper.selectById(uid);
+            if (ftUser.getPhone().endsWith(phone)) {
+                result.add(i);
+            }
+        });
+        return result;
+    }
+
+    @Override
+    public List<FtOrder> getCouponNum(String str) {
+        if (str.indexOf(0) >= 'a' && str.indexOf(0) <= 'z') {
+            FtSchool school = ftSchoolMapper.selectOne(new QueryWrapper<FtSchool>().eq("remark", str));
+            return ftOrderMapper.selectList(new QueryWrapper<FtOrder>().eq("school_id", school.getId()));
+        }
+        return ftOrderMapper.selectList(new QueryWrapper<FtOrder>().eq("school_id", str));
     }
 
     @Override
