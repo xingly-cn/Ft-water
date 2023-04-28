@@ -28,8 +28,8 @@ import java.util.List;
  * @author ruoyi
  */
 @Configuration
-//@EnableOpenApi
-//@EnableKnife4j
+@EnableOpenApi
+@EnableKnife4j
 @EnableSwagger2
 public class SwaggerConfig {
     /**
@@ -53,7 +53,7 @@ public class SwaggerConfig {
      */
     @Bean
     public Docket createRestApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
                 // 是否启用Swagger
                 .enable(enabled)
                 // 用来创建该API的基本信息，展示在文档的页面中（自定义展示的信息）
