@@ -4,7 +4,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.ruoyi.system.config.ApplicationContextProvider;
-import com.ruoyi.system.service.impl.ConfigServiceImpl;
+import com.ruoyi.system.service.impl.SysConfigServiceImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,18 +32,18 @@ public class CommonUtils {
     private static final String MSG_TOKEN;
 
     static {
-        ConfigServiceImpl configService = ApplicationContextProvider.getBean(ConfigServiceImpl.class);
-        ENDPOINT = configService.getConfig("ENDPOINT");
-        RESULT_URL = configService.getConfig("RESULT_URL");
-        ACCESS_KEY_ID = configService.getConfig("ACCESS_KEY_ID");
-        ACCESS_KEY_SECRET = configService.getConfig("ACCESS_KEY_SECRET");
-        MSG_APPID = configService.getConfig("MSG_APPID");
-        MSG_APPSID = configService.getConfig("MSG_APPSID");
-        MSG_TOKEN = configService.getConfig("MSG_TOKEN");
+        SysConfigServiceImpl configService = ApplicationContextProvider.getBean(SysConfigServiceImpl.class);
+        ENDPOINT = configService.selectConfigByKey("ENDPOINT");
+        RESULT_URL = configService.selectConfigByKey("RESULT_URL");
+        ACCESS_KEY_ID = configService.selectConfigByKey("ACCESS_KEY_ID");
+        ACCESS_KEY_SECRET = configService.selectConfigByKey("ACCESS_KEY_SECRET");
+        MSG_APPID = configService.selectConfigByKey("MSG_APPID");
+        MSG_APPSID = configService.selectConfigByKey("MSG_APPSID");
+        MSG_TOKEN = configService.selectConfigByKey("MSG_TOKEN");
     }
 
     /**
-     * @param file   文件上传
+     * @param file 文件上传
      * @param type 类型：图片, 文件
      */
     public static String uploadFile(MultipartFile file, String type) {
@@ -61,6 +61,7 @@ public class CommonUtils {
 
     /**
      * 短信发送
+     *
      * @param phone
      * @param message
      * @return

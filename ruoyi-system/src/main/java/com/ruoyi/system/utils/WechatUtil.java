@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.system.config.ApplicationContextProvider;
 import com.ruoyi.system.exception.ServiceException;
-import com.ruoyi.system.service.impl.ConfigServiceImpl;
+import com.ruoyi.system.service.impl.SysConfigServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -27,15 +27,15 @@ public class WechatUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(WechatUtil.class);
 
-    private final static ConfigServiceImpl configService;
+    private final static SysConfigServiceImpl configService;
 
     static {
-        configService = ApplicationContextProvider.getBean(ConfigServiceImpl.class);
+        configService = ApplicationContextProvider.getBean(SysConfigServiceImpl.class);
     }
 
     public static String[] getOpenId(String code) {
-        String appId = configService.getConfig("wechat_appid");
-        String secret = configService.getConfig("wechat_secret");
+        String appId = configService.selectConfigByKey("wechat_appid");
+        String secret = configService.selectConfigByKey("wechat_secret");
         logger.info("【小程序获取openId】: code={}, appId={}, secret={}", code, appId, secret);
         String url = String.format("https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
                 appId, secret, code);
@@ -97,8 +97,8 @@ public class WechatUtil {
 
 
     private static String getAccessTokenAndRefresh() {
-        String appId = configService.getConfig("wechat_appid");
-        String secret = configService.getConfig("wechat_secret");
+        String appId = configService.selectConfigByKey("wechat_appid");
+        String secret = configService.selectConfigByKey("wechat_secret");
         String url = String.format("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
                 appId, secret);
         logger.info("【小程序】获取accessToken url:{}", url);

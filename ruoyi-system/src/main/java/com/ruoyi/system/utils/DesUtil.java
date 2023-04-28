@@ -1,7 +1,7 @@
 package com.ruoyi.system.utils;
 
 import com.ruoyi.system.config.ApplicationContextProvider;
-import com.ruoyi.system.service.impl.ConfigServiceImpl;
+import com.ruoyi.system.service.impl.SysConfigServiceImpl;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -24,8 +24,8 @@ public class DesUtil {
     private static String key;
 
     static {
-        ConfigServiceImpl configService = ApplicationContextProvider.getBean(ConfigServiceImpl.class);
-        key = configService.getConfig("DES_KEY");
+        SysConfigServiceImpl configService = ApplicationContextProvider.getBean(SysConfigServiceImpl.class);
+        key = configService.selectConfigByKey("DES_KEY");
     }
 
 
