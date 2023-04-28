@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("v1/admin/user")
 @Api(tags = "后台-用户")
-public class UserController {
+public class AdminUserController {
 
     @Resource
     private FtUserService userService;

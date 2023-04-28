@@ -2,6 +2,8 @@ package com.ruoyi.web.core.config;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +26,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 /**
  * Swagger2的接口配置
- * 
+ *
  * @author ruoyi
  */
 @Configuration
@@ -39,8 +41,8 @@ public class SwaggerConfig
     private boolean enabled;
 
     /** 设置请求的统一前缀 */
-    @Value("${swagger.pathMapping}")
-    private String pathMapping;
+//    @Value("${swagger.pathMapping}")
+//    private String pathMapping;
 
     /**
      * 创建API
@@ -56,7 +58,7 @@ public class SwaggerConfig
                 // 设置哪些接口暴露给Swagger展示
                 .select()
                 // 扫描所有有注解的api，用这种方式更灵活
-                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+                .apis(RequestHandlerSelectors.withMethodAnnotation(Api.class))
                 // 扫描指定包中的swagger注解
                 // .apis(RequestHandlerSelectors.basePackage("com.ruoyi.project.tool.swagger"))
                 // 扫描所有 .apis(RequestHandlerSelectors.any())
@@ -64,8 +66,8 @@ public class SwaggerConfig
                 .build()
                 /* 设置安全模式，swagger可以设置访问token */
                 .securitySchemes(securitySchemes())
-                .securityContexts(securityContexts())
-                .pathMapping(pathMapping);
+                .securityContexts(securityContexts());
+//                .pathMapping(pathMapping);
     }
 
     /**

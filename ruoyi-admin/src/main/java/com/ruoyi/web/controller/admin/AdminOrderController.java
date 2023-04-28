@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("v1/admin/order")
 @Api(tags = "后台-订单")
-public class OrderController {
+public class AdminOrderController {
 
     @Resource
     private FtOrderService orderService;

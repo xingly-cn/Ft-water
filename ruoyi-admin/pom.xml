@@ -24,12 +24,6 @@
             <optional>true</optional> <!-- 表示依赖不会传递 -->
         </dependency>
 
-        <!-- swagger3-->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-boot-starter</artifactId>
-        </dependency>
-
         <!-- 防止进入swagger页面报类型转换错误，排除3.0.0中的引用，手动增加1.6.2版本 -->
         <dependency>
             <groupId>io.swagger</groupId>
@@ -81,6 +75,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <version>3.0.2</version>
         </dependency>
 
     </dependencies>
