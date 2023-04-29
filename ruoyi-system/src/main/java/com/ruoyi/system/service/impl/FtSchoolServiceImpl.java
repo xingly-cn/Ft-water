@@ -1,9 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.entity.FtSchool;
 import com.ruoyi.system.mapper.FtSchoolMapper;
 import com.ruoyi.system.request.SchoolRequest;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +21,7 @@ import java.util.Map;
  * @create 2023/3/30 15:59
  */
 @Service
-public class FtSchoolServiceImpl extends BaseMapperImpl<FtSchool, SchoolResponse, SchoolRequest, FtSchoolMapper> implements FtSchoolService {
+public class FtSchoolServiceImpl implements FtSchoolService {
 
     @Resource
     private FtSchoolMapper ftSchoolMapper;
@@ -55,23 +51,14 @@ public class FtSchoolServiceImpl extends BaseMapperImpl<FtSchool, SchoolResponse
     }
 
     @Override
-    public Map<String, Object> getSchoolPage(SchoolRequest request) {
-        IPage<SchoolResponse> page = new Page<>(request.getPage(), request.getSize());
-        return selectPage(page, request);
+    public List<SchoolResponse> selectSchoolList(SchoolRequest request) {
+        return ftSchoolMapper.selectList(request);
     }
 
-    @Override
-    public List<FtSchool> selectSchoolList(FtSchool School) {
-        return ftSchoolMapper.selectList(new QueryWrapper<>(School));
-    }
-
-    @Cacheable(value = "school", key = "#ids", unless = "#result == null")
+    //以每一个返回的对象的id作为key，返回的对象作为value
+    @Cacheable(value = "school", key = "#result[ids]", unless = "#result == null")
     public List<FtSchool> selectSchoolListByIds(List<Long> ids) {
         return ftSchoolMapper.selectBatchIds(ids);
     }
 
-    @Override
-    protected void customSelectPage(IPage<SchoolResponse> page, SchoolRequest request) {
-        ftSchoolMapper.selectPage(page, request);
-    }
 }

@@ -128,7 +128,7 @@ public class FtOrderServiceImpl extends BaseMapperImpl<FtOrder, OrderResponse, O
     @Override
     public List<FtOrder> getCouponNum(String str) {
         if (str.indexOf(0) >= 'a' && str.indexOf(0) <= 'z') {
-            FtSchool school = ftSchoolMapper.selectOne(new QueryWrapper<FtSchool>().eq("remark", str));
+            FtSchool school = ftSchoolMapper.getSchoolByRemark(str);
             return ftOrderMapper.selectList(new QueryWrapper<FtOrder>().eq("school_id", school.getId()));
         }
         return ftOrderMapper.selectList(new QueryWrapper<FtOrder>().eq("school_id", str));

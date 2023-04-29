@@ -1,9 +1,6 @@
 package com.ruoyi.system.mapper;
 
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.entity.FtSchool;
 import com.ruoyi.system.request.SchoolRequest;
 import com.ruoyi.system.response.IndexCountResponse;
@@ -14,12 +11,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
-* Created by IntelliJ IDEA.
-* @Author : 镜像
-* @create 2023/3/30 15:59
-*/
+ * Created by IntelliJ IDEA.
+ *
+ * @Author : 镜像
+ * @create 2023/3/30 15:59
+ */
 @Repository
-public interface FtSchoolMapper extends BaseMapper<FtSchool> {
+public interface FtSchoolMapper {
 
     int deleteByPrimaryKey(Long id);
 
@@ -31,9 +29,12 @@ public interface FtSchoolMapper extends BaseMapper<FtSchool> {
 
     int updateByPrimaryKey(FtSchool record);
 
-    List<IndexCountResponse> countIndex(@Param("time")String time,
-                                        @Param("schoolIds")List<Long> schoolIds);
+    List<IndexCountResponse> countIndex(@Param("time") String time,
+                                        @Param("schoolIds") List<Long> schoolIds);
 
-    Page<SchoolResponse> selectPage(@Param("page") IPage<SchoolResponse> page,
-                                    @Param("school") SchoolRequest request);
+    List<SchoolResponse> selectList(@Param("school") SchoolRequest request);
+
+    List<FtSchool> selectBatchIds(@Param("ids") List<Long> ids);
+
+    FtSchool getSchoolByRemark(@Param("remark") String remark);
 }

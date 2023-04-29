@@ -149,14 +149,35 @@
             '%Y-%M-%d')
     </select>
 
-    <select id="selectPage" resultType="com.ruoyi.system.response.SchoolResponse">
+    <select id="selectList" resultType="com.ruoyi.system.response.SchoolResponse">
         <!--  学校  -->
         select
         <include refid="Base_Column_List"/>
         from ft_school
-        where deleted = 0 and
+        where deleted = 0
         <if test="school.schoolName != null and school.schoolName != ''">
-            school_name like concat('%',#{school.schoolName},'%')
+            and school_name like concat('%',#{school.schoolName},'%')
         </if>
+    </select>
+
+    <select id="selectBatchIds" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_school
+        where deleted = 0
+          and id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getSchoolByRemark" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_school
+        where deleted = 0
+          and remark = #{remark}
     </select>
 </mapper>

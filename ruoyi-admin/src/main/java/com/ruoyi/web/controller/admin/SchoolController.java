@@ -1,8 +1,12 @@
 package com.ruoyi.web.controller.admin;
 
 
+import com.ruoyi.common.core.controller.BaseController;
+import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.request.SchoolRequest;
 import com.ruoyi.system.entity.FtSchool;
+import com.ruoyi.system.response.SchoolResponse;
 import com.ruoyi.system.service.FtSchoolService;
 import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
@@ -10,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Desc 学校
@@ -19,16 +24,20 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("v1/admin/school")
 @Api(tags = "后台-学校")
-public class SchoolController {
+public class SchoolController extends BaseController {
 
     @Resource
     private FtSchoolService schoolService;
 
     @GetMapping("/page")
     @ApiOperation("学校列表-分页")
-    public Result<?> getSchoolList(SchoolRequest request) {
-        return Result.success(schoolService.getSchoolPage(request));
+    public TableDataInfo getSchoolList(SchoolRequest request)
+    {
+        startPage();
+        List<SchoolResponse> list = schoolService.selectSchoolList(request);
+        return getDataTable(list);
     }
+
 
     @GetMapping("/detail")
     @ApiOperation("学校详情")
@@ -50,8 +59,8 @@ public class SchoolController {
 
     @GetMapping("/list")
     @ApiOperation("学校列表")
-    public Result<?> selectSchoolList(FtSchool School) {
-        return Result.success(schoolService.selectSchoolList(School));
+    public Result<?> selectSchoolList(SchoolRequest request) {
+        return Result.success(schoolService.selectSchoolList(request));
     }
 
     @DeleteMapping("/remove")

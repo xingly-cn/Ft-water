@@ -3,6 +3,7 @@ package com.ruoyi.system.service;
 
 import com.ruoyi.system.entity.FtSchool;
 import com.ruoyi.system.request.SchoolRequest;
+import com.ruoyi.system.response.SchoolResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,5 @@ public interface FtSchoolService{
 
     Boolean updateSchool(FtSchool record);
 
-    Map<String, Object> getSchoolPage(SchoolRequest request);
-
-    List<FtSchool> selectSchoolList(FtSchool School);
-
+    List<SchoolResponse> selectSchoolList(SchoolRequest request);
 }
