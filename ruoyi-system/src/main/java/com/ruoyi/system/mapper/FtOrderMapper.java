@@ -1,10 +1,5 @@
 package com.ruoyi.system.mapper;
 
-
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.entity.FtOrder;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
@@ -20,7 +15,7 @@ import java.util.List;
  * @create 2023/3/30 15:59
  */
 @Repository
-public interface FtOrderMapper extends BaseMapper<FtOrder> {
+public interface FtOrderMapper {
 
     int deleteByPrimaryKey(Long id);
 
@@ -31,9 +26,6 @@ public interface FtOrderMapper extends BaseMapper<FtOrder> {
     int updateByPrimaryKeySelective(FtOrder record);
 
     int updateByPrimaryKey(FtOrder record);
-
-    Page<OrderResponse> selectPage(@Param("page") IPage<OrderResponse> page,
-                                   @Param("order") OrderRequest request);
 
     List<OrderResponse> selectList(@Param("order") OrderRequest order);
 }

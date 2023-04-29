@@ -214,7 +214,7 @@
         where deleted = 0 and home_id is not null and find_in_set(#{type},user_type)
     </select>
 
-    <select id="selectPage" resultType="com.ruoyi.system.response.UserResponse">
+    <select id="selectList" resultType="com.ruoyi.system.response.UserResponse">
         <!-- 后面多表查询 -->
         select
         <include refid="Base_Column_List"/>
@@ -226,9 +226,46 @@
         <if test="user.phone != null and user.phone != ''">
             and phone like concat('%',#{user.phone},'%')
         </if>
-        <if test="user.type != null and user.type != ''">
-            and find_in_set(#{user.type},user_type)
+        <if test="user.userType != null and user.userType != ''">
+            and find_in_set(#{user.userType},user_type)
         </if>
         order by id desc
+    </select>
+
+    <select id="getUserList" resultType="com.ruoyi.system.response.UserResponse">
+        <!-- 后面多表查询 -->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_user
+        where deleted = 0
+        <if test="user.name != null and user.name != ''">
+            and name like concat('%',#{user.name},'%')
+        </if>
+        <if test="user.phone != null and user.phone != ''">
+            and phone like concat('%',#{user.phone},'%')
+        </if>
+        <if test="user.userType != null and user.userType != ''">
+            and find_in_set(#{user.userType},user_type)
+        </if>
+        order by id desc
+    </select>
+
+    <insert id="insert">
+        <!-- 判断字段是否为空-->
+
+    </insert>
+
+    <select id="getUserByPhone" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ft_user
+        where phone = #{phone} and deleted = 0
+    </select>
+
+    <select id="getUserByOpenId" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ft_user
+        where open_id = #{openId} and deleted = 0
     </select>
 </mapper>

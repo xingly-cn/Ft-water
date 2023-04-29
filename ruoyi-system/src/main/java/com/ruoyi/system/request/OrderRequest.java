@@ -20,12 +20,4 @@ public class OrderRequest extends FtOrder {
 
     @ApiModelProperty(value = "通用模糊查询")
     private String keyword;
-
-    @ApiModelProperty(value = "页码")
-    @TableField(exist = false)
-    private Integer page = 1;
-
-    @ApiModelProperty(value = "每页数量")
-    @TableField(exist = false)
-    private Integer size = 10;
 }

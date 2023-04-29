@@ -153,23 +153,6 @@
         where id = #{id}
     </update>
 
-    <select id="selectPage" resultType="com.ruoyi.system.response.OrderResponse">
-        <include refid="Base_Column_Goods_School_User_List"/>
-        where fo.deleted = 0
-          and fg.deleted = 0
-          and fs.deleted = 0
-          and fu.deleted = 0
-          and fo.payed is not null
-        <if test="order.keyword != null and order.keyword != ''">
-            and (
-                    fg.title like concat('%', #{order.keyword}, '%')
-                    or fs.school_name like concat('%', #{order.keyword}, '%')
-                    or fu.name like concat('%', #{order.keyword}, '%')
-                )
-        </if>
-        order by fo.id desc
-    </select>
-
     <select id="selectList" resultType="com.ruoyi.system.response.OrderResponse">
         <include refid="Base_Column_Goods_School_User_List"/>
         where fo.deleted = 0
@@ -182,7 +165,17 @@
                     fg.title like concat('%', #{order.keyword}, '%')
                     or fs.school_name like concat('%', #{order.keyword}, '%')
                     or fu.name like concat('%', #{order.keyword}, '%')
+                    or fu.phone = #{order.keyword}
                 )
+        </if>
+        <if test="order.schoolId != null">
+            and fs.id = #{order.schoolId}
+        </if>
+        <if test="order.goodId != null">
+            and fg.id = #{order.goodId}
+        </if>
+        <if test="order.uid != null">
+            and fu.id = #{order.uid}
         </if>
         order by fo.id desc
     </select>

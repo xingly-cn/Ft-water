@@ -1,11 +1,7 @@
 package com.ruoyi.system.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.entity.FtOrder;
 import com.ruoyi.system.entity.FtSchool;
-import com.ruoyi.system.entity.FtUser;
 import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.mapper.FtSchoolMapper;
 import com.ruoyi.system.mapper.FtUserMapper;
@@ -21,11 +17,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -35,7 +28,7 @@ import java.util.Map;
  */
 @Service
 @Slf4j
-public class FtOrderServiceImpl extends BaseMapperImpl<FtOrder, OrderResponse, OrderRequest, FtOrderMapper> implements FtOrderService {
+public class FtOrderServiceImpl implements FtOrderService {
 
     @Resource
     private FtOrderMapper ftOrderMapper;
@@ -84,12 +77,6 @@ public class FtOrderServiceImpl extends BaseMapperImpl<FtOrder, OrderResponse, O
     }
 
     @Override
-    public Map<String, Object> getOrderPage(OrderRequest request) {
-        IPage<OrderResponse> page = new Page<>(request.getPage(), request.getSize());
-        return selectPage(page, request);
-    }
-
-    @Override
     public List<OrderResponse> selectOrderList(OrderRequest order) {
         return ftOrderMapper.selectList(order);
     }
@@ -112,31 +99,21 @@ public class FtOrderServiceImpl extends BaseMapperImpl<FtOrder, OrderResponse, O
     }
 
     @Override
-    public List<FtOrder> searchByPhone(String phone) {
-        List<FtOrder> result = new LinkedList<>();
-        List<FtOrder> ftOrders = ftOrderMapper.selectList(new QueryWrapper<>());
-        // todo 不应该在循环里查询，后面用sql连表查
-        ftOrders.forEach(i -> {
-            Long uid = i.getUid();
-            FtUser ftUser = ftUserMapper.selectById(uid);
-            if (ftUser.getPhone().endsWith(phone)) {
-                result.add(i);
-            }
-        });
-        return result;
+    public List<OrderResponse> searchByPhone(String phone) {
+        OrderRequest orderRequest = new OrderRequest();
+        orderRequest.setKeyword(phone);
+        return ftOrderMapper.selectList(orderRequest);
     }
 
     @Override
-    public List<FtOrder> getCouponNum(String str) {
+    public List<OrderResponse> getCouponNum(String str) {
+        OrderRequest orderRequest = new OrderRequest();
         if (str.indexOf(0) >= 'a' && str.indexOf(0) <= 'z') {
             FtSchool school = ftSchoolMapper.getSchoolByRemark(str);
-            return ftOrderMapper.selectList(new QueryWrapper<FtOrder>().eq("school_id", school.getId()));
+            orderRequest.setKeyword(school.getSchoolName());
+            return ftOrderMapper.selectList(orderRequest);
         }
-        return ftOrderMapper.selectList(new QueryWrapper<FtOrder>().eq("school_id", str));
-    }
-
-    @Override
-    protected void customSelectPage(IPage<OrderResponse> page, OrderRequest request) {
-        ftOrderMapper.selectPage(page, request);
+        orderRequest.setKeyword(str);
+        return ftOrderMapper.selectList(orderRequest);
     }
 }

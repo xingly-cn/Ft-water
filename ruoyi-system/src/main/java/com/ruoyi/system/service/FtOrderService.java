@@ -1,6 +1,5 @@
 package com.ruoyi.system.service;
 
-
 import com.ruoyi.system.entity.FtOrder;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
@@ -24,13 +23,11 @@ public interface FtOrderService {
 
     Boolean updateOrder(FtOrder record);
 
-    Map<String, Object> getOrderPage(OrderRequest request);
-
     List<OrderResponse> selectOrderList(OrderRequest order);
 
     Boolean payOrder(Long id);
 
-    List<FtOrder> searchByPhone(String phone);
+    List<OrderResponse> searchByPhone(String phone);
 
-    List<FtOrder> getCouponNum(String str);
+    List<OrderResponse> getCouponNum(String str);
 }

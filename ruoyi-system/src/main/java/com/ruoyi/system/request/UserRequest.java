@@ -1,5 +1,6 @@
 package com.ruoyi.system.request;
 
+import com.ruoyi.system.entity.FtUser;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,16 +14,7 @@ import lombok.ToString;
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class UserRequest extends PageRequest {
-
-    private String name;
-
-    private String type;
-
-    private String phone;
-
-    @ApiModelProperty(value = "密码")
-    private String password;
+public class UserRequest extends FtUser {
 
     @ApiModelProperty(value = "新密码")
     private String newPassword;
@@ -30,5 +22,4 @@ public class UserRequest extends PageRequest {
     @ApiModelProperty(value = "验证码")
     private String code;
 
-    private String address;
 }

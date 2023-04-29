@@ -1,14 +1,18 @@
 package com.ruoyi.web.controller.admin;
 
+import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.entity.FtOrder;
 import com.ruoyi.system.request.OrderRequest;
+import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Desc 订单
@@ -18,21 +22,23 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("v1/admin/order")
 @Api(tags = "后台-订单")
-public class AdminOrderController {
+public class AdminOrderController extends BaseController {
 
     @Resource
     private FtOrderService orderService;
 
     @GetMapping("/search")
     @ApiOperation("订单搜索")
-    public AjaxResult OrderSearch(String phone) {
+    public AjaxResult orderSearch(String phone) {
         return AjaxResult.success(orderService.searchByPhone(phone));
     }
 
     @GetMapping("/page")
     @ApiOperation("订单列表-分页")
-    public AjaxResult getOrderList(OrderRequest request) {
-        return AjaxResult.success(orderService.getOrderPage(request));
+    public TableDataInfo getOrderList(OrderRequest request) {
+        startPage();
+        List<OrderResponse> responses = orderService.selectOrderList(request);
+        return getDataTable(responses);
     }
 
     @GetMapping("/detail")
