@@ -73,5 +73,5 @@ public class FtGoods extends BaseEntity implements Serializable {
     private Integer goodSex;
 
     @ApiModelProperty(value = "取货方式")
-    private Integer getType;
+    private Boolean getType;
 }

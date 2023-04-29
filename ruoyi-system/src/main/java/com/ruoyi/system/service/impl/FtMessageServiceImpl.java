@@ -77,6 +77,7 @@ public class FtMessageServiceImpl implements FtMessageService {
         Long userId = SecurityUtils.getUserId();
         FtUser user = userService.selectByPrimaryKey(userId);
         Long homeId = Long.parseLong(user.getHomeId());
+        //驳回 确认
         confirms(homeId, userId);
         return homeService.addNumberByHomeId(homeId, message.getNumber());
     }

@@ -17,8 +17,9 @@
         <result column="min_num" jdbcType="INTEGER" property="minNum"/>
         <result column="max_num" jdbcType="INTEGER" property="maxNum"/>
         <result column="good_sex" jdbcType="INTEGER" property="goodSex"/>
-        <result column="get_type" jdbcType="INTEGER" property="getType"/>
+        <result column="get_type" jdbcType="BOOLEAN" property="getType"/>
     </resultMap>
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
@@ -27,44 +28,35 @@
         remark,
         avatar,
         deleted,
-            typer,
-            opener,
-            run_price,
-            water_num,
-            min_num,
-            max_num,
+        typer,
+        opener,
+        run_price,
+        water_num,
+        min_num,
+        max_num,
         good_sex,
-            get_type
+        get_type
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         <!--@mbg.generated-->
-        select
-        *
+        select *
         from ft_goods
         where id = #{id}
     </select>
 
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        <!--@mbg.generated-->
-        <!--        delete-->
-        <!--        from ft_goods-->
-        <!--        where id = #{id}-->
         update ft_goods
         set deleted = 1
         where id = #{id}
     </delete>
-
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
             parameterType="com.ruoyi.system.entity.FtGoods">
         <!--@mbg.generated-->
         insert into ft_goods
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null and id != ''">
-                id,
-            </if>
             <if test="title != null and title != ''">
                 title,
             </if>
@@ -77,14 +69,32 @@
             <if test="avatar != null and avatar != ''">
                 avatar,
             </if>
-            <if test="deleted != null">
-                deleted,
+           <if test="typer != null">
+               typer,
+           </if>
+            <if test="opener != null">
+                opener,
+            </if>
+            <if test="runPrice != null">
+                run_price,
+            </if>
+            <if test="waterNum != null">
+                water_num,
+            </if>
+            <if test="minNum != null">
+                min_num,
+            </if>
+            <if test="maxNum != null">
+                max_num,
+            </if>
+            <if test="goodSex != null">
+                good_sex,
+            </if>
+            <if test="getType != null">
+                get_type,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null and id != ''">
-                #{id},
-            </if>
             <if test="title != null and title != ''">
                 #{title,jdbcType=VARCHAR},
             </if>
@@ -97,8 +107,29 @@
             <if test="avatar != null and avatar != ''">
                 #{avatar,jdbcType=VARCHAR},
             </if>
-            <if test="deleted != null">
-                #{deleted,jdbcType=BOOLEAN},
+            <if test="typer != null">
+                #{typer,jdbcType=BOOLEAN},
+            </if>
+            <if test="opener != null">
+                #{opener,jdbcType=BOOLEAN},
+            </if>
+            <if test="runPrice != null">
+                #{runPrice,jdbcType=DECIMAL},
+            </if>
+            <if test="waterNum != null">
+                #{waterNum,jdbcType=INTEGER},
+            </if>
+            <if test="minNum != null">
+                #{minNum,jdbcType=INTEGER},
+            </if>
+            <if test="maxNum != null">
+                #{maxNum,jdbcType=INTEGER},
+            </if>
+            <if test="goodSex != null">
+                #{goodSex,jdbcType=INTEGER},
+            </if>
+            <if test="getType != null">
+                #{getType,jdbcType=BOOLEAN},
             </if>
         </trim>
     </insert>
@@ -107,21 +138,22 @@
         <!--@mbg.generated-->
         update ft_goods
         <set>
-                title = #{title,jdbcType=VARCHAR},
-                remark = #{remark,jdbcType=VARCHAR},
-                avatar = #{avatar,jdbcType=VARCHAR},
-                typer = #{typer,jdbcType=BOOLEAN},
-                opener = #{opener,jdbcType=BOOLEAN},
-                run_price = #{run_price,jdbcType=DECIMAL},
-                water_num = #{water_num,jdbcType=INTEGER},
-                min_num = #{min_num,jdbcType=INTEGER},
-                max_num = #{max_num,jdbcType=INTEGER},
-                good_sex = #{good_sex,jdbcType=INTEGER},
-                get_type = #{get_type,jdbcType=INTEGER},
-                deleted = #{deleted,jdbcType=BOOLEAN},
+            title     = #{title,jdbcType=VARCHAR},
+            remark    = #{remark,jdbcType=VARCHAR},
+            avatar    = #{avatar,jdbcType=VARCHAR},
+            typer     = #{typer,jdbcType=BOOLEAN},
+            opener    = #{opener,jdbcType=BOOLEAN},
+            price     = #{price,jdbcType=DECIMAL},
+            run_price = #{runPrice,jdbcType=DECIMAL},
+            water_num = #{waterNum,jdbcType=INTEGER},
+            min_num   = #{maxNum,jdbcType=INTEGER},
+            max_num   = #{maxNum,jdbcType=INTEGER},
+            good_sex  = #{goodSex,jdbcType=INTEGER},
+            get_type  = #{getType,jdbcType=BOOLEAN},
         </set>
         where id = #{id}
     </update>
+
     <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.entity.FtGoods">
         <!--@mbg.generated-->
         update ft_goods
@@ -132,12 +164,12 @@
             deleted = #{deleted,jdbcType=BOOLEAN}
         where id = #{id}
     </update>
+
     <update id="setOpen" parameterType="java.lang.String">
         update ft_goods
         set opener = 1
         where id = #{id}
     </update>
-
 
     <update id="setUnOpen" parameterType="java.lang.String">
         update ft_goods
