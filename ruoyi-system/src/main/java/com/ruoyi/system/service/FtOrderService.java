@@ -6,7 +6,6 @@ import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +23,7 @@ public interface FtOrderService {
 
     Boolean updateOrder(FtOrder record);
 
-    Map<String, Object> getOrderPage(OrderRequest request);
+    List<OrderResponse> getOrderPage(OrderRequest request);
 
     List<OrderResponse> selectOrderList(OrderRequest order);
 

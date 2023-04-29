@@ -34,4 +34,6 @@ public interface FtOrderMapper {
                                    @Param("order") OrderRequest request);
 
     List<OrderResponse> selectList(@Param("order") OrderRequest order);
+
+    List<FtOrder> selectList2(FtOrder ftOrder);
 }

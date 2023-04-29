@@ -46,7 +46,7 @@ public class FtUserServiceImpl implements FtUserService {
     private FtUserMapper ftUserMapper;
 
     @Resource
-    private Ft  OrderMapper ftOrderMapper;
+    private  FtOrderMapper ftOrderMapper;
 
     @Override
     @CacheEvict(value = "user", key = "#id")

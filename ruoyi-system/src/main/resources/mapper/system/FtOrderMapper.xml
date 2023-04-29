@@ -186,4 +186,13 @@
         </if>
         order by fo.id desc
     </select>
+
+    <select id="selectList2" parameterType="com.ruoyi.system.entity.FtOrder" resultType="com.ruoyi.system.entity.FtOrder">
+        <include refid="Base_Column_Goods_School_User_List"/>
+        where fo.deleted = 0
+            <if test="school_id != null and school_id != ''">
+                and school_id = #{school_id}
+            </if>
+    </select>
+
 </mapper>
