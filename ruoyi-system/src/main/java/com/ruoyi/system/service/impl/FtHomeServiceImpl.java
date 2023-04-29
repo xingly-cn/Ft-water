@@ -103,13 +103,19 @@ public class FtHomeServiceImpl implements FtHomeService {
         //找该楼下面的管理员 发送消息
         List<FtUser> users = userMapper.getUserByHomeId(request.getId(), 1);
 
-        if (CollectionUtils.isEmpty(users)) {
-            throw new SecurityException("该宿舍楼下没有管理员");
-        }
+
+        // todo，等user好了，在处理，先模拟一个user
+//        if (CollectionUtils.isEmpty(users)) {
+//            throw new SecurityException("该宿舍楼下没有管理员");
+//        }
 
         //消息
         List<FtMessage> messages = Lists.newArrayList();
         for (FtUser user : users) {
+
+            // todo 模拟
+            user.setId(1L);
+
             FtMessage message = FtMessage.builder()
                     .number(request.getNumber())
                     .homeId(request.getId())
