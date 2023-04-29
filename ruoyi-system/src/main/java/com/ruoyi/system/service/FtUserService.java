@@ -26,10 +26,6 @@ public interface FtUserService{
 
     Boolean updateUser(FtUser record);
 
-    Map<String, Object> getUserPage(UserRequest userRequest);
-
-    List<FtUser> selectUserList(FtUser User);
-
     UserResponse login(LoginRequest request);
 
     UserResponse loginUser(LoginRequest request);
@@ -53,4 +49,6 @@ public interface FtUserService{
     List<FtUser> getUserBySearch(String str);
 
     Object checkCoupon(HttpServletRequest request);
+
+    List<UserResponse> getUserList(UserRequest userRequest);
 }

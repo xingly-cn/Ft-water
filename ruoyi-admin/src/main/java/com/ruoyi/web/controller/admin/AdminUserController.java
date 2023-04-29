@@ -1,10 +1,13 @@
 package com.ruoyi.web.controller.admin;
 
 
+import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.entity.FtUser;
 import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.UserRequest;
+import com.ruoyi.system.response.UserResponse;
 import com.ruoyi.system.service.FtUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @Desc 用户
@@ -21,15 +25,17 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("v1/admin/user")
 @Api(tags = "后台-用户")
-public class AdminUserController {
+public class AdminUserController extends BaseController {
 
     @Resource
     private FtUserService userService;
 
     @GetMapping("/page")
     @ApiOperation("用户列表-分页")
-    public AjaxResult getUserList(UserRequest userRequest) {
-        return AjaxResult.success(userService.getUserPage(userRequest));
+    public TableDataInfo getUserList(UserRequest userRequest) {
+        startPage();
+        List<UserResponse> userResponses = userService.getUserList(userRequest);
+        return getDataTable(userResponses);
     }
 
     @GetMapping("/search")
@@ -64,8 +70,8 @@ public class AdminUserController {
 
     @GetMapping("/list")
     @ApiOperation("用户列表")
-    public AjaxResult selectUserList(FtUser User) {
-        return AjaxResult.success(userService.selectUserList(User));
+    public AjaxResult selectUserList(UserRequest request) {
+        return AjaxResult.success(userService.getUserList(request));
     }
 
     @DeleteMapping("/remove")

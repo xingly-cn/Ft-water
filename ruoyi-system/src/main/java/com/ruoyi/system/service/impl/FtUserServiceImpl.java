@@ -6,13 +6,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.exception.ServiceException;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.entity.FtOrder;
 import com.ruoyi.system.entity.FtUser;
 import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.mapper.FtUserMapper;
 import com.ruoyi.system.request.LoginRequest;
+import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.request.WechatUserInfo;
+import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.response.UserResponse;
 import com.ruoyi.system.service.FtUserService;
 import com.ruoyi.system.utils.JwtUtils;
@@ -46,7 +49,7 @@ public class FtUserServiceImpl implements FtUserService {
     private FtUserMapper ftUserMapper;
 
     @Resource
-    private  FtOrderMapper ftOrderMapper;
+    private FtOrderMapper ftOrderMapper;
 
     @Override
     @CacheEvict(value = "user", key = "#id")
@@ -73,14 +76,8 @@ public class FtUserServiceImpl implements FtUserService {
     }
 
     @Override
-    public Map<String, Object> getUserPage(UserRequest request) {
-        IPage<UserResponse> page = new Page<>(request.getPage(), request.getSize());
-        return selectPage(page, request);
-    }
-
-    @Override
-    public List<FtUser> selectUserList(FtUser user) {
-        return ftUserMapper.selectList(user);
+    public List<UserResponse> getUserList(UserRequest userRequest) {
+        return ftUserMapper.getUserList(userRequest);
     }
 
     @Override
@@ -121,7 +118,7 @@ public class FtUserServiceImpl implements FtUserService {
         }
 
         //根据手机号和openId查询用户 唯一
-        FtUser user = ftUserMapper.seleteUserByOpenId(openId);
+        FtUser user = ftUserMapper.getUserByOpenId(openId);
 
         if (user == null) {
             //register
@@ -171,15 +168,14 @@ public class FtUserServiceImpl implements FtUserService {
     @Override
     public String changeUserPhone(UserRequest request) {
         // 由注解已经做了校验, 所以执行到这里, token一定是有效的
-        String userId = getCurrentUser().get("userId");
-        log.info(userId);
-        FtUser user = ftUserMapper.selectOne(new QueryWrapper<FtUser>()
-                .eq("open_id", userId));
+        Long userId = SecurityUtils.getUserId();
+        log.info("changeUserPhone userId:{}", userId);
+        FtUser user = ftUserMapper.selectByPrimaryKey(userId);
 
         // 从redis校验验证码是否正确，这里先写死，因为甲方还没有购买短信
         if ("666666".equals(request.getCode())) {
             user.setPhone(request.getPhone());
-            ftUserMapper.updateByPrimaryKey(user);
+            ftUserMapper.updateByPrimaryKeySelective(user);
             return "修改手机号成功";
         }
         return "验证码错误";
@@ -187,18 +183,16 @@ public class FtUserServiceImpl implements FtUserService {
 
     @Override
     public FtUser getUserInfo(HttpServletRequest rq) {
-        String userId = getCurrentUser().get("userId");
-        return ftUserMapper.selectOne(new QueryWrapper<FtUser>().eq("open_id", userId));
+        Long userId = SecurityUtils.getUserId();
+        return ftUserMapper.selectByPrimaryKey(userId);
     }
 
     @Override
     public List<FtUser> getUserBySearch(String str) {
 
-        if (str.indexOf(0) >= 'a' && str.indexOf(0) <= 'z') {
-            FtUser ftUser = new FtUser();
-            ftUser.setSmallName(str);
-            return ftUserMapper.selectList(ftUser);
-        }
+       /* if (str.indexOf(0) >= 'a' && str.indexOf(0) <= 'z') {
+            return baseMapper.selectList(new QueryWrapper<FtUser>().eq("smallName", str));
+        }*/
 
         List<FtUser> result = new LinkedList<>();
         result.add(ftUserMapper.selectByPrimaryKey(Long.valueOf(str)));
@@ -208,15 +202,16 @@ public class FtUserServiceImpl implements FtUserService {
 
     @Override
     public Object checkCoupon(HttpServletRequest rq) {
-        String userId = getCurrentUser().get("userId");
-
-
-        List<FtOrder> ftOrders = ftOrderMapper.selectList(new QueryWrapper<FtOrder>().eq("uid", userId));
+        Long userId = SecurityUtils.getUserId();
+        OrderRequest orderRequest = new OrderRequest();
+        orderRequest.setUid(userId);
+        List<OrderResponse> ftOrders = ftOrderMapper
+                .selectList(orderRequest);
         int totalNum = 0;
         for (FtOrder ftOrder : ftOrders) {
             totalNum += ftOrder.getNum();
         }
-        FtUser ftUser = ftUserMapper.selectByPrimaryKey(Long.valueOf(userId));
+        FtUser ftUser = ftUserMapper.selectByPrimaryKey(userId);
         Integer waterNum = ftUser.getWaterNum();
         ConcurrentHashMap<String, Integer> result = new ConcurrentHashMap<String, Integer>();
         result.put("usedNum", totalNum - waterNum);
@@ -227,8 +222,7 @@ public class FtUserServiceImpl implements FtUserService {
     @Override
     public FtUser checkPhone(String phone, String code) {
         //通过手机号查询用户
-        FtUser user = ftUserMapper.selectOne(new QueryWrapper<FtUser>()
-                .eq("phone", phone));
+        FtUser user = ftUserMapper.getUserByPhone(phone);
 
         if (user == null) {
             user = new FtUser();
@@ -248,8 +242,7 @@ public class FtUserServiceImpl implements FtUserService {
 
     @Override
     public Boolean updateUserInfo(WechatUserInfo userInfo) {
-        FtUser ftUser = ftUserMapper.selectOne(new QueryWrapper<FtUser>()
-                .eq("open_id", userInfo.getOpenId()));
+        FtUser ftUser = ftUserMapper.getUserByOpenId(userInfo.getOpenId());
 
         ftUser.setAvatar(userInfo.getAvatar());
         ftUser.setName(userInfo.getName());
@@ -258,7 +251,7 @@ public class FtUserServiceImpl implements FtUserService {
         ftUser.setDormType(userInfo.getDormType());
 
         ftUser.setSex(userInfo.getSex());
-        int i = ftUserMapper.updateById(ftUser);
+        int i = ftUserMapper.updateByPrimaryKeySelective(ftUser);
         return i == 1;
     }
 
@@ -302,7 +295,7 @@ public class FtUserServiceImpl implements FtUserService {
             throw new ServiceException("地址不能为空");
         }
 
-        FtUser user = ftUserMapper.selectOne(new QueryWrapper<FtUser>().eq("phone", phone));
+        FtUser user = ftUserMapper.getUserByPhone(phone);
 
         if (user == null) {
             throw new ServiceException("用户不存在");
@@ -313,7 +306,7 @@ public class FtUserServiceImpl implements FtUserService {
     }
 
     private FtUser checkLoginUser(String phone, String password) {
-        FtUser user = ftUserMapper.selectOne(new QueryWrapper<FtUser>().eq("phone", phone));
+        FtUser user = ftUserMapper.getUserByPhone(phone);
 
         if (user == null) {
             throw new ServiceException("用户不存在");
@@ -323,10 +316,5 @@ public class FtUserServiceImpl implements FtUserService {
             throw new ServiceException("密码错误");
         }
         return user;
-    }
-
-    @Override
-    protected void customSelectPage(IPage<UserResponse> page, UserRequest request) {
-        ftUserMapper.selectPage(page, request);
     }
 }

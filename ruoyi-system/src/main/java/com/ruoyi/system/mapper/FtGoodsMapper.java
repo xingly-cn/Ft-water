@@ -1,9 +1,6 @@
 package com.ruoyi.system.mapper;
 
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.entity.FtGoods;
 import com.ruoyi.system.request.GoodRequest;
 import com.ruoyi.system.response.GoodsResponse;
@@ -13,12 +10,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
-* Created by IntelliJ IDEA.
-* @Author : 镜像
-* @create 2023/3/30 15:59
-*/
+ * Created by IntelliJ IDEA.
+ *
+ * @Author : 镜像
+ * @create 2023/3/30 15:59
+ */
 @Repository
-public interface FtGoodsMapper{
+public interface FtGoodsMapper {
 
     int deleteByPrimaryKey(Long id);
 

@@ -1,8 +1,5 @@
 package com.ruoyi.system.mapper;
 
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.entity.FtOrder;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
@@ -30,10 +27,5 @@ public interface FtOrderMapper {
 
     int updateByPrimaryKey(FtOrder record);
 
-    Page<OrderResponse> selectPage(@Param("page") IPage<OrderResponse> page,
-                                   @Param("order") OrderRequest request);
-
     List<OrderResponse> selectList(@Param("order") OrderRequest order);
-
-    List<FtOrder> selectList2(FtOrder ftOrder);
 }
