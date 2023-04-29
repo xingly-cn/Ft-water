@@ -1,10 +1,8 @@
 package com.ruoyi.system.mapper;
 
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-
 import com.ruoyi.system.entity.FtUser;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.response.UserResponse;
@@ -19,7 +17,7 @@ import java.util.List;
 * @create 2023/3/30 15:59
 */
 @Repository
-public interface FtUserMapper extends BaseMapper<FtUser> {
+public interface FtUserMapper{
 
     int deleteByPrimaryKey(Long id);
 
@@ -50,4 +48,8 @@ public interface FtUserMapper extends BaseMapper<FtUser> {
 
     Page<UserResponse> selectPage(@Param("page") IPage<UserResponse> page,
                                   @Param("user") UserRequest request);
+
+    FtUser seleteUserByOpenId(String openId);
+
+    List<FtUser> selectList(FtUser user);
 }

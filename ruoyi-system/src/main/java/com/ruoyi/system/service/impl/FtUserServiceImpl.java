@@ -40,13 +40,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 @Slf4j
-public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, UserRequest, FtUserMapper> implements FtUserService {
+public class FtUserServiceImpl implements FtUserService {
 
     @Resource
     private FtUserMapper ftUserMapper;
 
     @Resource
-    private FtOrderMapper ftOrderMapper;
+    private Ft  OrderMapper ftOrderMapper;
 
     @Override
     @CacheEvict(value = "user", key = "#id")
@@ -58,7 +58,7 @@ public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, User
     @CachePut(value = "user", key = "#record.id")
     public Boolean addUser(FtUser record) {
         record.setCreateTime(new Date());
-        return ftUserMapper.insert(record) > 0;
+        return ftUserMapper.insertSelective(record) > 0;
     }
 
     @Override
@@ -79,8 +79,8 @@ public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, User
     }
 
     @Override
-    public List<FtUser> selectUserList(FtUser User) {
-        return ftUserMapper.selectList(new QueryWrapper<>(User));
+    public List<FtUser> selectUserList(FtUser user) {
+        return ftUserMapper.selectList(user);
     }
 
     @Override
@@ -121,7 +121,7 @@ public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, User
         }
 
         //根据手机号和openId查询用户 唯一
-        FtUser user = ftUserMapper.selectOne(new QueryWrapper<FtUser>().eq("open_id", openId));
+        FtUser user = ftUserMapper.seleteUserByOpenId(openId);
 
         if (user == null) {
             //register
@@ -179,7 +179,7 @@ public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, User
         // 从redis校验验证码是否正确，这里先写死，因为甲方还没有购买短信
         if ("666666".equals(request.getCode())) {
             user.setPhone(request.getPhone());
-            ftUserMapper.updateById(user);
+            ftUserMapper.updateByPrimaryKey(user);
             return "修改手机号成功";
         }
         return "验证码错误";
@@ -195,11 +195,13 @@ public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, User
     public List<FtUser> getUserBySearch(String str) {
 
         if (str.indexOf(0) >= 'a' && str.indexOf(0) <= 'z') {
-            return baseMapper.selectList(new QueryWrapper<FtUser>().eq("smallName", str));
+            FtUser ftUser = new FtUser();
+            ftUser.setSmallName(str);
+            return ftUserMapper.selectList(ftUser);
         }
 
         List<FtUser> result = new LinkedList<>();
-        result.add(ftUserMapper.selectOne(new QueryWrapper<FtUser>().eq("id", str)));
+        result.add(ftUserMapper.selectByPrimaryKey(Long.valueOf(str)));
 
         return result;
     }
@@ -207,12 +209,14 @@ public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, User
     @Override
     public Object checkCoupon(HttpServletRequest rq) {
         String userId = getCurrentUser().get("userId");
+
+
         List<FtOrder> ftOrders = ftOrderMapper.selectList(new QueryWrapper<FtOrder>().eq("uid", userId));
         int totalNum = 0;
         for (FtOrder ftOrder : ftOrders) {
             totalNum += ftOrder.getNum();
         }
-        FtUser ftUser = ftUserMapper.selectById(userId);
+        FtUser ftUser = ftUserMapper.selectByPrimaryKey(Long.valueOf(userId));
         Integer waterNum = ftUser.getWaterNum();
         ConcurrentHashMap<String, Integer> result = new ConcurrentHashMap<String, Integer>();
         result.put("usedNum", totalNum - waterNum);

@@ -31,7 +31,8 @@
         create_time,
         user_type,
         dorm_type,
-        water_num
+        water_num,
+        small_name
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -40,6 +41,13 @@
         <include refid="Base_Column_List"/>
         from ft_user
         where id = #{id}
+    </select>
+
+    <select id="seleteUserByOpenId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ft_user
+        where open_id = #{openId}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -212,6 +220,28 @@
         <include refid="Base_Column_List"/>
         from ft_user
         where deleted = 0 and home_id is not null and find_in_set(#{type},user_type)
+    </select>
+
+    <select id="selectList" resultMap="BaseResultMap" parameterType="com.ruoyi.system.entity.FtUser">
+        select
+        <include refid="Base_Column_List"/>
+        from ft_user
+        where deleted = 0
+        <if test="open_id != null and open_id != ''">
+            and open_id = #{open_id}
+        </if>
+        <if test="phone != null and phone != ''">
+            and phone = #{phone}
+        </if>
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+        <if test="user_type != null and user_type != ''">
+            and user_type = #{user_type}
+        </if>
+        <if test="dorm_type != null and dorm_type != ''">
+            and dorm_type = #{dorm_type}
+        </if>
     </select>
 
     <select id="selectPage" resultType="com.ruoyi.system.response.UserResponse">
