@@ -31,7 +31,7 @@ public class FtHome extends BaseEntity {
     private String remark;
 
     @ApiModelProperty(value = "名字")
-    private String name;
+    private String schoolName;
 
     @ApiModelProperty(value = "库存")
     private Integer number;

@@ -7,7 +7,7 @@
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="school_id" jdbcType="BIGINT" property="schoolId"/>
         <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
-        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="school_name" jdbcType="VARCHAR" property="schoolName"/>
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
         <result column="longitude" jdbcType="DOUBLE" property="longitude"/>
         <result column="latitude" jdbcType="DOUBLE" property="latitude"/>
@@ -20,7 +20,7 @@
         id,
         school_id,
         parent_id,
-        `name`,
+        school_name,
         remark,
         longitude,
         latitude,
@@ -46,16 +46,6 @@
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.entity.FtHome"
-            useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into ft_home (school_id, parent_id, `name`, remark,
-                             `number`, longitude, latitude, deleted)
-        values (#{schoolId,jdbcType=BIGINT}, #{parentId,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR},
-                #{remark,jdbcType=VARCHAR},#{number,jdbcType=INTEGER},
-                #{longitude,jdbcType=DOUBLE}, #{latitude,jdbcType=DOUBLE} , #{deleted,jdbcType=BOOLEAN})
-    </insert>
-
     <insert id="insertSelective" keyColumn="id" keyProperty="id"
             parameterType="com.ruoyi.system.entity.FtHome"
             useGeneratedKeys="true">
@@ -68,8 +58,8 @@
             <if test="parentId != null">
                 parent_id,
             </if>
-            <if test="name != null and name != ''">
-                `name`,
+            <if test="school_name != null and school_name != ''">
+                `school_name`,
             </if>
             <if test="remark != null and remark != ''">
                 remark,
@@ -95,8 +85,8 @@
             <if test="parentId != null">
                 #{parentId,jdbcType=BIGINT},
             </if>
-            <if test="name != null and name != ''">
-                #{name,jdbcType=VARCHAR},
+            <if test="school_name != null and school_name != ''">
+                #{school_name,jdbcType=VARCHAR},
             </if>
             <if test="remark != null and remark != ''">
                 #{remark,jdbcType=VARCHAR},
@@ -126,8 +116,8 @@
             <if test="parentId != null">
                 parent_id = #{parentId,jdbcType=BIGINT},
             </if>
-            <if test="name != null and name != ''">
-                `name` = #{name,jdbcType=VARCHAR},
+            <if test="school_name != null and school_name != ''">
+                `school_name` = #{school_name,jdbcType=VARCHAR},
             </if>
             <if test="remark != null and remark != ''">
                 remark = #{remark,jdbcType=VARCHAR},
@@ -153,7 +143,7 @@
         update ft_home
         set school_id = #{schoolId,jdbcType=BIGINT},
             parent_id = #{parentId,jdbcType=BIGINT},
-            `name`    = #{name,jdbcType=VARCHAR},
+            `school_name`    = #{school_name,jdbcType=VARCHAR},
             remark    = #{remark,jdbcType=VARCHAR},
             longitude = #{longitude,jdbcType=DOUBLE},
             latitude  = #{latitude,jdbcType=DOUBLE},
@@ -174,8 +164,8 @@
         <if test="parentId != null">
             and parent_id = #{parentId,jdbcType=BIGINT}
         </if>
-        <if test="name != null and name != ''">
-            and `name` like concat('%', #{name,jdbcType=VARCHAR}, '%')
+        <if test="school_name != null and school_name != ''">
+            and `school_name` like concat('%', #{school_name,jdbcType=VARCHAR}, '%')
         </if>
         <if test="remark != null and remark != ''">
             and remark like concat('%', #{remark,jdbcType=VARCHAR}, '%')

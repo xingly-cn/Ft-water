@@ -6,9 +6,6 @@ import com.ruoyi.system.mapper.FtGoodsMapper;
 import com.ruoyi.system.request.GoodRequest;
 import com.ruoyi.system.response.GoodsResponse;
 import com.ruoyi.system.service.FtGoodsService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,20 +24,16 @@ public class FtGoodsServiceImpl implements FtGoodsService {
     private FtGoodsMapper ftGoodsMapper;
 
     @Override
-    @CacheEvict(value = "goods", key = "#id")
     public Boolean deleteByPrimaryKey(Long id) {
         return ftGoodsMapper.deleteByPrimaryKey(id) > 0;
     }
 
     @Override
-    @CachePut(value = "goods", key = "#record.id")
     public Boolean addGoods(FtGoods record) {
         return ftGoodsMapper.insertSelective(record) > 0;
     }
 
-
     @Override
-    @CachePut(value = "goods", key = "#record.id")
     public Boolean updateGoods(FtGoods record) {
         return ftGoodsMapper.updateByPrimaryKeySelective(record) > 0;
     }
@@ -51,8 +44,17 @@ public class FtGoodsServiceImpl implements FtGoodsService {
     }
 
     @Override
-    @Cacheable(value = "goods", key = "#id", unless = "#result == null")
+//    @Cacheable(value = "goods", key = "#id", unless = "#result == null")
     public FtGoods selectByPrimaryKey(Long id) {
         return ftGoodsMapper.selectByPrimaryKey(id);
     }
+
+    @Override
+    public Boolean setOpener(String id, int flag) {
+        if (flag == 1) {
+            return ftGoodsMapper.setOpen(id);
+        }
+        return ftGoodsMapper.setUnOpen(id);
+    }
+
 }

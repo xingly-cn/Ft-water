@@ -6,7 +6,6 @@ import com.ruoyi.system.request.GoodRequest;
 import com.ruoyi.system.response.GoodsResponse;
 
 import java.util.List;
-import java.util.Map;
 
 /**
 * Created by IntelliJ IDEA.
@@ -24,4 +23,7 @@ public interface FtGoodsService{
     List<GoodsResponse> selectGoodsList(GoodRequest request);
 
     FtGoods selectByPrimaryKey(Long id);
+
+    Boolean setOpener(String id, int flag);
+
 }

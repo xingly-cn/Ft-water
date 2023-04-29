@@ -10,6 +10,14 @@
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
         <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
         <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
+        <result column="typer" jdbcType="BOOLEAN" property="typer"/>
+        <result column="opener" jdbcType="BOOLEAN" property="opener"/>
+        <result column="run_price" jdbcType="DECIMAL" property="runPrice"/>
+        <result column="water_num" jdbcType="INTEGER" property="waterNum"/>
+        <result column="min_num" jdbcType="INTEGER" property="minNum"/>
+        <result column="max_num" jdbcType="INTEGER" property="maxNum"/>
+        <result column="good_sex" jdbcType="INTEGER" property="goodSex"/>
+        <result column="get_type" jdbcType="INTEGER" property="getType"/>
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
@@ -18,15 +26,26 @@
         price,
         remark,
         avatar,
-        deleted
+        deleted,
+            typer,
+            opener,
+            run_price,
+            water_num,
+            min_num,
+            max_num,
+        good_sex,
+            get_type
     </sql>
+
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         <!--@mbg.generated-->
         select
-        <include refid="Base_Column_List"/>
+        *
         from ft_goods
         where id = #{id}
     </select>
+
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--@mbg.generated-->
         <!--        delete-->
@@ -36,13 +55,7 @@
         set deleted = 1
         where id = #{id}
     </delete>
-    <insert id="insert" parameterType="com.ruoyi.system.entity.FtGoods">
-        <!--@mbg.generated-->
-        insert into ft_goods (id, title, price,
-                              remark, avatar, deleted)
-        values (#{id}, #{title,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR},
-                #{avatar,jdbcType=VARCHAR}, #{deleted,jdbcType=BOOLEAN})
-    </insert>
+
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
             parameterType="com.ruoyi.system.entity.FtGoods">
@@ -89,25 +102,23 @@
             </if>
         </trim>
     </insert>
+
     <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.entity.FtGoods">
         <!--@mbg.generated-->
         update ft_goods
         <set>
-            <if test="title != null and title != ''">
                 title = #{title,jdbcType=VARCHAR},
-            </if>
-            <if test="price != null">
-                price = #{price,jdbcType=DECIMAL},
-            </if>
-            <if test="remark != null and remark != ''">
                 remark = #{remark,jdbcType=VARCHAR},
-            </if>
-            <if test="avatar != null and avatar != ''">
                 avatar = #{avatar,jdbcType=VARCHAR},
-            </if>
-            <if test="deleted != null">
+                typer = #{typer,jdbcType=BOOLEAN},
+                opener = #{opener,jdbcType=BOOLEAN},
+                run_price = #{run_price,jdbcType=DECIMAL},
+                water_num = #{water_num,jdbcType=INTEGER},
+                min_num = #{min_num,jdbcType=INTEGER},
+                max_num = #{max_num,jdbcType=INTEGER},
+                good_sex = #{good_sex,jdbcType=INTEGER},
+                get_type = #{get_type,jdbcType=INTEGER},
                 deleted = #{deleted,jdbcType=BOOLEAN},
-            </if>
         </set>
         where id = #{id}
     </update>
@@ -121,8 +132,20 @@
             deleted = #{deleted,jdbcType=BOOLEAN}
         where id = #{id}
     </update>
+    <update id="setOpen" parameterType="java.lang.String">
+        update ft_goods
+        set opener = 1
+        where id = #{id}
+    </update>
 
-    <select id="selectList" resultType="com.ruoyi.system.response.GoodsResponse">
+
+    <update id="setUnOpen" parameterType="java.lang.String">
+        update ft_goods
+        set opener = 0
+        where id = #{id}
+    </update>
+
+    <select id="selectList" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from ft_goods

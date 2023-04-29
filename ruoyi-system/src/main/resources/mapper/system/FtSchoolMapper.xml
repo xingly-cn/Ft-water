@@ -12,7 +12,6 @@
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
     </resultMap>
     <sql id="Base_Column_List">
-        <!--@mbg.generated-->
         id,
         deleted,
         school_name,
@@ -20,27 +19,23 @@
         latitude,
         remark
     </sql>
+
+
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         <!--@mbg.generated-->
         select
         <include refid="Base_Column_List"/>
         from ft_school
-        where deleted = 0
-          and id = #{id}
+        where deleted = 0 and id = #{id}
     </select>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--@mbg.generated-->
         update ft_school
         set deleted = 1
         where id = #{id}
     </delete>
-    <insert id="insert" parameterType="com.ruoyi.system.entity.FtSchool">
-        <!--@mbg.generated-->
-        insert into ft_school (id, deleted, school_name,
-                               longitude, latitude, remark)
-        values (#{id}, #{deleted,jdbcType=BOOLEAN}, #{schoolName,jdbcType=VARCHAR},
-                #{longitude,jdbcType=DOUBLE}, #{latitude,jdbcType=DOUBLE}, #{remark,jdbcType=VARCHAR})
-    </insert>
+
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
             parameterType="com.ruoyi.system.entity.FtSchool">
         <!--@mbg.generated-->
@@ -149,7 +144,7 @@
             '%Y-%M-%d')
     </select>
 
-    <select id="selectList" resultType="com.ruoyi.system.response.SchoolResponse">
+    <select id="selectList" resultMap="BaseResultMap">
         <!--  学校  -->
         select
         <include refid="Base_Column_List"/>

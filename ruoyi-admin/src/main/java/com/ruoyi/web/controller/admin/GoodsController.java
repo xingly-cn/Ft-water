@@ -38,15 +38,23 @@ public class GoodsController extends BaseController {
 
     @GetMapping("/detail")
     @ApiOperation("商品详情")
-    public AjaxResult getGoodsDetail(@RequestParam(value = "id") Long id) {
+    public AjaxResult getGoodsDetail(Long id) {
         return AjaxResult.success(goodsService.selectByPrimaryKey(id));
     }
 
     @PostMapping("/insert")
-    @ApiOperation("商品上架")
+    @ApiOperation("商品添加")
     public AjaxResult addGoods(@RequestBody FtGoods Goods) {
         return AjaxResult.success(goodsService.addGoods(Goods));
     }
+
+
+    @GetMapping("/setOpen")
+    @ApiOperation("商品上下架")
+    public AjaxResult setOpen(String id, int flag) {
+        return AjaxResult.success(goodsService.setOpener(id, flag));
+    }
+
 
     @PostMapping("/update")
     @ApiOperation("修改商品")
@@ -61,7 +69,7 @@ public class GoodsController extends BaseController {
     }
 
     @DeleteMapping("/remove")
-    @ApiOperation("商品下架")
+    @ApiOperation("商品删除")
     public AjaxResult delete(@RequestParam Long id) {
         return AjaxResult.success(goodsService.deleteByPrimaryKey(id));
     }

@@ -53,11 +53,6 @@ public class AdminOrderController extends BaseController {
         return AjaxResult.success(orderService.getCouponNum(str));
     }
 
-//    @GetMapping("/goodNum")       // 缺订单表
-//    @ApiOperation("水商品销量")
-//    public AjaxResult getGoodsNum(GoodRequest goodRequest) {
-//        return AjaxResult.success(goodsService.getGoodsPage(goodRequest));
-//    }
 
     @PostMapping("/insert")
     @ApiOperation("新增订单")

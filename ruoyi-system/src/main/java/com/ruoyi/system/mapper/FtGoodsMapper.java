@@ -29,4 +29,8 @@ public interface FtGoodsMapper {
     int updateByPrimaryKey(FtGoods record);
 
     List<GoodsResponse> selectList(@Param("goods") GoodRequest request);
+
+    Boolean setOpen(String id);
+
+    Boolean setUnOpen(String id);
 }

@@ -50,4 +50,28 @@ public class FtGoods extends BaseEntity implements Serializable {
      */
     @ApiModelProperty(value = "商品图片")
     private String avatar;
+
+    @ApiModelProperty(value = "商品类型")
+    private Boolean typer;
+
+    @ApiModelProperty(value = "上架状态")
+    private Boolean opener;
+
+    @ApiModelProperty(value = "运费")
+    private BigDecimal runPrice;
+
+    @ApiModelProperty(value = "赠送水票水量")
+    private Integer waterNum;
+
+    @ApiModelProperty(value = "最小购买")
+    private Integer minNum;
+
+    @ApiModelProperty(value = "最大购买")
+    private Integer maxNum;
+
+    @ApiModelProperty(value = "商品性别显示")
+    private Integer goodSex;
+
+    @ApiModelProperty(value = "取货方式")
+    private Integer getType;
 }
