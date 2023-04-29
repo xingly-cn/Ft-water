@@ -1,13 +1,13 @@
 package com.ruoyi.system.service.impl;
 
 
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.entity.FtHome;
 import com.ruoyi.system.entity.FtMessage;
 import com.ruoyi.system.entity.FtNotices;
-import com.ruoyi.system.entity.FtUser;
 import com.ruoyi.system.mapper.FtHomeMapper;
-import com.ruoyi.system.mapper.FtUserMapper;
+import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.request.HomeRequest;
 import com.ruoyi.system.response.HomeResponse;
 import com.ruoyi.system.service.FtHomeService;
@@ -41,7 +41,10 @@ public class FtHomeServiceImpl implements FtHomeService {
     private FtHomeMapper homeMapper;
 
     @Autowired
-    private FtUserMapper userMapper;
+    private SysUserServiceImpl userService;
+
+    @Autowired
+    private SysUserMapper userMapper;
 
     @Autowired
     private FtMessageServiceImpl messageService;
@@ -77,10 +80,10 @@ public class FtHomeServiceImpl implements FtHomeService {
         }
 
         //找到所有的用户
-        List<FtUser> users = userMapper.getUsersFindByType(1);
-        Map<String, List<FtUser>> userMap = new ConcurrentHashMap<>();
+        List<SysUser> users = userMapper.getUsersFindByRoleId(7);
+        Map<Long, List<SysUser>> userMap = new ConcurrentHashMap<>();
         if (CollectionUtils.isNotEmpty(users)) {
-            userMap = users.stream().collect(Collectors.groupingBy(FtUser::getHomeId));
+            userMap = users.stream().collect(Collectors.groupingBy(SysUser::getHomeId));
         }
 
         //先找到所有的一级菜单
@@ -101,7 +104,7 @@ public class FtHomeServiceImpl implements FtHomeService {
         //添加消息 确认之后在入库
         Long userId = SecurityUtils.getUserId();
         //找该楼下面的管理员 发送消息
-        List<FtUser> users = userMapper.getUserByHomeId(request.getId(), 1);
+        List<SysUser> users = userMapper.getUserByHomeIdAndRoleId(request.getId(), 7);
 
         if (CollectionUtils.isEmpty(users)) {
             throw new SecurityException("该宿舍楼下没有管理员");
@@ -109,7 +112,7 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         //消息
         List<FtMessage> messages = Lists.newArrayList();
-        for (FtUser user : users) {
+        for (SysUser user : users) {
             FtMessage message = FtMessage.builder()
                     .number(request.getNumber())
                     .homeId(request.getId())
@@ -163,19 +166,19 @@ public class FtHomeServiceImpl implements FtHomeService {
             throw new SecurityException("该宿舍楼不存在");
         }
         //是否存在
-        FtUser user = userMapper.selectByPrimaryKey(request.getUserId());
+        SysUser user = userService.selectUserById(request.getUserId());
         if (user == null) {
             throw new SecurityException("该用户不存在");
         }
 
         //查询该用户是否在其他宿舍楼下面是管理员
-        List<FtUser> myUsers = userMapper.getUserByUserId(request.getUserId(), 1);
+        List<SysUser> myUsers = userMapper.getUsersFindByRoleIdAndUserId(request.getUserId(), 6);
         if (CollectionUtils.isNotEmpty(myUsers)) {
             throw new SecurityException("该用户已经是其他宿舍楼管理员了");
         }
 
         //查询该宿舍楼下面的管理员 最多俩个 一个人只可以管理一个宿舍楼
-        List<FtUser> users = userMapper.getUserByHomeId(request.getId(), 1);
+        List<SysUser> users = userMapper.getUserByHomeIdAndRoleId(request.getId(), 1);
         if (users.size() >= 2) {
             throw new SecurityException("该宿舍楼下面已经有两个管理员了，不能再添加了");
         }
@@ -183,11 +186,12 @@ public class FtHomeServiceImpl implements FtHomeService {
         users.stream().filter(u -> u.getId().equals(request.getUserId())).findAny().ifPresent(u -> {
             throw new SecurityException("该用户已经是该宿舍楼管理员了");
         });
-        //添加管理员 更新用户 type 以及 楼栋id
-        return userMapper.updateUserHomeId(request.getUserId(), request.getId());
+        //添加管理员
+        user.setRoleIds(new Long[]{7L});
+        return userService.updateUser(user) > 0;
     }
 
-    private List<HomeResponse> buildTree(List<FtHome> homes, Long parentId, Map<String, List<FtUser>> userMap) {
+    private List<HomeResponse> buildTree(List<FtHome> homes, Long parentId, Map<Long, List<SysUser>> userMap) {
         List<HomeResponse> responses = Lists.newArrayList();
         for (FtHome home : homes) {
             if (home.getParentId().equals(parentId)) {
@@ -197,10 +201,10 @@ public class FtHomeServiceImpl implements FtHomeService {
         return responses;
     }
 
-    private void assembleHomeResponse(List<FtHome> homes, Map<String, List<FtUser>> userMap, List<HomeResponse> responses, FtHome home) {
+    private void assembleHomeResponse(List<FtHome> homes, Map<Long, List<SysUser>> userMap, List<HomeResponse> responses, FtHome home) {
         HomeResponse response = new HomeResponse();
         BeanUtils.copyProperties(home, response);
-        response.setUsers(userMap.get(home.getId().toString()) != null ? userMap.get(home.getId().toString()) : Lists.newArrayList());
+        response.setUsers(userMap.get(home.getId()) != null ? userMap.get(home.getId()) : Lists.newArrayList());
         response.setChildren(buildTree(homes, home.getId(), userMap));
         responses.add(response);
     }
@@ -222,7 +226,7 @@ public class FtHomeServiceImpl implements FtHomeService {
         return homeMapper.getSchoolByRemark(name);
     }
 
-    @Cacheable(value = "home",unless = "#result == null")
+    @Cacheable(value = "home", unless = "#result == null")
     public List<FtHome> getHomes() {
         return homeMapper.selectList(null);
     }

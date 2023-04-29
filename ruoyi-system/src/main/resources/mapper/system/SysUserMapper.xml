@@ -3,6 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysUserMapper">
+
     <resultMap type="com.ruoyi.common.core.domain.entity.SysUser" id="SysUserResult">
         <id property="userId" column="user_id"/>
         <result property="deptId" column="dept_id"/>
@@ -14,6 +15,11 @@
         <result property="avatar" column="avatar"/>
         <result property="password" column="password"/>
         <result property="status" column="status"/>
+        <result property="openId" column="open_id"/>
+        <result property="waterNum" column="water_num"/>
+        <result property="addressId" column="address"/>
+        <result property="dormType" column="dorm_type"/>
+        <result property="homeId" column="home_id"/>
         <result property="delFlag" column="del_flag"/>
         <result property="loginIp" column="login_ip"/>
         <result property="loginDate" column="login_date"/>
@@ -22,18 +28,7 @@
         <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
         <result property="remark" column="remark"/>
-        <association property="dept" column="dept_id" javaType="com.ruoyi.common.core.domain.entity.SysDept" resultMap="deptResult"/>
         <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>
-    </resultMap>
-
-    <resultMap id="deptResult" type="com.ruoyi.common.core.domain.entity.SysDept">
-        <id property="deptId" column="dept_id"/>
-        <result property="parentId" column="parent_id"/>
-        <result property="deptName" column="dept_name"/>
-        <result property="ancestors" column="ancestors"/>
-        <result property="orderNum" column="order_num"/>
-        <result property="leader" column="leader"/>
-        <result property="status" column="dept_status"/>
     </resultMap>
 
     <resultMap id="RoleResult" type="com.ruoyi.common.core.domain.entity.SysRole">
@@ -55,6 +50,11 @@
                u.phonenumber,
                u.password,
                u.sex,
+               u.open_id,
+               u.water_num,
+               u.address,
+               u.dorm_type,
+               u.home_id,
                u.status,
                u.del_flag,
                u.login_ip,
@@ -64,13 +64,6 @@
                u.update_by,
                u.update_time,
                u.remark,
-               d.dept_id,
-               d.parent_id,
-               d.ancestors,
-               d.dept_name,
-               d.order_num,
-               d.leader,
-               d.status as dept_status,
                r.role_id,
                r.role_name,
                r.role_key,
@@ -78,9 +71,37 @@
                r.data_scope,
                r.status as role_status
         from sys_user u
-                 left join sys_dept d on u.dept_id = d.dept_id
                  left join sys_user_role ur on u.user_id = ur.user_id
                  left join sys_role r on r.role_id = ur.role_id
+    </sql>
+
+    <sql id="selectUserRole_Home">
+        select u.user_id,
+               u.dept_id,
+               u.user_name,
+               u.nick_name,
+               u.email,
+               u.avatar,
+               u.phonenumber,
+               u.password,
+               u.sex,
+               u.open_id,
+               u.water_num,
+               u.address,
+               u.dorm_type,
+               u.home_id,
+               u.status,
+               u.del_flag,
+               u.login_ip,
+               u.login_date,
+               u.create_by,
+               u.create_time,
+               u.update_by,
+               u.update_time,
+               u.remark
+        from sys_user u
+                 left join sys_user_role ur on u.user_id = ur.user_id
+                 left join ft_home h on u.home_id = h.home_id
     </sql>
 
     <select id="selectUserList" parameterType="com.ruoyi.common.core.domain.entity.SysUser" resultMap="SysUserResult">
@@ -92,6 +113,11 @@
                u.avatar,
                u.phonenumber,
                u.sex,
+               u.open_id,
+               u.water_num,
+               u.address,
+               u.dorm_type,
+               u.home_id,
                u.status,
                u.del_flag,
                u.login_ip,
@@ -252,7 +278,24 @@
         <if test="remark != null and remark != ''">
             remark,
         </if>
-        create_time)values(
+        <if test="openId != null and openId != ''">
+            open_id,
+        </if>
+        <if test="waterNum != null">
+            water_num,
+        </if>
+        <if test="dormType != null">
+            dorm_type,
+        </if>
+        <if test="addressId != null">
+            address,
+        </if>
+        <if test="homeId != null">
+            home_id,
+        </if>
+        create_time)
+        values
+        (
         <if test="userId != null and userId != ''">
             #{userId},
         </if>
@@ -288,6 +331,21 @@
         </if>
         <if test="remark != null and remark != ''">
             #{remark},
+        </if>
+        <if test="openId != null and openId != ''">
+            #{openId},
+        </if>
+        <if test="waterNum != null">
+            #{waterNum},
+        </if>
+        <if test="dormType != null">
+            #{dormType},
+        </if>
+        <if test="addressId != null">
+            #{addressId},
+        </if>
+        <if test="homeId != null">
+            #{homeId},
         </if>
         sysdate())
     </insert>
@@ -334,6 +392,21 @@
             <if test="remark != null">
                 remark = #{remark},
             </if>
+            <if test="openId != null and openId != ''">
+                open_id = #{openId},
+            </if>
+            <if test="waterNum != null">
+                water_num = #{waterNum},
+            </if>
+            <if test="dormType != null">
+                dorm_type = #{dormType},
+            </if>
+            <if test="addressId != null">
+                address = #{addressId},
+            </if>
+            <if test="homeId != null">
+                home_id = #{homeId},
+            </if>
             update_time = sysdate()
         </set>
         where user_id = #{userId}
@@ -370,4 +443,45 @@
             #{userId}
         </foreach>
     </delete>
+
+    <update id="updatePasswordByPhone">
+        update sys_user
+        set password = #{password}
+        where phonenumber = #{phone}
+    </update>
+
+    <select id="getUserByPhone" resultMap="SysUserResult">
+        select * from sys_user where phonenumber = #{phone} and del_flag = '0'
+    </select>
+
+    <update id="updateOpenIdByPhone">
+        update sys_user set open_id = #{openId} where phone = #{phone}
+    </update>
+
+    <update id="updatePhoneById">
+        update sys_user set phone = #{phonenumber} where user_id = #{userId}
+    </update>
+
+    <select id="getUserByOpenId" resultMap="SysUserResult">
+        select * from sys_user where open_id = #{openId} and del_flag = '0'
+    </select>
+
+    <select id="getUsersFindByRoleId" resultMap="SysUserResult">
+        <include refid="selectUserVo"/>
+        where r.role_id = #{roleId}
+    </select>
+
+    <select id="getUserByHomeIdAndRoleId" resultMap="SysUserResult">
+        <include refid="selectUserVo"/>
+        where u.home_id = #{homeId}
+          and u.del_flag = '0'
+          and r.role_id = #{roleId}
+    </select>
+
+    <select id="getUsersFindByRoleIdAndUserId" resultMap="SysUserResult">
+        <include refid="selectUserVo"/>
+        where r.role_id = #{roleId}
+          and u.user_id = #{userId}
+          and u.del_flag = '0'
+    </select>
 </mapper>

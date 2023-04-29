@@ -34,7 +34,7 @@ public class FtOrderServiceImpl implements FtOrderService {
     private OrderWebSocket orderWebSocket;
 
     @Autowired
-    private FtUserServiceImpl userService;
+    private SysUserServiceImpl userService;
 
     @Autowired
     private FtGoodsServiceImpl goodsService;
@@ -82,7 +82,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         ftOrder.setPayed(true);
         //发送消息
         //什么用户购买什么商品多少吧
-        String userName = userService.selectByPrimaryKey(ftOrder.getUid()).getName();
+        String userName = userService.selectUserById(ftOrder.getUid()).getUserName();
         String goodsName = goodsService.selectByPrimaryKey(ftOrder.getGoodId()).getTitle();
         String schoolName = homeService.selectByPrimaryKey(ftOrder.getSchoolId()).getName();
         orderWebSocket.sendMessage(userName + "在" + schoolName + "购买了" + goodsName + ftOrder.getNum() + "个");

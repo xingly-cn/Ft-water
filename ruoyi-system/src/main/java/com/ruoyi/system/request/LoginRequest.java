@@ -37,8 +37,8 @@ public class LoginRequest {
     private Integer dormType;
 
     @ApiModelProperty(value = "楼栋ID")
-    private String homeId;
+    private Long homeId;
 
     @ApiModelProperty(value = "地址")
-    private String address;
+    private Long addressId;
 }

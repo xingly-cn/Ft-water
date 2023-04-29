@@ -2,6 +2,7 @@ package com.ruoyi.system.response;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.system.entity.FtHome;
 import com.ruoyi.system.entity.FtUser;
 import lombok.Data;
@@ -26,5 +27,5 @@ public class HomeResponse extends FtHome {
 
 //    private String schoolName;
 
-    private List<FtUser> users;
+    private List<SysUser> users;
 }

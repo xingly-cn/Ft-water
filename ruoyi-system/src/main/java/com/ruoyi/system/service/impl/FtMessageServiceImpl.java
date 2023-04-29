@@ -1,9 +1,9 @@
 package com.ruoyi.system.service.impl;
 
 
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.entity.FtMessage;
-import com.ruoyi.system.entity.FtUser;
 import com.ruoyi.system.mapper.FtMessageMapper;
 import com.ruoyi.system.request.MessageRequest;
 import com.ruoyi.system.response.MessageResponse;
@@ -33,7 +33,7 @@ public class FtMessageServiceImpl implements FtMessageService {
     private FtHomeService homeService;
 
     @Autowired
-    private FtUserServiceImpl userService;
+    private SysUserServiceImpl userService;
 
     @Override
     public int deleteByPrimaryKey(Long id) {
@@ -75,8 +75,8 @@ public class FtMessageServiceImpl implements FtMessageService {
         }
         //找到对应的楼 一人确认收获 一楼确认收获
         Long userId = SecurityUtils.getUserId();
-        FtUser user = userService.selectByPrimaryKey(userId);
-        Long homeId = Long.parseLong(user.getHomeId());
+        SysUser user = userService.selectUserById(userId);
+        Long homeId = user.getHomeId();
         //驳回 确认
         confirms(homeId, userId);
         return homeService.addNumberByHomeId(homeId, message.getNumber());

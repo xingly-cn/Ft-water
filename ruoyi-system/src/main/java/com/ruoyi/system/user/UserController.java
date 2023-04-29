@@ -4,7 +4,7 @@ import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.request.WechatUserInfo;
-import com.ruoyi.system.service.FtUserService;
+import com.ruoyi.system.service.ISysUserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -23,19 +23,13 @@ import javax.servlet.http.HttpServletRequest;
 public class UserController {
 
     @Resource
-    private FtUserService userService;
+    private ISysUserService userService;
 
     @PostMapping("/login")
     @ApiOperation("登陆")
     public AjaxResult login(@RequestBody LoginRequest request) {
         // 学生使用微信登陆, 所以没有密码, 直接生成token
         return AjaxResult.success(userService.loginUser(request));
-    }
-
-    @ApiOperation(value = "解密手机号-老版小程序")
-    @PostMapping(value = "/decryptPhone")
-    public AjaxResult decryptPhone(String encryptedData, String iv, String sessionKey) {
-        return AjaxResult.success(userService.decryptPhone(encryptedData, iv, sessionKey));
     }
 
     @ApiOperation(value = "获取手机号-新版小程序")

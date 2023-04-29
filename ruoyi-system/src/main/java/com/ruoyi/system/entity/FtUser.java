@@ -1,7 +1,5 @@
 package com.ruoyi.system.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ruoyi.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -79,14 +77,4 @@ public class FtUser extends BaseEntity implements Serializable {
 
     @ApiModelProperty(value = "楼栋ID")
     private String homeId;
-
-    @JsonIgnore
-    public String getPassword() {
-        return password;
-    }
-
-    @JsonProperty
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
