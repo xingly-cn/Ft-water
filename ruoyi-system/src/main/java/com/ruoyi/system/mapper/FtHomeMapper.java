@@ -3,8 +3,9 @@ package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.entity.FtHome;
 import com.ruoyi.system.request.HomeRequest;
+import com.ruoyi.system.response.IndexCountResponse;
 import org.springframework.stereotype.Repository;
-
+import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
@@ -27,4 +28,9 @@ public interface FtHomeMapper {
     int updateByPrimaryKey(FtHome record);
 
     List<FtHome> selectList(HomeRequest request);
+
+    String getSchoolByRemark(String name);
+
+    List<IndexCountResponse> countIndex(@Param("time") String time,
+                                        @Param("schoolIds") List<Long> schoolIds);
 }

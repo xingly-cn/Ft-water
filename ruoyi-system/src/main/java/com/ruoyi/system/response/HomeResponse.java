@@ -24,7 +24,7 @@ public class HomeResponse extends FtHome {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<HomeResponse> children;
 
-    private String schoolName;
+//    private String schoolName;
 
     private List<FtUser> users;
 }

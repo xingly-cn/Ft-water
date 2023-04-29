@@ -5,9 +5,8 @@
         <!--@mbg.generated-->
         <!--@Table ft_home-->
         <id column="id" jdbcType="BIGINT" property="id"/>
-        <result column="school_id" jdbcType="BIGINT" property="schoolId"/>
         <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
-        <result column="school_name" jdbcType="VARCHAR" property="schoolName"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
         <result column="longitude" jdbcType="DOUBLE" property="longitude"/>
         <result column="latitude" jdbcType="DOUBLE" property="latitude"/>
@@ -18,9 +17,8 @@
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
-        school_id,
         parent_id,
-        school_name,
+        name,
         remark,
         longitude,
         latitude,
@@ -38,9 +36,6 @@
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--@mbg.generated-->
-<!--        delete-->
-<!--        from ft_home-->
-<!--        where id = #{id,jdbcType=BIGINT}-->
         update ft_home
         set deleted = true
         where id = #{id,jdbcType=BIGINT}
@@ -52,14 +47,11 @@
         <!--@mbg.generated-->
         insert into ft_home
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="schoolId != null">
-                school_id,
-            </if>
             <if test="parentId != null">
                 parent_id,
             </if>
-            <if test="schoolName != null and schoolName != ''">
-                `school_name`,
+            <if test="name != null and name != ''">
+                `name`,
             </if>
             <if test="remark != null and remark != ''">
                 remark,
@@ -79,14 +71,11 @@
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="schoolId != null">
-                #{schoolId,jdbcType=BIGINT},
-            </if>
             <if test="parentId != null">
                 #{parentId,jdbcType=BIGINT},
             </if>
-            <if test="schoolName != null and schoolName != ''">
-                #{schoolName,jdbcType=VARCHAR},
+            <if test="name != null and name != ''">
+                #{name,jdbcType=VARCHAR},
             </if>
             <if test="remark != null and remark != ''">
                 #{remark,jdbcType=VARCHAR},
@@ -110,14 +99,11 @@
         <!--@mbg.generated-->
         update ft_home
         <set>
-            <if test="schoolId != null">
-                school_id = #{schoolId,jdbcType=BIGINT},
-            </if>
             <if test="parentId != null">
                 parent_id = #{parentId,jdbcType=BIGINT},
             </if>
-            <if test="schoolName != null and schoolName != ''">
-                `school_name` = #{schoolName,jdbcType=VARCHAR},
+            <if test="name != null and name != ''">
+                `name` = #{name,jdbcType=VARCHAR},
             </if>
             <if test="remark != null and remark != ''">
                 remark = #{remark,jdbcType=VARCHAR},
@@ -141,9 +127,8 @@
     <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.entity.FtHome">
         <!--@mbg.generated-->
         update ft_home
-        set school_id = #{schoolId,jdbcType=BIGINT},
-            parent_id = #{parentId,jdbcType=BIGINT},
-            `school_name`    = #{schoolName,jdbcType=VARCHAR},
+        set parent_id = #{parentId,jdbcType=BIGINT},
+            `name`    = #{name,jdbcType=VARCHAR},
             remark    = #{remark,jdbcType=VARCHAR},
             longitude = #{longitude,jdbcType=DOUBLE},
             latitude  = #{latitude,jdbcType=DOUBLE},
@@ -158,14 +143,11 @@
         <include refid="Base_Column_List"/>
         from ft_home
         where deleted = false
-        <if test="schoolId != null">
-            and school_id = #{schoolId,jdbcType=BIGINT}
-        </if>
         <if test="parentId != null">
             and parent_id = #{parentId,jdbcType=BIGINT}
         </if>
-        <if test="schoolName != null and schoolName != ''">
-            and `school_name` like concat('%', #{schoolName,jdbcType=VARCHAR}, '%')
+        <if test="name != null and name != ''">
+            and `name` like concat('%', #{name,jdbcType=VARCHAR}, '%')
         </if>
         <if test="remark != null and remark != ''">
             and remark like concat('%', #{remark,jdbcType=VARCHAR}, '%')
@@ -179,5 +161,41 @@
         <if test="number != null">
             and `number` = #{number,jdbcType=INTEGER}
         </if>
+    </select>
+
+    <select id="getSchoolByRemark" resultType="java.lang.String">
+        select name
+        from ft_home
+        where remark = #{remark,jdbcType=VARCHAR}
+          and deleted = false
+    </select>
+
+    <select id="countIndex" resultType="com.ruoyi.system.response.IndexCountResponse">
+        SELECT fc.name schoolName,
+               fc.id   schoolId,
+               any_value(DATE_FORMAT(fo.create_time, '%Y-%m-%d')) time,
+        	           SUM( fo.num ) count
+        FROM
+            ft_order fo
+            INNER JOIN ft_home fc
+        ON fo.school_id = fc.id
+        where fo.payed=1
+          and fo.deleted=0
+        <if test="time != null and time != ''">
+            and DATE_FORMAT(fo.create_time
+              , '%Y-%m-%d') like concat(#{time}
+              , '%')
+        </if>
+        <if test="schoolIds != null and schoolIds.size() != 0">
+            and fc.id in
+            <foreach collection="schoolIds" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY
+            fc.id,
+            DATE_FORMAT(
+            fo.create_time,
+            '%Y-%M-%d')
     </select>
 </mapper>

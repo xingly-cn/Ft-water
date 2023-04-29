@@ -34,7 +34,7 @@
         update_time
     </sql>
 
-    <sql id="Base_Column_List_With_School_Home_User">
+    <sql id="Base_Column_List_With_Home_User">
         <!--@mbg.generated-->
         select n.id,
         n.type,
@@ -48,18 +48,18 @@
         n.update_by,
         n.create_time,
         n.update_time,
-        s.school_name as schoolName,
+        s.name as schoolName,
         h.name        as homeName,
         u.name        as userName
         from ft_notices n
-        inner join ft_school s on n.school_id = s.id
+        inner join ft_home s on n.school_id = s.id
         inner join ft_home h on n.home_id = h.id
         inner join ft_user u on n.user_id = u.id
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.ruoyi.system.response.NoticesResponse">
         <!--@mbg.generated-->
-        <include refid="Base_Column_List_With_School_Home_User"/>
+        <include refid="Base_Column_List_With_Home_User"/>
         where n.id = #{id,jdbcType=BIGINT}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -215,7 +215,7 @@
 
     <select id="selectList" resultType="com.ruoyi.system.response.NoticesResponse">
         <!--  school home user  -->
-        <include refid="Base_Column_List_With_School_Home_User"/>
+        <include refid="Base_Column_List_With_Home_User"/>
         where n.deleted = 0
         <if test="notices.homeId != null">
             and n.home_id = #{notices.homeId}

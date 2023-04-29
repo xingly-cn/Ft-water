@@ -25,7 +25,7 @@
         payed
     </sql>
 
-    <sql id="Base_Column_Goods_School_User_List">
+    <sql id="Base_Column_Goods_HOME_User_List">
         select fo.id,
                fo.create_time,
                fo.payed,
@@ -36,10 +36,10 @@
                fu.name        as userName,
                fu.phone       as userPhone,
                fg.title       as goodName,
-               fs.school_name as schoolName
+               fh.name as schoolName
         from ft_order fo
                  inner join ft_goods fg on fo.good_id = fg.id
-                 inner join ft_school fs on fo.school_id = fs.id
+                 inner join ft_home fh on fo.school_id = fh.id
                  inner join ft_user fu on fo.uid = fu.id
     </sql>
 
@@ -154,22 +154,22 @@
     </update>
 
     <select id="selectList" resultType="com.ruoyi.system.response.OrderResponse">
-        <include refid="Base_Column_Goods_School_User_List"/>
+        <include refid="Base_Column_Goods_HOME_User_List"/>
         where fo.deleted = 0
           and fg.deleted = 0
-          and fs.deleted = 0
+          and fh.deleted = 0
           and fu.deleted = 0
           and fo.payed is not null
         <if test="order.keyword != null and order.keyword != ''">
             and (
-                    fg.title like concat('%', #{order.keyword}, '%')
-                    or fs.school_name like concat('%', #{order.keyword}, '%')
+                        fg.title like concat('%', #{order.keyword}, '%')
+                    or fh.name like concat('%', #{order.keyword}, '%')
                     or fu.name like concat('%', #{order.keyword}, '%')
                     or fu.phone = #{order.keyword}
                 )
         </if>
         <if test="order.schoolId != null">
-            and fs.id = #{order.schoolId}
+            and fh.id = #{order.schoolId}
         </if>
         <if test="order.goodId != null">
             and fg.id = #{order.goodId}

@@ -21,7 +21,7 @@ public class Config extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "配置value")
     private String configValue;
 
-    @ApiModelProperty(value = "备注")
-    private String remark;
+//    @ApiModelProperty(value = "备注")
+//    private String remark;
 
 }

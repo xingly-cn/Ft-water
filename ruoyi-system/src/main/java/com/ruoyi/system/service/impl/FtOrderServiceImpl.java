@@ -1,10 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.system.entity.FtOrder;
-import com.ruoyi.system.entity.FtSchool;
 import com.ruoyi.system.mapper.FtOrderMapper;
-import com.ruoyi.system.mapper.FtSchoolMapper;
-import com.ruoyi.system.mapper.FtUserMapper;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;
@@ -43,13 +40,7 @@ public class FtOrderServiceImpl implements FtOrderService {
     private FtGoodsServiceImpl goodsService;
 
     @Autowired
-    private FtSchoolServiceImpl schoolService;
-
-    @Autowired
-    private FtUserMapper ftUserMapper;
-
-    @Autowired
-    private FtSchoolMapper ftSchoolMapper;
+    private FtHomeServiceImpl homeService;
 
     @Override
     @CacheEvict(value = "order", key = "#id")
@@ -93,7 +84,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         //什么用户购买什么商品多少吧
         String userName = userService.selectByPrimaryKey(ftOrder.getUid()).getName();
         String goodsName = goodsService.selectByPrimaryKey(ftOrder.getGoodId()).getTitle();
-        String schoolName = schoolService.selectByPrimaryKey(ftOrder.getSchoolId()).getSchoolName();
+        String schoolName = homeService.selectByPrimaryKey(ftOrder.getSchoolId()).getName();
         orderWebSocket.sendMessage(userName + "在" + schoolName + "购买了" + goodsName + ftOrder.getNum() + "个");
         return updateOrder(ftOrder);
     }
@@ -109,8 +100,8 @@ public class FtOrderServiceImpl implements FtOrderService {
     public List<OrderResponse> getCouponNum(String str) {
         OrderRequest orderRequest = new OrderRequest();
         if (str.indexOf(0) >= 'a' && str.indexOf(0) <= 'z') {
-            FtSchool school = ftSchoolMapper.getSchoolByRemark(str);
-            orderRequest.setKeyword(school.getSchoolName());
+            String name = homeService.getSchoolByRemark(str);
+            orderRequest.setKeyword(name);
             return ftOrderMapper.selectList(orderRequest);
         }
         orderRequest.setKeyword(str);

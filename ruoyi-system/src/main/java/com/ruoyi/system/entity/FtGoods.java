@@ -42,8 +42,8 @@ public class FtGoods extends BaseEntity implements Serializable {
     /**
      * 商品信息（备注）
      */
-    @ApiModelProperty(value = "商品信息（备注）")
-    private String remark;
+//    @ApiModelProperty(value = "商品信息（备注）")
+//    private String remark;
 
     /**
      * 商品图片

@@ -1,8 +1,7 @@
 package com.ruoyi.system.service.impl;
 
-
 import com.ruoyi.common.exception.ServiceException;
-import com.ruoyi.system.mapper.FtSchoolMapper;
+import com.ruoyi.system.mapper.FtHomeMapper;
 import com.ruoyi.system.request.IndexRequest;
 import com.ruoyi.system.response.IndexCountResponse;
 import com.ruoyi.system.service.IndexService;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -26,29 +24,29 @@ import java.util.List;
 public class IndexServiceImpl implements IndexService {
 
     @Autowired
-    private FtSchoolMapper schoolMapper;
+    private FtHomeMapper homeMapper;
 
     @Override
     public List<IndexCountResponse> countEveryDay(IndexRequest request) {
         //查看各学校 每天的销售量、月销售量、全部学校当天总销售量、月总销售量
-        if (request.getChoose()== null){
+        if (request.getChoose() == null) {
             throw new ServiceException("请选择统计方式");
         }
-        if (CollectionUtils.isEmpty(request.getSchoolIds())){
+        if (CollectionUtils.isEmpty(request.getSchoolIds())) {
             throw new ServiceException("请选择学校");
         }
         List<IndexCountResponse> indexCountResponses = Lists.newArrayList();
         String time = "";
-        if (request.getChoose() == 0){
+        if (request.getChoose() == 0) {
             time = DateUtils.getCurrentDate("yyyy-MM-dd");
             indexCountResponses = initDayCount();
-        }else if (request.getChoose() == 1){
+        } else if (request.getChoose() == 1) {
             time = DateUtils.getCurrentDate("yyyy-MM");
             indexCountResponses = initMonthCount();
         }
 
-        List<IndexCountResponse> countIndex = schoolMapper.countIndex(time, request.getSchoolIds());
-        if (CollectionUtils.isEmpty(countIndex)){
+        List<IndexCountResponse> countIndex = homeMapper.countIndex(time, request.getSchoolIds());
+        if (CollectionUtils.isEmpty(countIndex)) {
             return indexCountResponses;
         }
 
@@ -56,7 +54,7 @@ public class IndexServiceImpl implements IndexService {
             for (IndexCountResponse countIndexResponse : countIndex) {
                 indexCountResponse.setSchoolId(countIndexResponse.getSchoolId());
                 indexCountResponse.setSchoolName(countIndexResponse.getSchoolName());
-                if (indexCountResponse.getTime().equals(countIndexResponse.getTime())){
+                if (indexCountResponse.getTime().equals(countIndexResponse.getTime())) {
                     indexCountResponse.setCount(countIndexResponse.getCount());
                 }
             }
@@ -83,10 +81,12 @@ public class IndexServiceImpl implements IndexService {
 
     private List<IndexCountResponse> initDayCount() {
         String dayFullHour = DateUtils.getCurrentDate();
-        return Lists.newArrayList((Iterator<? extends IndexCountResponse>) IndexCountResponse.builder()
+        List<IndexCountResponse> response = Lists.newArrayList();
+        response.add(IndexCountResponse.builder()
                 .time(dayFullHour)
                 .count(0)
                 .build());
+        return response;
     }
 
 }

@@ -16,8 +16,6 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class HomeRequest extends FtHome {
 
-    private Long id;
-
     private Integer number;
 
     private Long userId;

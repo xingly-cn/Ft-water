@@ -21,17 +21,14 @@ public class FtHome extends BaseEntity {
 
     private static final long serialVersionUID = 7802128654790973740L;
 
-    @ApiModelProperty(value = "学校id")
-    private Long schoolId;
-
     @ApiModelProperty(value = "父级id")
     private Long parentId;
 
-    @ApiModelProperty(value = "备注")
-    private String remark;
+  /*  @ApiModelProperty(value = "备注")
+    private String remark;*/
 
     @ApiModelProperty(value = "名字")
-    private String schoolName;
+    private String name;
 
     @ApiModelProperty(value = "库存")
     private Integer number;
