@@ -1,8 +1,15 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.system.entity.FtUser;
+import com.ruoyi.system.request.LoginRequest;
+import com.ruoyi.system.request.UserRequest;
+import com.ruoyi.system.request.WechatUserInfo;
+import com.ruoyi.system.response.UserResponse;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 用户 业务层
@@ -178,13 +185,6 @@ public interface ISysUserService {
      */
     int resetUserPwd(String userName, String password);
 
-    /**
-     * 通过用户ID删除用户
-     *
-     * @param userId 用户ID
-     * @return 结果
-     */
-    int deleteUserById(Long userId);
 
     /**
      * 批量删除用户信息
@@ -203,4 +203,20 @@ public interface ISysUserService {
      * @return 结果
      */
     String importUser(List<SysUser> userList, Boolean isUpdateSupport, String operName);
+
+    ConcurrentHashMap<String, Integer> checkCoupon(HttpServletRequest request);
+
+    String change(UserRequest request);
+
+    UserResponse loginUser(LoginRequest request);
+
+    SysUser checkPhone(String phone, String code);
+
+    Boolean updateUserInfo(WechatUserInfo userInfo);
+
+    String getPhone(UserRequest request);
+
+    String changeUserPhone(UserRequest request);
+
+    SysUser getUserInfo(HttpServletRequest rq);
 }

@@ -4,27 +4,40 @@ import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
+import com.ruoyi.common.core.domain.model.LoginUser;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanValidators;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysPost;
-import com.ruoyi.system.domain.SysUserPost;
 import com.ruoyi.system.domain.SysUserRole;
+import com.ruoyi.system.entity.FtOrder;
 import com.ruoyi.system.mapper.*;
+import com.ruoyi.system.request.LoginRequest;
+import com.ruoyi.system.request.OrderRequest;
+import com.ruoyi.system.request.UserRequest;
+import com.ruoyi.system.request.WechatUserInfo;
+import com.ruoyi.system.response.OrderResponse;
+import com.ruoyi.system.response.UserResponse;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.system.utils.WechatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -49,13 +62,16 @@ public class SysUserServiceImpl implements ISysUserService {
     private SysUserRoleMapper userRoleMapper;
 
     @Autowired
-    private SysUserPostMapper userPostMapper;
-
-    @Autowired
     private ISysConfigService configService;
 
     @Autowired
     protected Validator validator;
+
+    @Resource
+    private FtOrderMapper ftOrderMapper;
+
+    @Autowired
+    private TokenService tokenService;
 
     /**
      * 根据条件分页查询用户列表
@@ -64,7 +80,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 用户信息集合信息
      */
     @Override
-//    @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUserList(SysUser user) {
         return userMapper.selectUserList(user);
     }
@@ -76,7 +91,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 用户信息集合信息
      */
     @Override
-//    @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectAllocatedList(SysUser user) {
         return userMapper.selectAllocatedList(user);
     }
@@ -234,7 +248,7 @@ public class SysUserServiceImpl implements ISysUserService {
         // 新增用户信息
         int rows = userMapper.insertUser(user);
         // 新增用户岗位关联
-        insertUserPost(user);
+//        insertUserPost(user);
         // 新增用户与角色管理
         insertUserRole(user);
         return rows;
@@ -260,15 +274,15 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     @Transactional
     public int updateUser(SysUser user) {
-        Long userId = user.getUserId();
+//        Long userId = user.getUserId();
         // 删除用户与角色关联
-        userRoleMapper.deleteUserRoleByUserId(userId);
+//        userRoleMapper.deleteUserRoleByUserId(userId);
         // 新增用户与角色管理
         insertUserRole(user);
         // 删除用户与岗位关联
-        userPostMapper.deleteUserPostByUserId(userId);
+//        userPostMapper.deleteUserPostByUserId(userId);
         // 新增用户与岗位管理
-        insertUserPost(user);
+//        insertUserPost(user);
         return userMapper.updateUser(user);
     }
 
@@ -351,25 +365,6 @@ public class SysUserServiceImpl implements ISysUserService {
         this.insertUserRole(user.getUserId(), user.getRoleIds());
     }
 
-    /**
-     * 新增用户岗位信息
-     *
-     * @param user 用户对象
-     */
-    public void insertUserPost(SysUser user) {
-        Long[] posts = user.getPostIds();
-        if (StringUtils.isNotEmpty(posts)) {
-            // 新增用户与岗位管理
-            List<SysUserPost> list = new ArrayList<SysUserPost>(posts.length);
-            for (Long postId : posts) {
-                SysUserPost up = new SysUserPost();
-                up.setUserId(user.getUserId());
-                up.setPostId(postId);
-                list.add(up);
-            }
-            userPostMapper.batchUserPost(list);
-        }
-    }
 
     /**
      * 新增用户角色信息
@@ -392,22 +387,6 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     /**
-     * 通过用户ID删除用户
-     *
-     * @param userId 用户ID
-     * @return 结果
-     */
-    @Override
-    @Transactional
-    public int deleteUserById(Long userId) {
-        // 删除用户与角色关联
-        userRoleMapper.deleteUserRoleByUserId(userId);
-        // 删除用户与岗位表
-        userPostMapper.deleteUserPostByUserId(userId);
-        return userMapper.deleteUserById(userId);
-    }
-
-    /**
      * 批量删除用户信息
      *
      * @param userIds 需要删除的用户ID
@@ -423,7 +402,7 @@ public class SysUserServiceImpl implements ISysUserService {
         // 删除用户与角色关联
         userRoleMapper.deleteUserRole(userIds);
         // 删除用户与岗位关联
-        userPostMapper.deleteUserPost(userIds);
+//        userPostMapper.deleteUserPost(userIds);
         return userMapper.deleteUserByIds(userIds);
     }
 
@@ -483,5 +462,165 @@ public class SysUserServiceImpl implements ISysUserService {
             successMsg.insert(0, "恭喜您，数据已全部导入成功！共 " + successNum + " 条，数据如下：");
         }
         return successMsg.toString();
+    }
+
+    @Override
+    public ConcurrentHashMap<String, Integer> checkCoupon(HttpServletRequest request) {
+        Long userId = SecurityUtils.getUserId();
+        OrderRequest orderRequest = new OrderRequest();
+        orderRequest.setUid(userId);
+        List<OrderResponse> ftOrders = ftOrderMapper.selectList(orderRequest);
+        int totalNum = ftOrders.stream().mapToInt(FtOrder::getNum).sum();
+        SysUser user = userMapper.selectUserById(userId);
+        Integer waterNum = user.getWaterNum();
+        ConcurrentHashMap<String, Integer> result = new ConcurrentHashMap<>();
+        result.put("usedNum", totalNum - waterNum);
+        result.put("unUsedNum", waterNum);
+        return result;
+    }
+
+    @Override
+    public String change(UserRequest request) {
+        String phone = request.getPhone();
+        String password = request.getPassword();
+        String newPassword = request.getNewPassword();
+
+        if (org.apache.commons.lang3.StringUtils.isEmpty(phone)) {
+            throw new ServiceException("手机号不能为空");
+        }
+
+        if (org.apache.commons.lang3.StringUtils.isEmpty(password)) {
+            throw new ServiceException("密码不能为空");
+        }
+
+        if (org.apache.commons.lang3.StringUtils.isEmpty(newPassword)) {
+            throw new ServiceException("新密码不能为空");
+        }
+
+        if (password.equals(newPassword)) {
+            throw new ServiceException("新密码不能与旧密码相同");
+        }
+
+        checkLoginUser(phone, password);
+        userMapper.updatePasswordByPhone(newPassword, phone);
+        return "修改成功";
+    }
+
+    @Override
+    @Transactional
+    public UserResponse loginUser(LoginRequest request) {
+        if (org.apache.commons.lang3.StringUtils.isEmpty(request.getCode())) {
+            throw new ServiceException("code不能为空");
+        }
+        String[] codeArray = WechatUtil.getOpenId(request.getCode());
+        String openId = codeArray[0];
+
+        String phone = request.getPhone();
+
+        if (org.apache.commons.lang3.StringUtils.isEmpty(phone)) {
+            throw new ServiceException("手机号不能为空");
+        }
+
+        //根据手机号和openId查询用户 唯一
+        SysUser user = userMapper.getUserByOpenId(openId);
+
+        if (user == null) {
+            //register
+            user = new SysUser();
+            user.setOpenId(openId);
+            user.setPhonenumber(phone);
+            user.setDormType(request.getDormType());
+            user.setAvatar(request.getAvatar());
+            user.setCreateTime(new Date());
+            user.setHomeId(user.getHomeId());
+            user.setHomeId(request.getHomeId());
+            user.setSex(String.valueOf(request.getSex()));
+            user.setUserName(request.getName());
+            user.setAddressId(request.getAddressId());
+            user.setRoleIds(new Long[]{2L});
+            insertUser(user);
+        }
+
+        LoginUser loginUser = new LoginUser();
+        loginUser.setUser(user);
+        loginUser.setUserId(user.getUserId());
+        String token = tokenService.createToken(loginUser);
+        UserResponse userResponse = new UserResponse();
+        BeanUtils.copyProperties(user, userResponse);
+        userResponse.setToken(token);
+        return userResponse;
+    }
+
+    @Override
+    public String getPhone(UserRequest request) {
+        log.info("getPhone code:{}", request.getCode());
+        return WechatUtil.getPhone(request.getCode());
+    }
+
+    @Override
+    public String changeUserPhone(UserRequest request) {
+        Long userId = SecurityUtils.getUserId();
+        log.info("changeUserPhone userId:{}", userId);
+        SysUser user = userMapper.selectUserById(userId);
+
+        // 从redis校验验证码是否正确，这里先写死，因为甲方还没有购买短信
+        if ("666666".equals(request.getCode())) {
+            user.setPhonenumber(request.getPhone());
+            userMapper.updatePhoneById(user);
+            return userMapper.updatePhoneById(user) > 0 ? "修改手机号成功" : "修改手机号失败";
+        }
+        return "验证码错误";
+    }
+
+    @Override
+    public SysUser getUserInfo(HttpServletRequest rq) {
+        Long userId = SecurityUtils.getUserId();
+        return userMapper.selectUserById(userId);
+    }
+
+    @Override
+    public SysUser checkPhone(String phone, String code) {
+        //通过手机号查询用户
+        SysUser user = userMapper.getUserByPhone(phone);
+
+        if (user == null) {
+            user = new SysUser();
+            user.setPhonenumber(phone);
+            return user;
+        }
+
+        log.warn("check phone[{}],code[{}]", phone, code);
+        if (StringUtils.isNotEmpty(phone)) {
+            String[] codeArray = WechatUtil.getOpenId(code);
+            String openId = codeArray[0];
+            this.userMapper.updateOpenIdByPhone(openId, phone);
+        }
+        return user;
+    }
+
+    @Override
+    public Boolean updateUserInfo(WechatUserInfo userInfo) {
+        SysUser user = userMapper.getUserByOpenId(userInfo.getOpenId());
+
+        user.setAvatar(userInfo.getAvatar());
+        user.setUserName(userInfo.getName());
+        user.setAddressId(userInfo.getAddress());
+        user.setHomeId(userInfo.getHomeId());
+        user.setDormType(userInfo.getDormType());
+        user.setSex(String.valueOf(userInfo.getSex()));
+        int i = userMapper.updateUser(user);
+        return i == 1;
+    }
+
+    private void checkLoginUser(String phone, String password) {
+        SysUser user = userMapper.getUserByPhone(phone);
+
+        if (user == null) {
+            throw new ServiceException("用户不存在");
+        }
+
+        if (!user.getPassword().equals(password)) {
+            throw new ServiceException("密码错误");
+        }
     }
 }

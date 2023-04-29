@@ -2,8 +2,11 @@ package com.ruoyi.web.controller.system;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ruoyi.system.request.LoginRequest;
+import com.ruoyi.system.request.UserRequest;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.ArrayUtils;
@@ -264,5 +267,17 @@ public class SysUserController extends BaseController
     public AjaxResult deptTree(SysDept dept)
     {
         return success(deptService.selectDeptTreeList(dept));
+    }
+
+    @GetMapping("/coupon")
+    @ApiOperation("券包")
+    public AjaxResult getUserDetail(HttpServletRequest request) {
+        return AjaxResult.success(userService.checkCoupon(request));
+    }
+
+    @PostMapping("/change")
+    @ApiOperation("修改密码")
+    public AjaxResult change(@RequestBody UserRequest request) {
+        return AjaxResult.success(userService.change(request));
     }
 }

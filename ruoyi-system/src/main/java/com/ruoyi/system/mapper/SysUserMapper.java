@@ -124,4 +124,24 @@ public interface SysUserMapper {
      * @return 结果
      */
     SysUser checkEmailUnique(String email);
+
+    int updatePasswordByPhone(@Param("password") String password,
+                              @Param("phone") String phone);
+
+    SysUser getUserByPhone(String phone);
+
+    void updateOpenIdByPhone(@Param("openId") String openId,
+                             @Param("phone") String phone);
+
+    int updatePhoneById(SysUser user);
+
+    SysUser getUserByOpenId(String openId);
+
+    List<SysUser> getUsersFindByRoleId(int roleId);
+
+    List<SysUser> getUserByHomeIdAndRoleId(@Param("homeId") Long homeId,
+                                           @Param("roleId") int roleId);
+
+    List<SysUser> getUsersFindByRoleIdAndUserId(@Param("userId") Long userId,
+                                                @Param("roleId") int roleId);
 }

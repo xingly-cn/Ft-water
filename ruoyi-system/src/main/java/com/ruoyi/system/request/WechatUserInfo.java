@@ -22,7 +22,7 @@ public class WechatUserInfo {
     private String name;
 
     @ApiModelProperty(value = "楼栋ID")
-    private String homeId;
+    private Long homeId;
 
     @ApiModelProperty(value = "头像")
     private String avatar;
@@ -35,5 +35,5 @@ public class WechatUserInfo {
     private Integer dormType;
 
     @ApiModelProperty(value = "地址")
-    private String address;
+    private Long address;
 }

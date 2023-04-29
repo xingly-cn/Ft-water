@@ -28,9 +28,6 @@ public interface FtUserMapper {
 
     int updateByPrimaryKey(FtUser record);
 
-    int updatePasswordByPhone(@Param("password") String password,
-                              @Param("phone") String phone);
-
     void updateOpenIdByPhone(@Param("openId") String openId,
                              @Param("phone") String phone);
 
@@ -48,8 +45,6 @@ public interface FtUserMapper {
     List<UserResponse> selectList(@Param("user") UserRequest request);
 
     List<UserResponse> getUserList(@Param("user") UserRequest userRequest);
-
-    Boolean insert(FtUser record);
 
     FtUser getUserByPhone(String phone);
 

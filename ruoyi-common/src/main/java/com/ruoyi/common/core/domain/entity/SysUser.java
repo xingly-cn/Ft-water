@@ -1,5 +1,7 @@
 package com.ruoyi.common.core.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.annotation.Excel.ColumnType;
 import com.ruoyi.common.annotation.Excel.Type;
@@ -127,6 +129,19 @@ public class SysUser extends BaseEntity {
      */
     private Long roleId;
 
+    private Long addressId;
+
+    /**
+     * 剩余水量
+     */
+    private Integer waterNum;
+
+    private Long homeId;
+
+    private Integer dormType;
+
+    private String openId;
+
     public SysUser() {
 
     }
@@ -215,10 +230,12 @@ public class SysUser extends BaseEntity {
         this.avatar = avatar;
     }
 
+    @JsonIgnore
     public String getPassword() {
         return password;
     }
 
+    @JsonProperty
     public void setPassword(String password) {
         this.password = password;
     }
@@ -293,6 +310,46 @@ public class SysUser extends BaseEntity {
 
     public void setRoleId(Long roleId) {
         this.roleId = roleId;
+    }
+
+    public Long getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(Long address) {
+        this.addressId = address;
+    }
+
+    public Integer getWaterNum() {
+        return waterNum;
+    }
+
+    public void setWaterNum(Integer waterNum) {
+        this.waterNum = waterNum;
+    }
+
+    public Long getHomeId() {
+        return homeId;
+    }
+
+    public void setHomeId(Long homeId) {
+        this.homeId = homeId;
+    }
+
+    public Integer getDormType() {
+        return dormType;
+    }
+
+    public void setDormType(Integer dormType) {
+        this.dormType = dormType;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
     }
 
     @Override

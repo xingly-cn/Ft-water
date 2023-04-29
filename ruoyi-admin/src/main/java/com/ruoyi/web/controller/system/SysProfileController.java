@@ -20,7 +20,7 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.file.FileUploadUtils;
 import com.ruoyi.common.utils.file.MimeTypeUtils;
-import com.ruoyi.framework.web.service.TokenService;
+import com.ruoyi.system.service.impl.TokenService;
 import com.ruoyi.system.service.ISysUserService;
 
 /**

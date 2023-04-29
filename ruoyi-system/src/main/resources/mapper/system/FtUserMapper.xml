@@ -181,9 +181,6 @@
         update ft_user set open_id = #{openId} where phone = #{phone}
     </update>
 
-    <update id="updatePasswordByPhone">
-        update ft_user set password = #{password} where phone = #{phone}
-    </update>
 
     <update id="updateAddressByPhone">
         update ft_user set address = #{address} where phone = #{phone}
@@ -249,11 +246,6 @@
         </if>
         order by id desc
     </select>
-
-    <insert id="insert">
-        <!-- 判断字段是否为空-->
-
-    </insert>
 
     <select id="getUserByPhone" resultMap="BaseResultMap">
         select
