@@ -1,9 +1,9 @@
 package com.ruoyi.web.controller.admin;
 
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.request.NoticesRequest;
 import com.ruoyi.system.service.FtNoticesService;
-import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,19 +28,19 @@ public class NoticesController {
 
     @GetMapping("/page")
     @ApiOperation("库存记录列表-分页")
-    public Result<?> getNoticesList(NoticesRequest request) {
-        return Result.success(noticesService.getNoticesPage(request));
+    public AjaxResult getNoticesList(NoticesRequest request) {
+        return AjaxResult.success(noticesService.getNoticesPage(request));
     }
 
     @GetMapping("/input")
     @ApiOperation("入库查询")
-    public Result<?> getNoticesByInput(long cur, long size) {
-        return Result.success(noticesService.getNoticesByInput(cur, size));
+    public AjaxResult getNoticesByInput(long cur, long size) {
+        return AjaxResult.success(noticesService.getNoticesByInput(cur, size));
     }
 
     @GetMapping("/detail")
     @ApiOperation("库存详情")
-    public Result<?> getNoticesDetail(@RequestParam(value = "id") Long id) {
-        return Result.success(noticesService.selectByPrimaryKey(id));
+    public AjaxResult getNoticesDetail(@RequestParam(value = "id") Long id) {
+        return AjaxResult.success(noticesService.selectByPrimaryKey(id));
     }
 }

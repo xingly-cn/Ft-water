@@ -1,11 +1,11 @@
 package com.ruoyi.web.controller.admin;
 
 
+import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.system.entity.FtUser;
 import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.UserRequest;
-import com.ruoyi.system.entity.FtUser;
 import com.ruoyi.system.service.FtUserService;
-import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -28,61 +28,61 @@ public class AdminUserController {
 
     @GetMapping("/page")
     @ApiOperation("用户列表-分页")
-    public Result<?> getUserList(UserRequest userRequest) {
-        return Result.success(userService.getUserPage(userRequest));
+    public AjaxResult getUserList(UserRequest userRequest) {
+        return AjaxResult.success(userService.getUserPage(userRequest));
     }
 
     @GetMapping("/search")
     @ApiOperation("用户搜索-缩写")
-    public Result<?> getUserBySearch(String str) {
-        return Result.success(userService.getUserBySearch(str));
+    public AjaxResult getUserBySearch(String str) {
+        return AjaxResult.success(userService.getUserBySearch(str));
     }
 
     @GetMapping("/coupon")
     @ApiOperation("券包")
-    public Result<?> getUserDetail(HttpServletRequest request) {
-        return Result.success(userService.checkCoupon(request));
+    public AjaxResult getUserDetail(HttpServletRequest request) {
+        return AjaxResult.success(userService.checkCoupon(request));
     }
 
     @GetMapping("/detail")
     @ApiOperation("用户详情")
-    public Result<?> getUserDetail(@RequestParam(value = "id") Long id) {
-        return Result.success(userService.selectByPrimaryKey(id));
+    public AjaxResult getUserDetail(@RequestParam(value = "id") Long id) {
+        return AjaxResult.success(userService.selectByPrimaryKey(id));
     }
 
     @PostMapping("/insert")
     @ApiOperation("新增用户")
-    public Result<?> addUser(@RequestBody FtUser User) {
-        return Result.success(userService.addUser(User));
+    public AjaxResult addUser(@RequestBody FtUser User) {
+        return AjaxResult.success(userService.addUser(User));
     }
 
     @PostMapping("/update")
     @ApiOperation("修改用户")
-    public Result<?> updateUser(@RequestBody FtUser User) {
-        return Result.success(userService.updateUser(User));
+    public AjaxResult updateUser(@RequestBody FtUser User) {
+        return AjaxResult.success(userService.updateUser(User));
     }
 
     @GetMapping("/list")
     @ApiOperation("用户列表")
-    public Result<?> selectUserList(FtUser User) {
-        return Result.success(userService.selectUserList(User));
+    public AjaxResult selectUserList(FtUser User) {
+        return AjaxResult.success(userService.selectUserList(User));
     }
 
     @DeleteMapping("/remove")
     @ApiOperation("删除用户")
-    public Result<?> delete(@RequestParam Long id) {
-        return Result.success(userService.deleteByPrimaryKey(id));
+    public AjaxResult delete(@RequestParam Long id) {
+        return AjaxResult.success(userService.deleteByPrimaryKey(id));
     }
 
     @PostMapping("/login")
     @ApiOperation("登陆")
-    public Result<?> login(@RequestBody LoginRequest request) {
-        return Result.success(userService.login(request));
+    public AjaxResult login(@RequestBody LoginRequest request) {
+        return AjaxResult.success(userService.login(request));
     }
 
     @PostMapping("/change")
     @ApiOperation("修改密码")
-    public Result<?> change(@RequestBody UserRequest request) {
-        return Result.success(userService.change(request));
+    public AjaxResult change(@RequestBody UserRequest request) {
+        return AjaxResult.success(userService.change(request));
     }
 }

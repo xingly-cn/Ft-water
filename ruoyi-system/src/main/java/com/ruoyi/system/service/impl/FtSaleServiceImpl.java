@@ -24,7 +24,7 @@ import java.util.Map;
 * @create 2023/3/30 15:59
 */
 @Service
-public class FtSaleServiceImpl extends BaseMapperImpl<FtSale, SaleResponse, SaleRequest, FtSaleMapper> implements FtSaleService {
+public class FtSaleServiceImpl implements FtSaleService {
 
     @Resource
     private FtSaleMapper ftSaleMapper;
@@ -63,10 +63,5 @@ public class FtSaleServiceImpl extends BaseMapperImpl<FtSale, SaleResponse, Sale
     @Override
     public List<SaleResponse> selectSaleList(SaleRequest sale) {
         return ftSaleMapper.selectList(sale);
-    }
-
-    @Override
-    protected void customSelectPage(IPage<SaleResponse> page, SaleRequest request) {
-        ftSaleMapper.selectPage(page, request);
     }
 }

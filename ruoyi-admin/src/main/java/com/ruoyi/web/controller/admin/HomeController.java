@@ -1,10 +1,9 @@
 package com.ruoyi.web.controller.admin;
 
-
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.request.HomeRequest;
 import com.ruoyi.system.entity.FtHome;
 import com.ruoyi.system.service.FtHomeService;
-import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,43 +26,43 @@ public class HomeController {
 
     @GetMapping("/tree")
     @ApiOperation("树")
-    public Result<?> homeTree() {
-        return Result.success(homeService.homeTree());
+    public AjaxResult homeTree() {
+        return AjaxResult.success(homeService.homeTree());
     }
 
     @PostMapping("/insert")
     @ApiOperation("新增树")
-    public Result<?> addHome(@RequestBody FtHome Home) {
-        return Result.success(homeService.addHome(Home));
+    public AjaxResult addHome(@RequestBody FtHome Home) {
+        return AjaxResult.success(homeService.addHome(Home));
     }
 
     @PostMapping("/update")
     @ApiOperation("修改树")
-    public Result<?> updateHome(@RequestBody FtHome Home) {
-        return Result.success(homeService.updateHome(Home));
+    public AjaxResult updateHome(@RequestBody FtHome Home) {
+        return AjaxResult.success(homeService.updateHome(Home));
     }
 
     @DeleteMapping("/remove")
     @ApiOperation("删除树")
-    public Result<?> delete(@RequestParam Long id) {
-        return Result.success(homeService.deleteByPrimaryKey(id));
+    public AjaxResult delete(@RequestParam Long id) {
+        return AjaxResult.success(homeService.deleteByPrimaryKey(id));
     }
 
     @GetMapping("/detail")
     @ApiOperation("商品详情")
-    public Result<?> getGoodsDetail(@RequestParam(value = "id") Long id) {
-        return Result.success(homeService.selectByPrimaryKey(id));
+    public AjaxResult getGoodsDetail(@RequestParam(value = "id") Long id) {
+        return AjaxResult.success(homeService.selectByPrimaryKey(id));
     }
 
     @PostMapping("/addNumber")
     @ApiOperation("添加水漂数量")
-    public Result<?> addNumber(@RequestBody HomeRequest request) {
-        return Result.success(homeService.addNumber(request));
+    public AjaxResult addNumber(@RequestBody HomeRequest request) {
+        return AjaxResult.success(homeService.addNumber(request));
     }
 
     @PostMapping("/addUser")
     @ApiOperation("添加管理员")
-    public Result<?> addUser(@RequestBody HomeRequest request) {
-        return Result.success(homeService.addUser(request));
+    public AjaxResult addUser(@RequestBody HomeRequest request) {
+        return AjaxResult.success(homeService.addUser(request));
     }
 }

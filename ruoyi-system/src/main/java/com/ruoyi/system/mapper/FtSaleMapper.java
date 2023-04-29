@@ -18,7 +18,7 @@ import java.util.List;
  * @create 2023/3/30 15:59
  */
 @Repository
-public interface FtSaleMapper extends BaseMapper<FtSale> {
+public interface FtSaleMapper {
 
     int deleteByPrimaryKey(Long id);
 

@@ -1,9 +1,9 @@
 package com.ruoyi.web.controller.admin;
 
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.request.IndexRequest;
 import com.ruoyi.system.service.IndexService;
-import com.ruoyi.system.utils.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +24,7 @@ public class IndexController {
     private IndexService indexService;
 
     @PostMapping("/countEveryDay")
-    public Result<?> countEveryDay(@RequestBody IndexRequest request) {
-        return Result.success(indexService.countEveryDay(request));
+    public AjaxResult countEveryDay(@RequestBody IndexRequest request) {
+        return AjaxResult.success(indexService.countEveryDay(request));
     }
 }

@@ -1,11 +1,11 @@
 package com.ruoyi.system.user;
 
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.request.WechatUserInfo;
 import com.ruoyi.system.service.FtUserService;
-import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -28,46 +28,46 @@ public class UserController {
 
     @PostMapping("/login")
     @ApiOperation("登陆")
-    public Result<?> login(@RequestBody LoginRequest request) {
+    public AjaxResult login(@RequestBody LoginRequest request) {
         // 学生使用微信登陆, 所以没有密码, 直接生成token
-        return Result.success(userService.loginUser(request));
+        return AjaxResult.success(userService.loginUser(request));
     }
 
     @ApiOperation(value = "解密手机号-老版小程序")
     @PostMapping(value = "/decryptPhone")
-    public Result<?> decryptPhone(String encryptedData, String iv, String sessionKey) {
-        return Result.success(userService.decryptPhone(encryptedData, iv, sessionKey));
+    public AjaxResult decryptPhone(String encryptedData, String iv, String sessionKey) {
+        return AjaxResult.success(userService.decryptPhone(encryptedData, iv, sessionKey));
     }
 
     @ApiOperation(value = "获取手机号-新版小程序")
     @PostMapping(value = "/getPhone")
-    public Result<?> getPhone(@RequestBody UserRequest request) {
+    public AjaxResult getPhone(@RequestBody UserRequest request) {
         System.out.println("传入的参数为:" + request);
-        return Result.success(userService.getPhone(request));
+        return AjaxResult.success(userService.getPhone(request));
     }
 
 
     @ApiOperation(value = "检查手机号-是否存在-用于区分用户类型-后台注册更新openId")
     @PostMapping(value = "/checkPhone")
-    public Result<?> checkPhone(String phone, String code) {
-        return Result.success(userService.checkPhone(phone, code));
+    public AjaxResult checkPhone(String phone, String code) {
+        return AjaxResult.success(userService.checkPhone(phone, code));
     }
 
     @PostMapping("/userInfo")
     @ApiOperation("更新用户信息")
-    public Result<?> updateUserInfo(@RequestBody WechatUserInfo userInfo) {
-        return Result.success(userService.updateUserInfo(userInfo));
+    public AjaxResult updateUserInfo(@RequestBody WechatUserInfo userInfo) {
+        return AjaxResult.success(userService.updateUserInfo(userInfo));
     }
 
     @PostMapping("/updatePhone")
     @ApiOperation("更新用户手机")
-    public Result<?> changeUserPhone(@RequestBody UserRequest request) {
-        return Result.success(userService.changeUserPhone(request));
+    public AjaxResult changeUserPhone(@RequestBody UserRequest request) {
+        return AjaxResult.success(userService.changeUserPhone(request));
     }
 
     @GetMapping("/getUserInfo")
     @ApiOperation("获取用户信息")
-    public Result<?> getUserInfo(HttpServletRequest rq) {
-        return Result.success(userService.getUserInfo(rq));
+    public AjaxResult getUserInfo(HttpServletRequest rq) {
+        return AjaxResult.success(userService.getUserInfo(rq));
     }
 }

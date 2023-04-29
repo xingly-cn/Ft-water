@@ -1,10 +1,10 @@
 package com.ruoyi.web.controller.admin;
 
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.request.SaleRequest;
 import com.ruoyi.system.entity.FtSale;
 import com.ruoyi.system.service.FtSaleService;
-import com.ruoyi.system.utils.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
@@ -26,37 +26,37 @@ public class SaleController {
 
     @GetMapping("/page")
     @ApiOperation("核销列表-分页")
-    public Result<?> getSaleList(SaleRequest request) {
-        return Result.success(saleService.getSalePage(request));
+    public AjaxResult getSaleList(SaleRequest request) {
+        return AjaxResult.success(saleService.getSalePage(request));
     }
 
     @GetMapping("/detail")
     @ApiOperation("核销详情")
-    public Result<?> getSaleDetail(@RequestParam(value = "id") Long id) {
-        return Result.success(saleService.selectByPrimaryKey(id));
+    public AjaxResult getSaleDetail(@RequestParam(value = "id") Long id) {
+        return AjaxResult.success(saleService.selectByPrimaryKey(id));
     }
 
     @PostMapping("/insert")
     @ApiOperation("新增核销")
-    public Result<?> addSale(@RequestBody FtSale Sale) {
-        return Result.success(saleService.addSale(Sale));
+    public AjaxResult addSale(@RequestBody FtSale Sale) {
+        return AjaxResult.success(saleService.addSale(Sale));
     }
 
     @PostMapping("/update")
     @ApiOperation("修改核销")
-    public Result<?> updateSale(@RequestBody FtSale Sale) {
-        return Result.success(saleService.updateSale(Sale));
+    public AjaxResult updateSale(@RequestBody FtSale Sale) {
+        return AjaxResult.success(saleService.updateSale(Sale));
     }
 
     @GetMapping("/list")
     @ApiOperation("核销列表")
-    public Result<?> selectSaleList(SaleRequest Sale) {
-        return Result.success(saleService.selectSaleList(Sale));
+    public AjaxResult selectSaleList(SaleRequest Sale) {
+        return AjaxResult.success(saleService.selectSaleList(Sale));
     }
 
     @DeleteMapping("/remove")
     @ApiOperation("删除核销")
-    public Result<?> delete(@RequestParam Long id) {
-        return Result.success(saleService.deleteByPrimaryKey(id));
+    public AjaxResult delete(@RequestParam Long id) {
+        return AjaxResult.success(saleService.deleteByPrimaryKey(id));
     }
 }

@@ -1,7 +1,7 @@
 package com.ruoyi.system.exception;
 
 
-import com.ruoyi.system.utils.Result;
+import com.ruoyi.common.core.domain.AjaxResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -31,7 +31,7 @@ public class MyAdviceException {
     @ExceptionHandler(value = ConstraintViolationException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Result<?> verifyErrorHandler(HttpServletRequest request, Exception e) {
+    public AjaxResult verifyErrorHandler(HttpServletRequest request, Exception e) {
         log.error("[exception:GlobalExceptionHandler] {} {}", request.getMethod(), request.getRequestURI());
         ConstraintViolationException ce = (ConstraintViolationException) e;
         Set<ConstraintViolation<?>> constraintViolationSet = ce.getConstraintViolations();
@@ -45,18 +45,14 @@ public class MyAdviceException {
             }
             sb.deleteCharAt(sb.length() - 1);
         }
-        Result<?> result = new Result<>();
-        result.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        //system error
-        result.setMessage(sb.toString());
         log.error("[exception:GlobalExceptionHandler] parameter verify error, error message: {}", sb);
-        return result;
+        return new AjaxResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), sb.toString(), null);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Result<?> verifyErrorHandlers(HttpServletRequest request, Exception e) {
+    public AjaxResult verifyErrorHandlers(HttpServletRequest request, Exception e) {
         log.error("[exception:GlobalExceptionHandler] {} {}", request.getMethod(), request.getRequestURI());
         MethodArgumentNotValidException ce = (MethodArgumentNotValidException) e;
         BindingResult bindingResult = ce.getBindingResult();
@@ -69,34 +65,24 @@ public class MyAdviceException {
             }
             sb.deleteCharAt(sb.length() - 1);
         }
-        Result<?> result = new Result<>();
-        result.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        //system error
-        result.setMessage(sb.toString());
         log.error("[exception:GlobalExceptionHandler] parameter verify error, error message: {}", sb);
-        return result;
+        return new AjaxResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), sb.toString(), null);
     }
 
     @ExceptionHandler(value = ServiceException.class)
     @ResponseBody
-    public Result<ServiceException> handlerServiceException(HttpServletRequest request, Exception e) {
+    public AjaxResult handlerServiceException(HttpServletRequest request, Exception e) {
         log.error("[exception:ServiceException] {} {}", request.getMethod(), request.getRequestURI());
         ServiceException exception = (ServiceException) e;
-        Result<ServiceException> result = new Result<>();
-        result.setCode(exception.getCode());
-        result.setMessage(exception.getMessage());
         log.error("[exception:ServiceException] controller class raise exception ", e);
-        return result;
+        return new AjaxResult(exception.getCode(), exception.getMessage(), null);
     }
 
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public Result<?> handler(HttpServletRequest request, Exception e) {
+    public AjaxResult handler(HttpServletRequest request, Exception e) {
         log.error("[exception:GlobalExceptionHandler] {} {}", request.getMethod(), request.getRequestURI());
-        Result<?> result = new Result<>();
-        result.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        result.setMessage("系统异常，请稍后重试");
         log.error("[exception:GlobalExceptionHandler] controller class raise exception ", e);
-        return result;
+        return new AjaxResult(HttpStatus.INTERNAL_SERVER_ERROR.value(), "系统异常，请稍后重试", null);
     }
 }
