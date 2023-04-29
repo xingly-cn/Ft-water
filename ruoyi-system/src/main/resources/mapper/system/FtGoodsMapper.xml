@@ -146,7 +146,7 @@
             price     = #{price,jdbcType=DECIMAL},
             run_price = #{runPrice,jdbcType=DECIMAL},
             water_num = #{waterNum,jdbcType=INTEGER},
-            min_num   = #{maxNum,jdbcType=INTEGER},
+            min_num   = #{minNum,jdbcType=INTEGER},
             max_num   = #{maxNum,jdbcType=INTEGER},
             good_sex  = #{goodSex,jdbcType=INTEGER},
             get_type  = #{getType,jdbcType=BOOLEAN},
