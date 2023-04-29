@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -21,7 +22,7 @@ import java.util.Map;
  * @create 2023/4/19 21:48
  */
 @Service
-public class FtNoticesServiceImpl extends BaseMapperImpl<FtNotices, NoticesResponse, NoticesRequest, FtNoticesMapper> implements FtNoticesService {
+public class FtNoticesServiceImpl implements FtNoticesService {
 
     @Resource
     private FtNoticesMapper ftNoticesMapper;
@@ -57,26 +58,14 @@ public class FtNoticesServiceImpl extends BaseMapperImpl<FtNotices, NoticesRespo
     }
 
     @Override
-    public Map<String, Object> getNoticesPage(NoticesRequest request) {
-        IPage<NoticesResponse> page = new Page<>(request.getPage(), request.getSize());
-        return selectPage(page, request);
+    public List<NoticesResponse> getNoticesList(NoticesRequest request) {
+        return ftNoticesMapper.selectList(request);
     }
 
     @Override
-    public Map<String, Object> getNoticesByInput(long cur, long size) {
-        IPage<FtNotices> page = new Page<>(cur, size);
-        ftNoticesMapper.selectPage(page, new QueryWrapper<FtNotices>().eq("type", 0).orderByDesc("createTime"));
-        Map<String, Object> result = new HashMap<>();
-        result.put("total", page.getTotal());
-        result.put("list", page.getRecords());
-        result.put("size", page.getSize());
-        result.put("cur", page.getCurrent());
-        return result;
+    public List<NoticesResponse> getNoticesByInput(NoticesRequest request) {
+        request.setType(0);
+        return ftNoticesMapper.selectList(request);
     }
 
-
-    @Override
-    protected void customSelectPage(IPage<NoticesResponse> page, NoticesRequest request) {
-        ftNoticesMapper.selectPage(page, request);
-    }
 }

@@ -5,6 +5,7 @@ import com.ruoyi.system.entity.FtMessage;
 import com.ruoyi.system.request.MessageRequest;
 import com.ruoyi.system.response.MessageResponse;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,12 +16,18 @@ import java.util.Map;
  */
 public interface FtMessageService {
     int deleteByPrimaryKey(Long id);
+
     int insert(FtMessage record);
+
     int insertSelective(FtMessage record);
+
     MessageResponse selectByPrimaryKey(Long id);
+
     int updateByPrimaryKeySelective(FtMessage record);
+
     int updateByPrimaryKey(FtMessage record);
+
     Boolean addMessage(Long id);
 
-    Map<String, Object> getMessagePage(MessageRequest request);
+    List<MessageResponse> getMessageList(MessageRequest request);
 }

@@ -10,13 +10,15 @@ import com.ruoyi.system.request.NoticesRequest;
 import com.ruoyi.system.response.NoticesResponse;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  *
  * @Author : 镜像
  * @create 2023/4/19 21:48
  */
-public interface FtNoticesMapper extends BaseMapper<FtNotices> {
+public interface FtNoticesMapper {
 
     int deleteByPrimaryKey(Long id);
 
@@ -30,7 +32,5 @@ public interface FtNoticesMapper extends BaseMapper<FtNotices> {
 
     int updateByPrimaryKey(FtNotices record);
 
-    Page<NoticesResponse> selectPage(@Param("page") IPage<NoticesResponse> page,
-                                     @Param("notices") NoticesRequest request);
-
+    List<NoticesResponse> selectList(@Param("notices") NoticesRequest request);
 }

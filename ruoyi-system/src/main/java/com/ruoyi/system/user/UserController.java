@@ -1,6 +1,5 @@
 package com.ruoyi.system.user;
 
-
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.UserRequest;

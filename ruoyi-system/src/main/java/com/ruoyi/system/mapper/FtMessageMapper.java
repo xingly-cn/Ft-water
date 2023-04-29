@@ -18,7 +18,7 @@ import java.util.List;
  * @Author : 镜像
  * @create 2023/4/19 21:48
  */
-public interface FtMessageMapper extends BaseMapper<FtMessage> {
+public interface FtMessageMapper {
 
     int deleteByPrimaryKey(Long id);
 
@@ -38,7 +38,5 @@ public interface FtMessageMapper extends BaseMapper<FtMessage> {
 
     void confirms(@Param("homeId") Long homeId, @Param("userId") Long userId);
 
-    Page<MessageResponse> selectPage(@Param("page") IPage<MessageResponse> page,
-                                     @Param("message") MessageRequest request);
-
+    List<MessageResponse> getMessageList(@Param("message") MessageRequest request);
 }

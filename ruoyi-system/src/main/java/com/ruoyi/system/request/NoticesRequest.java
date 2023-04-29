@@ -1,5 +1,6 @@
 package com.ruoyi.system.request;
 
+import com.ruoyi.system.entity.FtNotices;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,7 +13,7 @@ import lombok.ToString;
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class NoticesRequest extends PageRequest{
+public class NoticesRequest extends FtNotices {
 
     private Long homeId;
 

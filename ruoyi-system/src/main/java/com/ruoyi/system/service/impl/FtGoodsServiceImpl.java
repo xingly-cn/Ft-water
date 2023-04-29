@@ -1,9 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.entity.FtGoods;
 import com.ruoyi.system.mapper.FtGoodsMapper;
 import com.ruoyi.system.request.GoodRequest;
@@ -16,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +21,7 @@ import java.util.Map;
  * @create 2023/3/30 15:59
  */
 @Service
-public class FtGoodsServiceImpl extends BaseMapperImpl<FtGoods, GoodsResponse, GoodRequest, FtGoodsMapper> implements FtGoodsService {
+public class FtGoodsServiceImpl implements FtGoodsService {
 
     @Resource
     private FtGoodsMapper ftGoodsMapper;
@@ -50,26 +46,13 @@ public class FtGoodsServiceImpl extends BaseMapperImpl<FtGoods, GoodsResponse, G
     }
 
     @Override
-    public Map<String, Object> getGoodsPage(GoodRequest request) {
-        IPage<GoodsResponse> page = new Page<>(request.getPage(), request.getSize());
-        return selectPage(page, request);
-    }
-
-    @Override
-    public List<FtGoods> selectGoodsList(FtGoods Goods) {
-        return ftGoodsMapper.selectList(new QueryWrapper<>(Goods));
+    public List<GoodsResponse> selectGoodsList(GoodRequest request) {
+        return ftGoodsMapper.selectList(request);
     }
 
     @Override
     @Cacheable(value = "goods", key = "#id", unless = "#result == null")
     public FtGoods selectByPrimaryKey(Long id) {
         return ftGoodsMapper.selectByPrimaryKey(id);
-    }
-
-
-
-    @Override
-    protected void customSelectPage(IPage<GoodsResponse> page, GoodRequest request) {
-        ftGoodsMapper.selectPage(page, request);
     }
 }

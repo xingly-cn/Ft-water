@@ -43,20 +43,6 @@
         where id = #{id}
     </select>
 
-    <select id="selectPage" resultType="com.ruoyi.system.response.SaleResponse">
-        <include refid="Base_User_List"/>
-        where fs.deleted = 0
-          and fu.deleted = 0
-          and fu2.deleted = 0
-        <if test="sale.keyword != null and sale.keyword != ''">
-            and (
-                    fu2.name like concat('%', #{sale.keyword}, '%')
-                    or fu.name like concat('%', #{sale.keyword}, '%')
-                )
-        </if>
-        order by fs.id desc
-    </select>
-
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--@mbg.generated-->
         <!--    delete from ft_sale-->

@@ -262,8 +262,7 @@
           and confirm = 0
     </update>
 
-    <select id="selectPage" resultType="com.ruoyi.system.response.MessageResponse">
-        <!--@mbg.generated-->
+    <select id="getMessageList" resultType="com.ruoyi.system.response.MessageResponse">
         <include refid="Base_Column_List_With_Home_User"/>
         <where>
             m.deleted = 0

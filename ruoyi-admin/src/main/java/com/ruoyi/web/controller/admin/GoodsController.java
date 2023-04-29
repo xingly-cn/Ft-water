@@ -1,15 +1,18 @@
 package com.ruoyi.web.controller.admin;
 
-
+import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.request.GoodRequest;
 import com.ruoyi.system.entity.FtGoods;
+import com.ruoyi.system.response.GoodsResponse;
 import com.ruoyi.system.service.FtGoodsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Desc 商品
@@ -19,15 +22,17 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("v1/admin/goods")
 @Api(tags = "后台-商品")
-public class GoodsController {
+public class GoodsController extends BaseController {
 
     @Resource
     private FtGoodsService goodsService;
 
     @GetMapping("/page")
     @ApiOperation("商品列表-已上架")
-    public AjaxResult getGoodsList(GoodRequest goodRequest) {
-        return AjaxResult.success(goodsService.getGoodsPage(goodRequest));
+    public TableDataInfo getGoodsList(GoodRequest goodRequest) {
+        startPage();
+        List<GoodsResponse> responses = goodsService.selectGoodsList(goodRequest);
+        return getDataTable(responses);
     }
 
 
@@ -51,8 +56,8 @@ public class GoodsController {
 
     @GetMapping("/list")
     @ApiOperation("商品列表")
-    public AjaxResult selectGoodsList(FtGoods Goods) {
-        return AjaxResult.success(goodsService.selectGoodsList(Goods));
+    public AjaxResult selectGoodsList(GoodRequest request) {
+        return AjaxResult.success(goodsService.selectGoodsList(request));
     }
 
     @DeleteMapping("/remove")

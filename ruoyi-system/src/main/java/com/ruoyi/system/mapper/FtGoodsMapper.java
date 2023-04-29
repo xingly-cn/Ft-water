@@ -10,13 +10,15 @@ import com.ruoyi.system.response.GoodsResponse;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
 * Created by IntelliJ IDEA.
 * @Author : 镜像
 * @create 2023/3/30 15:59
 */
 @Repository
-public interface FtGoodsMapper extends BaseMapper<FtGoods> {
+public interface FtGoodsMapper{
 
     int deleteByPrimaryKey(Long id);
 
@@ -28,6 +30,5 @@ public interface FtGoodsMapper extends BaseMapper<FtGoods> {
 
     int updateByPrimaryKey(FtGoods record);
 
-    Page<GoodsResponse> selectPage(@Param("page") IPage<GoodsResponse> page,
-                                   @Param("goods") GoodRequest request);
+    List<GoodsResponse> selectList(@Param("goods") GoodRequest request);
 }

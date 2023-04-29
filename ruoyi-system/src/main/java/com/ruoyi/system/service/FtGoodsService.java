@@ -3,6 +3,7 @@ package com.ruoyi.system.service;
 
 import com.ruoyi.system.entity.FtGoods;
 import com.ruoyi.system.request.GoodRequest;
+import com.ruoyi.system.response.GoodsResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -20,11 +21,7 @@ public interface FtGoodsService{
 
     Boolean updateGoods(FtGoods record);
 
-    Map<String, Object> getGoodsPage(GoodRequest request);
-
-    List<FtGoods> selectGoodsList(FtGoods Goods);
+    List<GoodsResponse> selectGoodsList(GoodRequest request);
 
     FtGoods selectByPrimaryKey(Long id);
-
-
 }

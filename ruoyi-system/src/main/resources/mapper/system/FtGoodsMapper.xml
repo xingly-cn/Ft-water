@@ -122,7 +122,7 @@
         where id = #{id}
     </update>
 
-    <select id="selectPage" resultType="com.ruoyi.system.response.GoodsResponse">
+    <select id="selectList" resultType="com.ruoyi.system.response.GoodsResponse">
         select
         <include refid="Base_Column_List"/>
         from ft_goods

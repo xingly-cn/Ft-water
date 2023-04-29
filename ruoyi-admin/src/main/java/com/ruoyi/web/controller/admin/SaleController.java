@@ -1,15 +1,19 @@
 package com.ruoyi.web.controller.admin;
 
 
+import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.request.SaleRequest;
 import com.ruoyi.system.entity.FtSale;
+import com.ruoyi.system.response.SaleResponse;
 import com.ruoyi.system.service.FtSaleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Desc 核销
@@ -19,15 +23,17 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("v1/admin/sale")
 @Api(tags = "后台-核销")
-public class SaleController {
+public class SaleController extends BaseController {
 
     @Resource
     private FtSaleService saleService;
 
     @GetMapping("/page")
     @ApiOperation("核销列表-分页")
-    public AjaxResult getSaleList(SaleRequest request) {
-        return AjaxResult.success(saleService.getSalePage(request));
+    public TableDataInfo getSaleList(SaleRequest request) {
+        startPage();
+        List<SaleResponse> responses = saleService.selectSaleList(request);
+        return getDataTable(responses);
     }
 
     @GetMapping("/detail")

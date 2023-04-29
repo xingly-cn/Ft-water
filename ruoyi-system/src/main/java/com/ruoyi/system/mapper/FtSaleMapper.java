@@ -30,8 +30,5 @@ public interface FtSaleMapper {
 
     int updateByPrimaryKey(FtSale record);
 
-    Page<SaleResponse> selectPage(@Param("page") IPage<SaleResponse> page,
-                                  @Param("sale") SaleRequest request);
-
     List<SaleResponse> selectList(@Param("sale") SaleRequest sale);
 }

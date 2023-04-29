@@ -1,8 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.entity.FtMessage;
 import com.ruoyi.system.entity.FtUser;
 import com.ruoyi.system.mapper.FtMessageMapper;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,7 +24,7 @@ import java.util.Map;
  * @create 2023/4/19 21:48
  */
 @Service
-public class FtMessageServiceImpl extends BaseMapperImpl<FtMessage, MessageResponse, MessageRequest, FtMessageMapper> implements FtMessageService {
+public class FtMessageServiceImpl implements FtMessageService {
 
     @Resource
     private FtMessageMapper ftMessageMapper;
@@ -76,7 +74,7 @@ public class FtMessageServiceImpl extends BaseMapperImpl<FtMessage, MessageRespo
             throw new SecurityException("该消息不存在");
         }
         //找到对应的楼 一人确认收获 一楼确认收获
-        Long userId = Long.parseLong(getCurrentUser().get("userId"));
+        Long userId = SecurityUtils.getUserId();
         FtUser user = userService.selectByPrimaryKey(userId);
         Long homeId = Long.parseLong(user.getHomeId());
         confirms(homeId, userId);
@@ -84,9 +82,8 @@ public class FtMessageServiceImpl extends BaseMapperImpl<FtMessage, MessageRespo
     }
 
     @Override
-    public Map<String, Object> getMessagePage(MessageRequest request) {
-        IPage<MessageResponse> page = new Page<>(request.getPage(), request.getSize());
-        return selectPage(page, request);
+    public List<MessageResponse> getMessageList(MessageRequest request) {
+        return ftMessageMapper.getMessageList(request);
     }
 
     public void addMessages(List<FtMessage> messages) {
@@ -106,10 +103,5 @@ public class FtMessageServiceImpl extends BaseMapperImpl<FtMessage, MessageRespo
     private void confirms(Long homeId, Long userId) {
         //确认收获 一楼确认收获 无收获的
         ftMessageMapper.confirms(homeId, userId);
-    }
-
-    @Override
-    protected void customSelectPage(IPage<MessageResponse> page, MessageRequest request) {
-        ftMessageMapper.selectPage(page, request);
     }
 }

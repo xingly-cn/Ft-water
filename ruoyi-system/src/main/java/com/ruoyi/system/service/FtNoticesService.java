@@ -5,6 +5,7 @@ import com.ruoyi.system.entity.FtNotices;
 import com.ruoyi.system.request.NoticesRequest;
 import com.ruoyi.system.response.NoticesResponse;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,8 +28,7 @@ public interface FtNoticesService {
 
     int updateByPrimaryKey(FtNotices record);
 
-    Map<String, Object> getNoticesPage(NoticesRequest request);
+    List<NoticesResponse> getNoticesByInput(NoticesRequest request);
 
-
-    Map<String, Object> getNoticesByInput(long cur, long size);
+    List<NoticesResponse> getNoticesList(NoticesRequest request);
 }

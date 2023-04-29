@@ -23,7 +23,5 @@ public interface FtSaleService{
 
     Boolean updateSale(FtSale record);
 
-    Map<String,Object> getSalePage(SaleRequest request);
-
     List<SaleResponse> selectSaleList(SaleRequest Sale);
 }

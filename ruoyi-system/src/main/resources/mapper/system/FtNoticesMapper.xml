@@ -213,7 +213,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="selectPage" resultType="com.ruoyi.system.response.NoticesResponse">
+    <select id="selectList" resultType="com.ruoyi.system.response.NoticesResponse">
         <!--  school home user  -->
         <include refid="Base_Column_List_With_School_Home_User"/>
         where n.deleted = 0
@@ -225,6 +225,9 @@
         </if>
         <if test="notices.userId != null">
             and n.user_id = #{notices.userId}
+        </if>
+        <if test="notices.type != null">
+            and n.type = #{notices.type}
         </if>
         order by n.id desc
     </select>
