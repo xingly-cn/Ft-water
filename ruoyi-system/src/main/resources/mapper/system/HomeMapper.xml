@@ -161,4 +161,33 @@
             deleted   = #{deleted,jdbcType=BOOLEAN}
         where id = #{id,jdbcType=BIGINT}
     </update>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_home
+        where deleted = false
+        <if test="schoolId != null">
+            and school_id = #{schoolId,jdbcType=BIGINT}
+        </if>
+        <if test="parentId != null">
+            and parent_id = #{parentId,jdbcType=BIGINT}
+        </if>
+        <if test="name != null and name != ''">
+            and `name` like concat('%', #{name,jdbcType=VARCHAR}, '%')
+        </if>
+        <if test="remark != null and remark != ''">
+            and remark like concat('%', #{remark,jdbcType=VARCHAR}, '%')
+        </if>
+        <if test="longitude !=null">
+            and longitude = #{longitude,jdbcType=DOUBLE}
+        </if>
+        <if test="latitude !=null">
+            and latitude = #{latitude,jdbcType=DOUBLE}
+        </if>
+        <if test="number != null">
+            and `number` = #{number,jdbcType=INTEGER}
+        </if>
+    </select>
 </mapper>

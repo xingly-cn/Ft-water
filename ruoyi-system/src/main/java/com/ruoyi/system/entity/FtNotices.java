@@ -1,6 +1,6 @@
 package com.ruoyi.system.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.ruoyi.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
@@ -8,9 +8,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Tolerate;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDateTime;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,7 +20,7 @@ import java.time.LocalDateTime;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @Builder
-public class FtNotices extends BaseEntry {
+public class FtNotices extends BaseEntity {
 
     private static final long serialVersionUID = 5011762148279740830L;
 
@@ -63,34 +60,6 @@ public class FtNotices extends BaseEntry {
     @ApiModelProperty(value = "剩余")
     private Integer residue;
 
-
-    /**
-     * 创建人
-     */
-    @ApiModelProperty(value = "创建人")
-    private Long createBy;
-
-    /**
-     * 修改人
-     */
-    @ApiModelProperty(value = "修改人")
-    private Long updateBy;
-
-    /**
-     * 创建时间
-     */
-    @ApiModelProperty(value = "创建时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
-
-    /**
-     * 修改时间
-     */
-    @ApiModelProperty(value = "修改时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateTime;
 
     @Tolerate
     public FtNotices() {}

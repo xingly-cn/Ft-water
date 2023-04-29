@@ -1,6 +1,5 @@
 package com.ruoyi.system.mapper;
 
-
 import com.ruoyi.system.entity.FtSchool;
 import com.ruoyi.system.request.SchoolRequest;
 import com.ruoyi.system.response.IndexCountResponse;

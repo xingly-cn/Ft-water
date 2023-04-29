@@ -29,10 +29,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -60,7 +57,7 @@ public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, User
     @Override
     @CachePut(value = "user", key = "#record.id")
     public Boolean addUser(FtUser record) {
-        record.setCreateTime(LocalDateTime.now());
+        record.setCreateTime(new Date());
         return ftUserMapper.insert(record) > 0;
     }
 
@@ -134,7 +131,7 @@ public class FtUserServiceImpl extends BaseMapperImpl<FtUser, UserResponse, User
             user.setUserType("0");
             user.setDormType(request.getDormType());
             user.setAvatar(request.getAvatar());
-            user.setCreateTime(LocalDateTime.now());
+            user.setCreateTime(new Date());
             user.setHomeId(user.getHomeId());
             user.setHomeId(request.getHomeId());
             user.setSex(request.getSex());

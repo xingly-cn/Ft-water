@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class FtSaleServiceImpl extends BaseMapperImpl<FtSale, SaleResponse, Sale
     @Override
     @CachePut(value = "sale",key = "#record.id")
     public Boolean addSale(FtSale record) {
-        record.setCreateTime(LocalDateTime.now());
+        record.setCreateTime(new Date());
         return ftSaleMapper.insertSelective(record)>0;
     }
 

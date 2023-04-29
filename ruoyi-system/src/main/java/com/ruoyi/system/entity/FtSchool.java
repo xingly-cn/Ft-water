@@ -1,5 +1,6 @@
 package com.ruoyi.system.entity;
 
+import com.ruoyi.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
@@ -22,7 +23,7 @@ import java.io.Serializable;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class FtSchool extends BaseEntry implements Serializable {
+public class FtSchool extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = -9196141504722593355L;
     /**

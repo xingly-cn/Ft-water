@@ -1,6 +1,8 @@
 package com.ruoyi.system.request;
 
+import com.ruoyi.system.entity.FtHome;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 /**
@@ -11,7 +13,8 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class HomeRequest {
+@EqualsAndHashCode(callSuper = true)
+public class HomeRequest extends FtHome {
 
     private Long id;
 

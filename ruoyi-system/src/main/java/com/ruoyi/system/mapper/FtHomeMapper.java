@@ -1,9 +1,11 @@
 package com.ruoyi.system.mapper;
 
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.system.entity.FtHome;
+import com.ruoyi.system.request.HomeRequest;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,7 +14,7 @@ import org.springframework.stereotype.Repository;
  * @create 2023/4/18 21:16
  */
 @Repository
-public interface FtHomeMapper extends BaseMapper<FtHome> {
+public interface FtHomeMapper {
 
     int deleteByPrimaryKey(Long id);
 
@@ -23,4 +25,6 @@ public interface FtHomeMapper extends BaseMapper<FtHome> {
     int updateByPrimaryKeySelective(FtHome record);
 
     int updateByPrimaryKey(FtHome record);
+
+    List<FtHome> selectList(HomeRequest request);
 }

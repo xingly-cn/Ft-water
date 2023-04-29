@@ -1,15 +1,13 @@
 package com.ruoyi.system.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.ruoyi.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,7 +25,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class FtUser extends BaseEntry implements Serializable {
+public class FtUser extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = -8451607199884042434L;
     /**
@@ -60,14 +58,6 @@ public class FtUser extends BaseEntry implements Serializable {
      */
     @ApiModelProperty(value = "微信获取手机号")
     private String phone;
-
-    /**
-     * 注册时间
-     */
-    @ApiModelProperty(value = "注册时间")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
 
     /**
      * 用户类型：0学生 1宿管

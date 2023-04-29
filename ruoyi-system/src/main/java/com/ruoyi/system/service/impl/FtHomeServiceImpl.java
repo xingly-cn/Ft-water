@@ -3,6 +3,7 @@ package com.ruoyi.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.entity.*;
 import com.ruoyi.system.mapper.FtHomeMapper;
 import com.ruoyi.system.mapper.FtUserMapper;
@@ -18,6 +19,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +33,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class FtHomeServiceImpl extends BaseMapperImpl<FtHome, HomeResponse, HomeRequest, FtHomeMapper> implements FtHomeService {
+public class FtHomeServiceImpl implements FtHomeService {
 
     @Autowired
     private FtHomeMapper homeMapper;
@@ -67,7 +69,7 @@ public class FtHomeServiceImpl extends BaseMapperImpl<FtHome, HomeResponse, Home
     public List<HomeResponse> homeTree() {
         List<HomeResponse> responses = Lists.newArrayList();
 
-        List<FtHome> homes = homeMapper.selectList(new QueryWrapper<>());
+        List<FtHome> homes = homeMapper.selectList(null);
         if (CollectionUtils.isEmpty(homes)) {
             return responses;
         }
@@ -87,7 +89,7 @@ public class FtHomeServiceImpl extends BaseMapperImpl<FtHome, HomeResponse, Home
         //先找到所有的一级菜单
         List<FtHome> parentHomes = homes.stream().filter(h -> h.getParentId().equals(0L)).collect(Collectors.toList());
         for (FtHome parentHome : parentHomes) {
-            assembleHomeReponse(homes, schoolMap, userMap, responses, parentHome);
+            assembleHomeResponse(homes, schoolMap, userMap, responses, parentHome);
         }
         return responses;
     }
@@ -100,7 +102,7 @@ public class FtHomeServiceImpl extends BaseMapperImpl<FtHome, HomeResponse, Home
         }
 
         //添加消息 确认之后在入库
-        Long userId = Long.parseLong(getCurrentUser().get("userId"));
+        Long userId = SecurityUtils.getUserId();
         //找该楼下面的管理员 发送消息
         List<FtUser> users = userMapper.getUserByHomeId(request.getId(), 1);
 
@@ -110,15 +112,16 @@ public class FtHomeServiceImpl extends BaseMapperImpl<FtHome, HomeResponse, Home
         //消息
         List<FtMessage> messages = Lists.newArrayList();
         for (FtUser user : users) {
-            messages.add(FtMessage.builder()
+            FtMessage message = FtMessage.builder()
                     .number(request.getNumber())
                     .homeId(request.getId())
                     .userId(user.getId())
                     .confirm(false)
-                    .createBy(userId)
-                    .updateBy(userId)
-                    .createTime(LocalDateTime.now())
-                    .build());
+                    .build();
+            message.setCreateBy(userId.toString());
+            message.setUpdateBy(userId.toString());
+            message.setCreateTime(new Date());
+            messages.add(message);
         }
         messageService.addMessages(messages);
         log.info("发送通知{}条", messages.size());
@@ -132,10 +135,10 @@ public class FtHomeServiceImpl extends BaseMapperImpl<FtHome, HomeResponse, Home
                 .userId(userId)
                 .number(request.getNumber())
                 .residue(home.getNumber() + request.getNumber())
-                .createTime(LocalDateTime.now())
-                .createBy(userId)
-                .updateBy(userId)
                 .build();
+        notices.setCreateBy(userId.toString());
+        notices.setUpdateBy(userId.toString());
+        notices.setCreateTime(new Date());
         noticesService.insert(notices);
         return true;
     }
@@ -189,13 +192,13 @@ public class FtHomeServiceImpl extends BaseMapperImpl<FtHome, HomeResponse, Home
         List<HomeResponse> responses = Lists.newArrayList();
         for (FtHome home : homes) {
             if (home.getParentId().equals(parentId)) {
-                assembleHomeReponse(homes, schoolMap, userMap, responses, home);
+                assembleHomeResponse(homes, schoolMap, userMap, responses, home);
             }
         }
         return responses;
     }
 
-    private void assembleHomeReponse(List<FtHome> homes, Map<Long, String> schoolMap, Map<String, List<FtUser>> userMap, List<HomeResponse> responses, FtHome home) {
+    private void assembleHomeResponse(List<FtHome> homes, Map<Long, String> schoolMap, Map<String, List<FtUser>> userMap, List<HomeResponse> responses, FtHome home) {
         HomeResponse response = new HomeResponse();
         BeanUtils.copyProperties(home, response);
         response.setSchoolName(schoolMap.get(home.getSchoolId()));
@@ -212,10 +215,5 @@ public class FtHomeServiceImpl extends BaseMapperImpl<FtHome, HomeResponse, Home
         }
         home.setNumber(home.getNumber() + number);
         return homeMapper.updateByPrimaryKeySelective(home) > 0;
-    }
-
-    @Override
-    protected void customSelectPage(IPage<HomeResponse> page, HomeRequest request) {
-
     }
 }

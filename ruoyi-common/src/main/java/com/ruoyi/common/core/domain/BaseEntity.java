@@ -7,15 +7,16 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.format.annotation.DateTimeFormat;
 
-/**
- * Entity基类
- * 
- * @author ruoyi
- */
+
 public class BaseEntity implements Serializable
 {
     private static final long serialVersionUID = 1L;
+
+    private Long id;
+
+    private Boolean deleted;
 
     /** 搜索值 */
     @JsonIgnore
@@ -26,6 +27,7 @@ public class BaseEntity implements Serializable
 
     /** 创建时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     /** 更新者 */
@@ -33,6 +35,7 @@ public class BaseEntity implements Serializable
 
     /** 更新时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date updateTime;
 
     /** 备注 */
@@ -114,5 +117,21 @@ public class BaseEntity implements Serializable
     public void setParams(Map<String, Object> params)
     {
         this.params = params;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class FtOrderServiceImpl extends BaseMapperImpl<FtOrder, OrderResponse, O
     @Override
     @CachePut(value = "order", key = "#record.id")
     public Boolean addOrder(FtOrder record) {
-        record.setCreateTime(LocalDateTime.now());
+        record.setCreateTime(new Date());
         return ftOrderMapper.insertSelective(record) > 0;
     }
 
