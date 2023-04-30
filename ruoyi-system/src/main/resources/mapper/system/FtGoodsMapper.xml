@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.FtGoodsMapper">
-    <resultMap id="BaseResultMap" type="com.ruoyi.system.entity.FtGoods">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.FtGoods">
         <!--@mbg.generated-->
         <!--@Table ft_goods-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -53,7 +53,7 @@
     </delete>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
-            parameterType="com.ruoyi.system.entity.FtGoods">
+            parameterType="com.ruoyi.system.domain.FtGoods">
         <!--@mbg.generated-->
         insert into ft_goods
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -134,7 +134,7 @@
         </trim>
     </insert>
 
-    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.entity.FtGoods">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.domain.FtGoods">
         <!--@mbg.generated-->
         update ft_goods
         <set>
@@ -154,7 +154,7 @@
         where id = #{id}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.entity.FtGoods">
+    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.domain.FtGoods">
         <!--@mbg.generated-->
         update ft_goods
         set title   = #{title,jdbcType=VARCHAR},

@@ -75,35 +75,6 @@
                  left join sys_role r on r.role_id = ur.role_id
     </sql>
 
-    <sql id="selectUserRole_Home">
-        select u.user_id,
-               u.dept_id,
-               u.user_name,
-               u.nick_name,
-               u.email,
-               u.avatar,
-               u.phonenumber,
-               u.password,
-               u.sex,
-               u.open_id,
-               u.water_num,
-               u.address,
-               u.dorm_type,
-               u.home_id,
-               u.status,
-               u.del_flag,
-               u.login_ip,
-               u.login_date,
-               u.create_by,
-               u.create_time,
-               u.update_by,
-               u.update_time,
-               u.remark
-        from sys_user u
-                 left join sys_user_role ur on u.user_id = ur.user_id
-                 left join ft_home h on u.home_id = h.home_id
-    </sql>
-
     <select id="selectUserList" parameterType="com.ruoyi.common.core.domain.entity.SysUser" resultMap="SysUserResult">
         select u.user_id,
                u.dept_id,

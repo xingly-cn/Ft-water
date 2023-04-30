@@ -1,12 +1,11 @@
 package com.ruoyi.system.service;
 
 
-import com.ruoyi.system.entity.FtMessage;
+import com.ruoyi.system.domain.FtMessage;
 import com.ruoyi.system.request.MessageRequest;
 import com.ruoyi.system.response.MessageResponse;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.

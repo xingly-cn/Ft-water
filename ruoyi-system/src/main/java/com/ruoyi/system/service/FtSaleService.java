@@ -1,12 +1,11 @@
 package com.ruoyi.system.service;
 
 
-import com.ruoyi.system.entity.FtSale;
+import com.ruoyi.system.domain.FtSale;
 import com.ruoyi.system.request.SaleRequest;
 import com.ruoyi.system.response.SaleResponse;
 
 import java.util.List;
-import java.util.Map;
 
 /**
 * Created by IntelliJ IDEA.

@@ -1,7 +1,6 @@
 package com.ruoyi.system.request;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.ruoyi.system.entity.FtOrder;
+import com.ruoyi.system.domain.FtOrder;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

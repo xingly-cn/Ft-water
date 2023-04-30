@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.FtMessageMapper">
-    <resultMap id="BaseResultMap" type="com.ruoyi.system.entity.FtMessage">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.FtMessage">
         <!--@mbg.generated-->
         <!--@Table ft_message-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -61,7 +61,7 @@
         where id = #{id,jdbcType=BIGINT}
     </delete>
 
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.entity.FtMessage"
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.domain.FtMessage"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into ft_message (number,deleted, home_id, user_id,
@@ -73,7 +73,7 @@
     </insert>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id"
-            parameterType="com.ruoyi.system.entity.FtMessage" useGeneratedKeys="true">
+            parameterType="com.ruoyi.system.domain.FtMessage" useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into ft_message
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -136,7 +136,7 @@
         </trim>
     </insert>
 
-    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.entity.FtMessage">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.domain.FtMessage">
         <!--@mbg.generated-->
         update ft_message
         <set>
@@ -170,7 +170,7 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.entity.FtMessage">
+    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.domain.FtMessage">
         <!--@mbg.generated-->
         update ft_message
         set deleted     = #{deleted,jdbcType=BOOLEAN},

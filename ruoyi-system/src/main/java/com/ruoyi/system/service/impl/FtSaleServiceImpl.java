@@ -1,6 +1,6 @@
 package com.ruoyi.system.service.impl;
 
-import com.ruoyi.system.entity.FtSale;
+import com.ruoyi.system.domain.FtSale;
 import com.ruoyi.system.mapper.FtSaleMapper;
 import com.ruoyi.system.request.SaleRequest;
 import com.ruoyi.system.response.SaleResponse;

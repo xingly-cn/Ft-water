@@ -1,4 +1,4 @@
-package com.ruoyi.system.entity;
+package com.ruoyi.system.domain;
 
 import com.ruoyi.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;

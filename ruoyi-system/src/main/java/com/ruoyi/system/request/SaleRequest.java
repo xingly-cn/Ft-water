@@ -1,5 +1,6 @@
 package com.ruoyi.system.request;
 
+import com.ruoyi.system.domain.FtSale;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,7 +13,7 @@ import lombok.ToString;
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class SaleRequest extends PageRequest {
+public class SaleRequest extends FtSale {
 
     private String keyword;
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.FtOrderMapper">
-    <resultMap id="BaseResultMap" type="com.ruoyi.system.entity.FtOrder">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         <!--@Table ft_order-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -54,14 +54,14 @@
         <!--@mbg.generated-->
         update ft_order set deleted = 1 where id = #{id}
     </delete>
-    <insert id="insert" parameterType="com.ruoyi.system.entity.FtOrder">
+    <insert id="insert" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         insert into ft_order (id, deleted, `uid`,
         good_id, school_id, num,
         create_time, payed)
         values (#{id}, #{deleted,jdbcType=BOOLEAN}, #{uid,jdbcType=BIGINT}, #{goodId,jdbcType=BIGINT}, #{schoolId,jdbcType=BIGINT}, #{num,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{payed,jdbcType=BOOLEAN})
     </insert>
-    <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true" parameterType="com.ruoyi.system.entity.FtOrder">
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         insert into ft_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -117,7 +117,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.entity.FtOrder">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         update ft_order
         <set>
@@ -146,7 +146,7 @@
         where id = #{id}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.entity.FtOrder">
+    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         update ft_order
         set deleted = #{deleted,jdbcType=BOOLEAN}, `uid` = #{uid,jdbcType=BIGINT}, good_id = #{goodId,jdbcType=BIGINT}, school_id = #{schoolId,jdbcType=BIGINT}, num = #{num,jdbcType=INTEGER}, createTime = #{createTime,jdbcType=TIMESTAMP}, payed = #{payed,jdbcType=BOOLEAN}

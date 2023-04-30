@@ -5,7 +5,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.request.SaleRequest;
-import com.ruoyi.system.entity.FtSale;
+import com.ruoyi.system.domain.FtSale;
 import com.ruoyi.system.response.SaleResponse;
 import com.ruoyi.system.service.FtSaleService;
 import io.swagger.annotations.Api;

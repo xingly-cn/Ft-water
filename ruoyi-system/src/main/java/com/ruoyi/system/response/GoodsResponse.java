@@ -1,6 +1,6 @@
 package com.ruoyi.system.response;
 
-import com.ruoyi.system.entity.FtGoods;
+import com.ruoyi.system.domain.FtGoods;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

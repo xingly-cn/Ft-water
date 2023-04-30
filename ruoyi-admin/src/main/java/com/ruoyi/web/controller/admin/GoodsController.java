@@ -4,7 +4,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.request.GoodRequest;
-import com.ruoyi.system.entity.FtGoods;
+import com.ruoyi.system.domain.FtGoods;
 import com.ruoyi.system.response.GoodsResponse;
 import com.ruoyi.system.service.FtGoodsService;
 import io.swagger.annotations.Api;

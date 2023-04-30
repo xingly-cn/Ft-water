@@ -1,6 +1,6 @@
 package com.ruoyi.system.service.impl;
 
-import com.ruoyi.system.entity.FtOrder;
+import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;

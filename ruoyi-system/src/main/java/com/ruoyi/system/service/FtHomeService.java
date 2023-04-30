@@ -1,7 +1,7 @@
 package com.ruoyi.system.service;
 
 
-import com.ruoyi.system.entity.FtHome;
+import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.request.HomeRequest;
 import com.ruoyi.system.response.HomeResponse;
 

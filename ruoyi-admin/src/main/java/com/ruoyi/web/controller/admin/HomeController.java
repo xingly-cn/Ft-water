@@ -2,7 +2,7 @@ package com.ruoyi.web.controller.admin;
 
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.request.HomeRequest;
-import com.ruoyi.system.entity.FtHome;
+import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.service.FtHomeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

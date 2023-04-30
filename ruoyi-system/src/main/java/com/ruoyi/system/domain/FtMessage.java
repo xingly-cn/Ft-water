@@ -1,4 +1,4 @@
-package com.ruoyi.system.entity;
+package com.ruoyi.system.domain;
 
 import com.ruoyi.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
@@ -15,26 +15,14 @@ import lombok.experimental.Tolerate;
  * @Author : 镜像
  * @create 2023/4/19 21:48
  */
-@ApiModel(description = "ft_notices")
+@ApiModel(description = "ft_message")
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
 @Builder
-public class FtNotices extends BaseEntity {
+public class FtMessage extends BaseEntity {
 
-    private static final long serialVersionUID = 5011762148279740830L;
-
-    /**
-     * 0 取货 1是收货
-     */
-    @ApiModelProperty(value = "0 送货 1是收货")
-    private Integer type;
-
-    /**
-     * 学校id
-     */
-    @ApiModelProperty(value = "学校id")
-    private Long schoolId;
+    private static final long serialVersionUID = 8510398728211060703L;
 
     /**
      * 楼栋id
@@ -49,18 +37,15 @@ public class FtNotices extends BaseEntity {
     private Long userId;
 
     /**
-     * 数量
+     * 是否确认
      */
-    @ApiModelProperty(value = "数量")
-    private Integer number;
+    @ApiModelProperty(value = "是否确认")
+    private Boolean confirm;
 
-    /**
-     * 剩余
-     */
-    @ApiModelProperty(value = "剩余")
-    private Integer residue;
+    private Integer number;
 
 
     @Tolerate
-    public FtNotices() {}
+    public FtMessage() {
+    }
 }

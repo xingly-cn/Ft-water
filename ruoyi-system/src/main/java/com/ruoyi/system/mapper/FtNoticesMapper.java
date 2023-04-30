@@ -1,7 +1,7 @@
 package com.ruoyi.system.mapper;
 
 
-import com.ruoyi.system.entity.FtNotices;
+import com.ruoyi.system.domain.FtNotices;
 import com.ruoyi.system.request.NoticesRequest;
 import com.ruoyi.system.response.NoticesResponse;
 import org.apache.ibatis.annotations.Param;

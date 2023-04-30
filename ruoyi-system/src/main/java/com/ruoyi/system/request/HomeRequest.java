@@ -1,6 +1,6 @@
 package com.ruoyi.system.request;
 
-import com.ruoyi.system.entity.FtHome;
+import com.ruoyi.system.domain.FtHome;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

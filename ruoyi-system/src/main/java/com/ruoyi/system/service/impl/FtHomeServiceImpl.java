@@ -3,9 +3,9 @@ package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.system.entity.FtHome;
-import com.ruoyi.system.entity.FtMessage;
-import com.ruoyi.system.entity.FtNotices;
+import com.ruoyi.system.domain.FtHome;
+import com.ruoyi.system.domain.FtMessage;
+import com.ruoyi.system.domain.FtNotices;
 import com.ruoyi.system.mapper.FtHomeMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.request.HomeRequest;

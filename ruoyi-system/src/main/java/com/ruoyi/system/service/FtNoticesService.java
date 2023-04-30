@@ -1,12 +1,11 @@
 package com.ruoyi.system.service;
 
 
-import com.ruoyi.system.entity.FtNotices;
+import com.ruoyi.system.domain.FtNotices;
 import com.ruoyi.system.request.NoticesRequest;
 import com.ruoyi.system.response.NoticesResponse;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.

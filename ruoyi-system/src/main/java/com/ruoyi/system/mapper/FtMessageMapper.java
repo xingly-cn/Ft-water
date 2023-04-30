@@ -1,7 +1,7 @@
 package com.ruoyi.system.mapper;
 
 
-import com.ruoyi.system.entity.FtMessage;
+import com.ruoyi.system.domain.FtMessage;
 import com.ruoyi.system.request.MessageRequest;
 import com.ruoyi.system.response.MessageResponse;
 import org.apache.ibatis.annotations.Param;

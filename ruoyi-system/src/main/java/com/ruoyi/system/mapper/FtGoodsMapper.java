@@ -1,7 +1,7 @@
 package com.ruoyi.system.mapper;
 
 
-import com.ruoyi.system.entity.FtGoods;
+import com.ruoyi.system.domain.FtGoods;
 import com.ruoyi.system.request.GoodRequest;
 import com.ruoyi.system.response.GoodsResponse;
 import org.apache.ibatis.annotations.Param;

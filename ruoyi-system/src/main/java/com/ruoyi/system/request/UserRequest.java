@@ -1,6 +1,6 @@
 package com.ruoyi.system.request;
 
-import com.ruoyi.system.entity.FtUser;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +14,7 @@ import lombok.ToString;
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class UserRequest extends FtUser {
+public class UserRequest extends SysUser {
 
     @ApiModelProperty(value = "新密码")
     private String newPassword;

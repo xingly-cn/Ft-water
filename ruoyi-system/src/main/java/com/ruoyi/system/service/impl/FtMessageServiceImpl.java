@@ -3,7 +3,7 @@ package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.system.entity.FtMessage;
+import com.ruoyi.system.domain.FtMessage;
 import com.ruoyi.system.mapper.FtMessageMapper;
 import com.ruoyi.system.request.MessageRequest;
 import com.ruoyi.system.response.MessageResponse;

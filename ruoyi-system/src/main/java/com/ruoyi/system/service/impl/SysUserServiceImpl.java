@@ -12,7 +12,7 @@ import com.ruoyi.common.utils.bean.BeanValidators;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserRole;
-import com.ruoyi.system.entity.FtOrder;
+import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.OrderRequest;
@@ -481,19 +481,19 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     public String change(UserRequest request) {
-        String phone = request.getPhone();
+        String phone = request.getPhonenumber();
         String password = request.getPassword();
         String newPassword = request.getNewPassword();
 
-        if (org.apache.commons.lang3.StringUtils.isEmpty(phone)) {
+        if (StringUtils.isEmpty(phone)) {
             throw new ServiceException("手机号不能为空");
         }
 
-        if (org.apache.commons.lang3.StringUtils.isEmpty(password)) {
+        if (StringUtils.isEmpty(password)) {
             throw new ServiceException("密码不能为空");
         }
 
-        if (org.apache.commons.lang3.StringUtils.isEmpty(newPassword)) {
+        if (StringUtils.isEmpty(newPassword)) {
             throw new ServiceException("新密码不能为空");
         }
 
@@ -565,7 +565,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
         // 从redis校验验证码是否正确，这里先写死，因为甲方还没有购买短信
         if ("666666".equals(request.getCode())) {
-            user.setPhonenumber(request.getPhone());
+            user.setPhonenumber(request.getPhonenumber());
             userMapper.updatePhoneById(user);
             return userMapper.updatePhoneById(user) > 0 ? "修改手机号成功" : "修改手机号失败";
         }

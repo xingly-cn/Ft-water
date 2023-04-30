@@ -1,4 +1,4 @@
-package com.ruoyi.system.entity;
+package com.ruoyi.system.domain;
 
 import com.ruoyi.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
@@ -14,7 +14,6 @@ import java.math.BigDecimal;
  * @Author : 镜像
  * @create 2023/3/30 15:59
  */
-
 /**
  * 商品表
  */

@@ -1,7 +1,7 @@
 package com.ruoyi.system.mapper;
 
 
-import com.ruoyi.system.entity.FtHome;
+import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.request.HomeRequest;
 import com.ruoyi.system.response.IndexCountResponse;
 import org.springframework.stereotype.Repository;

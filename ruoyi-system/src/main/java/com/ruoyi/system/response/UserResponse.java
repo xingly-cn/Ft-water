@@ -1,10 +1,11 @@
 package com.ruoyi.system.response;
 
 
-import com.ruoyi.system.entity.FtUser;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,16 +15,22 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UserResponse extends FtUser {
+public class UserResponse extends SysUser {
 
     private String token;
 
     @ApiModelProperty(value = "宿舍类型 男0 女1")
     private String dormTypeName;
 
-    @ApiModelProperty(value = "用户类型：0学生 1宿管 2管理 3  注册默认为学生 拼接")
-    private String userTypeName;
-
     @ApiModelProperty(value = "楼栋ID")
     private String homeName;
+
+    private String address;
+
+    public String getDormTypeName() {
+        if (StringUtils.isNotEmpty(dormTypeName)) {
+            return dormTypeName.equals("0") ? "男" : "女";
+        }
+        return dormTypeName;
+    }
 }

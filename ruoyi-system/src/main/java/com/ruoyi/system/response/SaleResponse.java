@@ -1,7 +1,7 @@
 package com.ruoyi.system.response;
 
 
-import com.ruoyi.system.entity.FtSale;
+import com.ruoyi.system.domain.FtSale;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

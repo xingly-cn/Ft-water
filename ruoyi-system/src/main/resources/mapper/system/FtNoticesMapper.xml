@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.FtNoticesMapper">
-    <resultMap id="BaseResultMap" type="com.ruoyi.system.entity.FtNotices">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.FtNotices">
         <!--@mbg.generated-->
         <!--@Table ft_notices-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -68,7 +68,7 @@
         from ft_notices
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.entity.FtNotices"
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.domain.FtNotices"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into ft_notices (`type`, school_id, home_id,
@@ -81,7 +81,7 @@
                 #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" keyColumn="id" keyProperty="id"
-            parameterType="com.ruoyi.system.entity.FtNotices" useGeneratedKeys="true">
+            parameterType="com.ruoyi.system.domain.FtNotices" useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into ft_notices
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -155,7 +155,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.entity.FtNotices">
+    <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.domain.FtNotices">
         <!--@mbg.generated-->
         update ft_notices
         <set>
@@ -196,7 +196,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.entity.FtNotices">
+    <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.domain.FtNotices">
         <!--@mbg.generated-->
         update ft_notices
         set `type`      = #{type,jdbcType=TINYINT},

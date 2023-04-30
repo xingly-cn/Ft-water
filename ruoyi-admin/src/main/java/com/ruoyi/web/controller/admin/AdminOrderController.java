@@ -3,7 +3,7 @@ package com.ruoyi.web.controller.admin;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.system.entity.FtOrder;
+import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;

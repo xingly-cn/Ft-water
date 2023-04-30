@@ -1,9 +1,6 @@
 package com.ruoyi.system.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.system.entity.FtNotices;
+import com.ruoyi.system.domain.FtNotices;
 import com.ruoyi.system.mapper.FtNoticesMapper;
 import com.ruoyi.system.request.NoticesRequest;
 import com.ruoyi.system.response.NoticesResponse;
@@ -11,9 +8,7 @@ import com.ruoyi.system.service.FtNoticesService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.

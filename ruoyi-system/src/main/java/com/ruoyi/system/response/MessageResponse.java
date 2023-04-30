@@ -1,7 +1,7 @@
 package com.ruoyi.system.response;
 
 
-import com.ruoyi.system.entity.FtMessage;
+import com.ruoyi.system.domain.FtMessage;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

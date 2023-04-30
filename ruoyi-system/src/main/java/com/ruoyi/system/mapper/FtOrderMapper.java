@@ -1,6 +1,6 @@
 package com.ruoyi.system.mapper;
 
-import com.ruoyi.system.entity.FtOrder;
+import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
 import org.apache.ibatis.annotations.Param;

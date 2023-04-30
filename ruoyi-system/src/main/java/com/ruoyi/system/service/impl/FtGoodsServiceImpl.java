@@ -1,7 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 
-import com.ruoyi.system.entity.FtGoods;
+import com.ruoyi.system.domain.FtGoods;
 import com.ruoyi.system.mapper.FtGoodsMapper;
 import com.ruoyi.system.request.GoodRequest;
 import com.ruoyi.system.response.GoodsResponse;

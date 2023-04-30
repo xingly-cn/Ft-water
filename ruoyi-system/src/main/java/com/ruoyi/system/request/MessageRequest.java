@@ -1,5 +1,6 @@
 package com.ruoyi.system.request;
 
+import com.ruoyi.system.domain.FtMessage;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -12,11 +13,6 @@ import lombok.ToString;
 @Data
 @ToString
 @EqualsAndHashCode(callSuper = true)
-public class MessageRequest extends PageRequest {
+public class MessageRequest extends FtMessage {
 
-    private Long homeId;
-
-    private Long userId;
-
-    private Boolean confirm;
 }
