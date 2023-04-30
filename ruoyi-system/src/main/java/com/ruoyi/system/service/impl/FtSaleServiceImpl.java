@@ -5,9 +5,6 @@ import com.ruoyi.system.mapper.FtSaleMapper;
 import com.ruoyi.system.request.SaleRequest;
 import com.ruoyi.system.response.SaleResponse;
 import com.ruoyi.system.service.FtSaleService;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -27,26 +24,22 @@ public class FtSaleServiceImpl implements FtSaleService {
     private FtSaleMapper ftSaleMapper;
 
     @Override
-    @CacheEvict(value = "sale", key = "#id")
     public Boolean deleteByPrimaryKey(Long id) {
         return ftSaleMapper.deleteByPrimaryKey(id) > 0;
     }
 
     @Override
-    @CachePut(value = "sale", key = "#record.id")
     public Boolean addSale(FtSale record) {
         record.setCreateTime(new Date());
         return ftSaleMapper.insertSelective(record) > 0;
     }
 
     @Override
-    @Cacheable(value = "sale", key = "#id")
     public FtSale selectByPrimaryKey(Long id) {
         return ftSaleMapper.selectByPrimaryKey(id);
     }
 
     @Override
-    @CachePut(value = "sale", key = "#record.id")
     public Boolean updateSale(FtSale record) {
         return ftSaleMapper.updateByPrimaryKeySelective(record) > 0;
     }

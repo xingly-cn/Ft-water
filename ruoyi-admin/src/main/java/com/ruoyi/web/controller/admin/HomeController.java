@@ -24,6 +24,12 @@ public class HomeController {
     @Autowired
     private FtHomeService homeService;
 
+    @GetMapping("/list")
+    @ApiOperation("列表")
+    public AjaxResult homeList(HomeRequest request) {
+        return AjaxResult.success(homeService.homeList(request));
+    }
+
     @GetMapping("/tree")
     @ApiOperation("树")
     public AjaxResult homeTree() {

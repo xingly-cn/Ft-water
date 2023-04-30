@@ -28,4 +28,6 @@ public interface FtHomeService {
     Boolean addUser(HomeRequest request);
 
     Boolean addNumberByHomeId(Long homeId, Integer number);
+
+    List<HomeResponse> homeList(HomeRequest request);
 }

@@ -8,9 +8,6 @@ import com.ruoyi.system.service.FtOrderService;
 import com.ruoyi.system.websocket.OrderWebSocket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -43,26 +40,22 @@ public class FtOrderServiceImpl implements FtOrderService {
     private FtHomeServiceImpl homeService;
 
     @Override
-    @CacheEvict(value = "order", key = "#id")
     public Boolean deleteByPrimaryKey(Long id) {
         return ftOrderMapper.deleteByPrimaryKey(id) > 0;
     }
 
     @Override
-    @CachePut(value = "order", key = "#record.id")
     public Boolean addOrder(FtOrder record) {
         record.setCreateTime(new Date());
         return ftOrderMapper.insertSelective(record) > 0;
     }
 
     @Override
-    @Cacheable(value = "order", key = "#id")
     public FtOrder selectByPrimaryKey(Long id) {
         return ftOrderMapper.selectByPrimaryKey(id);
     }
 
     @Override
-    @CachePut(value = "order", key = "#record.id")
     public Boolean updateOrder(FtOrder record) {
         return ftOrderMapper.updateByPrimaryKeySelective(record) > 0;
     }

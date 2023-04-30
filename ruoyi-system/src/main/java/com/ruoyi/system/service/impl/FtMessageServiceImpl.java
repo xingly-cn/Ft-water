@@ -11,7 +11,6 @@ import com.ruoyi.system.service.FtHomeService;
 import com.ruoyi.system.service.FtMessageService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -51,7 +50,6 @@ public class FtMessageServiceImpl implements FtMessageService {
     }
 
     @Override
-    @Cacheable(value = "message", key = "#id", unless = "#result==null")
     public MessageResponse selectByPrimaryKey(Long id) {
         return ftMessageMapper.selectByPrimaryKey(id);
     }

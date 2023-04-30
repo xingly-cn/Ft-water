@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.FtHome;
@@ -80,12 +79,7 @@ public class FtHomeServiceImpl implements FtHomeService {
         }
 
         //找到所有的用户
-        List<SysUser> users = userMapper.getUsersFindByRoleId(7);
-        Map<Long, List<SysUser>> userMap = new ConcurrentHashMap<>();
-        if (CollectionUtils.isNotEmpty(users)) {
-            users = users.stream().filter(u->u.getHomeId()!=null).collect(Collectors.toList());
-            userMap = users.stream().collect(Collectors.groupingBy(SysUser::getHomeId));
-        }
+        Map<Long, List<SysUser>> userMap = getUserMap();
 
         //先找到所有的一级菜单
         List<FtHome> parentHomes = homes.stream().filter(h -> h.getParentId().equals(0L)).collect(Collectors.toList());
@@ -149,7 +143,6 @@ public class FtHomeServiceImpl implements FtHomeService {
     }
 
     @Override
-    @Cacheable(value = "home", key = "#id")
     public HomeResponse selectByPrimaryKey(Long id) {
         FtHome home = homeMapper.selectByPrimaryKey(id);
         if (home != null) {
@@ -157,7 +150,7 @@ public class FtHomeServiceImpl implements FtHomeService {
             BeanUtils.copyProperties(home, response);
             return response;
         }
-        return null;
+        return new HomeResponse();
     }
 
     @Override
@@ -173,7 +166,7 @@ public class FtHomeServiceImpl implements FtHomeService {
         }
 
         //查询该用户是否在其他宿舍楼下面是管理员
-        List<SysUser> myUsers = userMapper.getUsersFindByRoleIdAndUserId(request.getUserId(), 6);
+        List<SysUser> myUsers = userMapper.getUsersFindByRoleIdAndUserId(request.getUserId(), 7);
         if (CollectionUtils.isNotEmpty(myUsers)) {
             throw new SecurityException("该用户已经是其他宿舍楼管理员了");
         }
@@ -189,25 +182,8 @@ public class FtHomeServiceImpl implements FtHomeService {
         });
         //添加管理员
         user.setRoleIds(new Long[]{7L});
+        user.setHomeId(request.getId());
         return userService.updateUser(user) > 0;
-    }
-
-    private List<HomeResponse> buildTree(List<FtHome> homes, Long parentId, Map<Long, List<SysUser>> userMap) {
-        List<HomeResponse> responses = Lists.newArrayList();
-        for (FtHome home : homes) {
-            if (home.getParentId().equals(parentId)) {
-                assembleHomeResponse(homes, userMap, responses, home);
-            }
-        }
-        return responses;
-    }
-
-    private void assembleHomeResponse(List<FtHome> homes, Map<Long, List<SysUser>> userMap, List<HomeResponse> responses, FtHome home) {
-        HomeResponse response = new HomeResponse();
-        BeanUtils.copyProperties(home, response);
-        response.setUsers(userMap.get(home.getId()) != null ? userMap.get(home.getId()) : Lists.newArrayList());
-        response.setChildren(buildTree(homes, home.getId(), userMap));
-        responses.add(response);
     }
 
     @Override
@@ -218,6 +194,23 @@ public class FtHomeServiceImpl implements FtHomeService {
         }
         home.setNumber(home.getNumber() + number);
         return homeMapper.updateByPrimaryKeySelective(home) > 0;
+    }
+
+    @Override
+    public List<HomeResponse> homeList(HomeRequest request) {
+        List<FtHome> homes = homeMapper.selectList(request);
+        if (CollectionUtils.isEmpty(homes)) {
+            return Lists.newArrayList();
+        }
+        List<HomeResponse> responses = Lists.newArrayList();
+        Map<Long, List<SysUser>> userMap = getUserMap();
+        for (FtHome home : homes) {
+            HomeResponse response = new HomeResponse();
+            BeanUtils.copyProperties(home, response);
+            response.setUsers(userMap.get(home.getId()) != null ? userMap.get(home.getId()) : Lists.newArrayList());
+            responses.add(response);
+        }
+        return responses;
     }
 
     public String getSchoolByRemark(String name) {
@@ -248,5 +241,34 @@ public class FtHomeServiceImpl implements FtHomeService {
             return home.getId();
         }
         return getTopId(homes, home.getParentId());
+    }
+
+    private List<HomeResponse> buildTree(List<FtHome> homes, Long parentId, Map<Long, List<SysUser>> userMap) {
+        List<HomeResponse> responses = Lists.newArrayList();
+        for (FtHome home : homes) {
+            if (home.getParentId().equals(parentId)) {
+                assembleHomeResponse(homes, userMap, responses, home);
+            }
+        }
+        return responses;
+    }
+
+    private void assembleHomeResponse(List<FtHome> homes, Map<Long, List<SysUser>> userMap, List<HomeResponse> responses, FtHome home) {
+        HomeResponse response = new HomeResponse();
+        BeanUtils.copyProperties(home, response);
+        response.setUsers(userMap.get(home.getId()) != null ? userMap.get(home.getId()) : Lists.newArrayList());
+        response.setChildren(buildTree(homes, home.getId(), userMap));
+        responses.add(response);
+    }
+
+    private Map<Long, List<SysUser>> getUserMap() {
+        //找到所有的用户
+        List<SysUser> users = userMapper.getUsersFindByRoleId(7);
+        Map<Long, List<SysUser>> userMap = new ConcurrentHashMap<>();
+        if (CollectionUtils.isNotEmpty(users)) {
+            users = users.stream().filter(u -> u.getHomeId() != null).collect(Collectors.toList());
+            return users.stream().collect(Collectors.groupingBy(SysUser::getHomeId));
+        }
+        return userMap;
     }
 }

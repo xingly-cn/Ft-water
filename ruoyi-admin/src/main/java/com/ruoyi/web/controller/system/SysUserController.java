@@ -250,7 +250,7 @@ public class SysUserController extends BaseController {
     }
 
     @GetMapping("/search")
-    @ApiOperation("搜索用户")
+    @ApiOperation("搜索用户-排除宿舍管理员")
     public AjaxResult search(@ApiParam(required = true) String keyword) {
         return AjaxResult.success(userService.search(keyword));
     }
