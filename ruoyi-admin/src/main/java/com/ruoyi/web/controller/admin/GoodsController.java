@@ -51,7 +51,7 @@ public class GoodsController extends BaseController {
 
     @GetMapping("/setOpen")
     @ApiOperation("商品上下架")
-    public AjaxResult setOpen(String id, int flag) {
+    public AjaxResult setOpen(Long id, int flag) {
         return AjaxResult.success(goodsService.setOpener(id, flag));
     }
 

@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysUserMapper">
 
-    <resultMap type="com.ruoyi.common.core.domain.entity.SysUser" id="SysUserResult">
+    <resultMap type="com.ruoyi.common.core.domain.entity.SysUser" id="BaseUserResult">
         <id property="userId" column="user_id"/>
         <result property="deptId" column="dept_id"/>
         <result property="userName" column="user_name"/>
@@ -28,33 +28,13 @@
         <result property="updateBy" column="update_by"/>
         <result property="updateTime" column="update_time"/>
         <result property="remark" column="remark"/>
+    </resultMap>
+
+    <resultMap type="com.ruoyi.common.core.domain.entity.SysUser" id="SysUserResult" extends="BaseUserResult">
         <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>
     </resultMap>
 
-    <resultMap type="com.ruoyi.system.response.UserResponse" id="sysUserResponse">
-        <id property="userId" column="user_id"/>
-        <result property="deptId" column="dept_id"/>
-        <result property="userName" column="user_name"/>
-        <result property="nickName" column="nick_name"/>
-        <result property="email" column="email"/>
-        <result property="phonenumber" column="phonenumber"/>
-        <result property="sex" column="sex"/>
-        <result property="avatar" column="avatar"/>
-        <result property="password" column="password"/>
-        <result property="status" column="status"/>
-        <result property="openId" column="open_id"/>
-        <result property="waterNum" column="water_num"/>
-        <result property="addressId" column="address"/>
-        <result property="dormType" column="dorm_type"/>
-        <result property="homeId" column="home_id"/>
-        <result property="delFlag" column="del_flag"/>
-        <result property="loginIp" column="login_ip"/>
-        <result property="loginDate" column="login_date"/>
-        <result property="createBy" column="create_by"/>
-        <result property="createTime" column="create_time"/>
-        <result property="updateBy" column="update_by"/>
-        <result property="updateTime" column="update_time"/>
-        <result property="remark" column="remark"/>
+    <resultMap type="com.ruoyi.system.response.UserResponse" id="sysUserResponse" extends="BaseUserResult">
         <result property="homeName" column="home_name"/>
         <association property="address" column="address" javaType="com.ruoyi.system.domain.Address" resultMap="AddressResult"/>
         <collection property="roles" javaType="java.util.List" resultMap="RoleResult"/>

@@ -26,6 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -122,6 +125,7 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 用户对象信息
      */
     @Override
+    @Cacheable(value = "user", key = "#userId")
     public SysUser selectUserById(Long userId) {
         return userMapper.selectUserById(userId);
     }
@@ -241,6 +245,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
+    @CachePut(value = "user", key = "#user.userId")
     public int insertUser(SysUser user) {
         // 新增用户信息
         int rows = userMapper.insertUser(user);
@@ -256,6 +261,8 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 结果
      */
     @Override
+    @Transactional
+    @CachePut(value = "user", key = "#user.userId")
     public boolean registerUser(SysUser user) {
         return userMapper.insertUser(user) > 0;
     }
@@ -268,6 +275,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
+    @CachePut(value = "user", key = "#user.userId")
     public int updateUser(SysUser user) {
         // 新增用户与角色管理
         insertUserRole(user);
@@ -359,6 +367,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
+    @CacheEvict(value = "user", allEntries = true)
     public int deleteUserByIds(Long[] userIds) {
         for (Long userId : userIds) {
             checkUserAllowed(new SysUser(userId));
@@ -366,8 +375,6 @@ public class SysUserServiceImpl implements ISysUserService {
         }
         // 删除用户与角色关联
         userRoleMapper.deleteUserRole(userIds);
-        // 删除用户与岗位关联
-//        userPostMapper.deleteUserPost(userIds);
         return userMapper.deleteUserByIds(userIds);
     }
 

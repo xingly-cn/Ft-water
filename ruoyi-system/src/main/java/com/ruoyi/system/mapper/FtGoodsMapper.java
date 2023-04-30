@@ -30,7 +30,7 @@ public interface FtGoodsMapper {
 
     List<GoodsResponse> selectList(@Param("goods") GoodRequest request);
 
-    Boolean setOpen(String id);
+    Boolean setOpen(@Param("id") Long id,
+                    @Param("flag") int flag);
 
-    Boolean setUnOpen(String id);
 }

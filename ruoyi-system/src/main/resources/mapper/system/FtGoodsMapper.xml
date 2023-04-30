@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.FtGoodsMapper">
-    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.FtGoods">
+
+    <resultMap id="BaseMap" type="com.ruoyi.system.domain.FtGoods">
         <!--@mbg.generated-->
         <!--@Table ft_goods-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -18,6 +19,12 @@
         <result column="max_num" jdbcType="INTEGER" property="maxNum"/>
         <result column="good_sex" jdbcType="INTEGER" property="goodSex"/>
         <result column="get_type" jdbcType="BOOLEAN" property="getType"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.FtGoods" extends="BaseMap">
+    </resultMap>
+
+    <resultMap id="BaseResponseMap" type="com.ruoyi.system.response.GoodsResponse" extends="BaseMap">
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -167,17 +174,11 @@
 
     <update id="setOpen" parameterType="java.lang.String">
         update ft_goods
-        set opener = 1
+        set opener = #{flag}
         where id = #{id}
     </update>
 
-    <update id="setUnOpen" parameterType="java.lang.String">
-        update ft_goods
-        set opener = 0
-        where id = #{id}
-    </update>
-
-    <select id="selectList" resultMap="BaseResultMap">
+    <select id="selectList" resultMap="BaseResponseMap">
         select
         <include refid="Base_Column_List"/>
         from ft_goods
