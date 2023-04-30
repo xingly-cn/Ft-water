@@ -22,4 +22,6 @@ public class UserRequest extends SysUser {
     @ApiModelProperty(value = "验证码")
     private String code;
 
+    @ApiModelProperty(value = "类型 true:学生 false:管理")
+    private String type;
 }

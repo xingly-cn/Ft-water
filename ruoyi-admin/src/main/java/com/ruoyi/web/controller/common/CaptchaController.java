@@ -75,6 +75,11 @@ public class CaptchaController
             image = captchaProducer.createImage(capStr);
         }
 
+        if (image == null)
+        {
+            return AjaxResult.error("验证码生成失败");
+        }
+
         redisCache.setCacheObject(verifyKey, code, Constants.CAPTCHA_EXPIRATION, TimeUnit.MINUTES);
         // 转换流信息写出
         FastByteArrayOutputStream os = new FastByteArrayOutputStream();

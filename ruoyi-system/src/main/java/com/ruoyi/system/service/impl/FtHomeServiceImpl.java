@@ -83,6 +83,7 @@ public class FtHomeServiceImpl implements FtHomeService {
         List<SysUser> users = userMapper.getUsersFindByRoleId(7);
         Map<Long, List<SysUser>> userMap = new ConcurrentHashMap<>();
         if (CollectionUtils.isNotEmpty(users)) {
+            users = users.stream().filter(u->u.getHomeId()!=null).collect(Collectors.toList());
             userMap = users.stream().collect(Collectors.groupingBy(SysUser::getHomeId));
         }
 

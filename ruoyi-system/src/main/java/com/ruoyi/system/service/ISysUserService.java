@@ -22,7 +22,7 @@ public interface ISysUserService {
      * @param user 用户信息
      * @return 用户信息集合信息
      */
-    List<SysUser> selectUserList(SysUser user);
+    List<UserResponse> selectUserList(UserRequest user);
 
     /**
      * 根据条件分页查询已分配用户角色列表
@@ -218,4 +218,6 @@ public interface ISysUserService {
     String changeUserPhone(UserRequest request);
 
     SysUser getUserInfo(HttpServletRequest rq);
+
+    List<SysUser> search(String keyword);
 }

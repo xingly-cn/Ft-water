@@ -1,6 +1,5 @@
 package com.ruoyi.system.service.impl;
 
-import com.ruoyi.common.annotation.DataScope;
 import com.ruoyi.common.constant.UserConstants;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
@@ -10,9 +9,9 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanValidators;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserRole;
-import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.OrderRequest;
@@ -27,11 +26,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Autowired
     protected Validator validator;
 
-    @Resource
+    @Autowired
     private FtOrderMapper ftOrderMapper;
 
     @Autowired
@@ -76,12 +77,12 @@ public class SysUserServiceImpl implements ISysUserService {
     /**
      * 根据条件分页查询用户列表
      *
-     * @param user 用户信息
+     * @param request 用户信息
      * @return 用户信息集合信息
      */
     @Override
-    public List<SysUser> selectUserList(SysUser user) {
-        return userMapper.selectUserList(user);
+    public List<UserResponse> selectUserList(UserRequest request) {
+        return userMapper.selectUserList(request);
     }
 
     /**
@@ -102,7 +103,6 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 用户信息集合信息
      */
     @Override
-    @DataScope(deptAlias = "d", userAlias = "u")
     public List<SysUser> selectUnallocatedList(SysUser user) {
         return userMapper.selectUnallocatedList(user);
     }
@@ -125,6 +125,7 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 用户对象信息
      */
     @Override
+    @Cacheable(value = "user", key = "#userId")
     public SysUser selectUserById(Long userId) {
         return userMapper.selectUserById(userId);
     }
@@ -179,7 +180,7 @@ public class SysUserServiceImpl implements ISysUserService {
      * 校验手机号码是否唯一
      *
      * @param user 用户信息
-     * @return
+     * @return 结果
      */
     @Override
     public boolean checkPhoneUnique(SysUser user) {
@@ -195,7 +196,7 @@ public class SysUserServiceImpl implements ISysUserService {
      * 校验email是否唯一
      *
      * @param user 用户信息
-     * @return
+     * @return 结果
      */
     @Override
     public boolean checkEmailUnique(SysUser user) {
@@ -227,9 +228,9 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     public void checkUserDataScope(Long userId) {
         if (!SysUser.isAdmin(SecurityUtils.getUserId())) {
-            SysUser user = new SysUser();
+            UserRequest user = new UserRequest();
             user.setUserId(userId);
-            List<SysUser> users = SpringUtils.getAopProxy(this).selectUserList(user);
+            List<UserResponse> users = SpringUtils.getAopProxy(this).selectUserList(user);
             if (StringUtils.isEmpty(users)) {
                 throw new ServiceException("没有权限访问用户数据！");
             }
@@ -244,11 +245,10 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
+    @CachePut(value = "user", key = "#user.userId")
     public int insertUser(SysUser user) {
         // 新增用户信息
         int rows = userMapper.insertUser(user);
-        // 新增用户岗位关联
-//        insertUserPost(user);
         // 新增用户与角色管理
         insertUserRole(user);
         return rows;
@@ -273,16 +273,10 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
+    @CachePut(value = "user", key = "#user.userId")
     public int updateUser(SysUser user) {
-//        Long userId = user.getUserId();
-        // 删除用户与角色关联
-//        userRoleMapper.deleteUserRoleByUserId(userId);
         // 新增用户与角色管理
         insertUserRole(user);
-        // 删除用户与岗位关联
-//        userPostMapper.deleteUserPostByUserId(userId);
-        // 新增用户与岗位管理
-//        insertUserPost(user);
         return userMapper.updateUser(user);
     }
 
@@ -294,6 +288,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
+    @CachePut(value = "user", key = "#userId")
     public void insertUserAuth(Long userId, Long[] roleIds) {
         userRoleMapper.deleteUserRoleByUserId(userId);
         insertUserRole(userId, roleIds);
@@ -357,36 +352,6 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     /**
-     * 新增用户角色信息
-     *
-     * @param user 用户对象
-     */
-    public void insertUserRole(SysUser user) {
-        this.insertUserRole(user.getUserId(), user.getRoleIds());
-    }
-
-
-    /**
-     * 新增用户角色信息
-     *
-     * @param userId  用户ID
-     * @param roleIds 角色组
-     */
-    public void insertUserRole(Long userId, Long[] roleIds) {
-        if (StringUtils.isNotEmpty(roleIds)) {
-            // 新增用户与角色管理
-            List<SysUserRole> list = new ArrayList<SysUserRole>(roleIds.length);
-            for (Long roleId : roleIds) {
-                SysUserRole ur = new SysUserRole();
-                ur.setUserId(userId);
-                ur.setRoleId(roleId);
-                list.add(ur);
-            }
-            userRoleMapper.batchUserRole(list);
-        }
-    }
-
-    /**
      * 批量删除用户信息
      *
      * @param userIds 需要删除的用户ID
@@ -394,6 +359,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
+    @CacheEvict(value = "user", allEntries = true)
     public int deleteUserByIds(Long[] userIds) {
         for (Long userId : userIds) {
             checkUserAllowed(new SysUser(userId));
@@ -509,7 +475,7 @@ public class SysUserServiceImpl implements ISysUserService {
     @Override
     @Transactional
     public UserResponse loginUser(LoginRequest request) {
-        if (org.apache.commons.lang3.StringUtils.isEmpty(request.getCode())) {
+        if (StringUtils.isEmpty(request.getCode())) {
             throw new ServiceException("code不能为空");
         }
         String[] codeArray = WechatUtil.getOpenId(request.getCode());
@@ -517,7 +483,7 @@ public class SysUserServiceImpl implements ISysUserService {
 
         String phone = request.getPhone();
 
-        if (org.apache.commons.lang3.StringUtils.isEmpty(phone)) {
+        if (StringUtils.isEmpty(phone)) {
             throw new ServiceException("手机号不能为空");
         }
 
@@ -612,6 +578,11 @@ public class SysUserServiceImpl implements ISysUserService {
         return i == 1;
     }
 
+    @Override
+    public List<SysUser> search(String keyword) {
+        return userMapper.search(keyword);
+    }
+
     private void checkLoginUser(String phone, String password) {
         SysUser user = userMapper.getUserByPhone(phone);
 
@@ -621,6 +592,35 @@ public class SysUserServiceImpl implements ISysUserService {
 
         if (!user.getPassword().equals(password)) {
             throw new ServiceException("密码错误");
+        }
+    }
+
+    /**
+     * 新增用户角色信息
+     *
+     * @param user 用户对象
+     */
+    public void insertUserRole(SysUser user) {
+        this.insertUserRole(user.getUserId(), user.getRoleIds());
+    }
+
+    /**
+     * 新增用户角色信息
+     *
+     * @param userId  用户ID
+     * @param roleIds 角色组
+     */
+    public void insertUserRole(Long userId, Long[] roleIds) {
+        if (StringUtils.isNotEmpty(roleIds)) {
+            // 新增用户与角色管理
+            List<SysUserRole> list = new ArrayList<SysUserRole>(roleIds.length);
+            for (Long roleId : roleIds) {
+                SysUserRole ur = new SysUserRole();
+                ur.setUserId(userId);
+                ur.setRoleId(roleId);
+                list.add(ur);
+            }
+            userRoleMapper.batchUserRole(list);
         }
     }
 }
