@@ -36,6 +36,7 @@ import org.springframework.util.CollectionUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -618,15 +619,33 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     public void insertUserRole(Long userId, Long[] roleIds) {
         if (StringUtils.isNotEmpty(roleIds)) {
-            // 新增用户与角色管理
-            List<SysUserRole> list = new ArrayList<SysUserRole>(roleIds.length);
-            for (Long roleId : roleIds) {
-                SysUserRole ur = new SysUserRole();
-                ur.setUserId(userId);
-                ur.setRoleId(roleId);
-                list.add(ur);
+            //先去查询用户是否已经有角色 有的话过滤 没有的话直接新增
+            List<SysUserRole> userRoleList = userRoleMapper.selectUserRoleByUserId(userId);
+            if (StringUtils.isNotEmpty(userRoleList)) {
+                List<Long> userRoleIdList = userRoleList.stream().map(SysUserRole::getRoleId).collect(Collectors.toList());
+                List<Long> roleIdList = Arrays.asList(roleIds);
+                roleIdList.removeAll(userRoleIdList);
+                if (StringUtils.isNotEmpty(roleIdList)) {
+                    List<SysUserRole> list = new ArrayList<>(roleIdList.size());
+                    for (Long roleId : roleIdList) {
+                        SysUserRole ur = new SysUserRole();
+                        ur.setUserId(userId);
+                        ur.setRoleId(roleId);
+                        list.add(ur);
+                    }
+                    userRoleMapper.batchUserRole(list);
+                }
+            } else {
+                // 新增用户与角色管理
+                List<SysUserRole> list = new ArrayList<SysUserRole>(roleIds.length);
+                for (Long roleId : roleIds) {
+                    SysUserRole ur = new SysUserRole();
+                    ur.setUserId(userId);
+                    ur.setRoleId(roleId);
+                    list.add(ur);
+                }
+                userRoleMapper.batchUserRole(list);
             }
-            userRoleMapper.batchUserRole(list);
         }
     }
 }

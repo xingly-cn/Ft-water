@@ -50,7 +50,7 @@ public class AddressController extends BaseController {
 
     @GetMapping("/list")
     @ApiOperation("获取当前用户地址列表")
-    public TableDataInfo getAddressList(@RequestBody AddressRequest request)
+    public TableDataInfo getAddressList(AddressRequest request)
     {
         startPage();
         List<Address> addressList = addressService.getAddressList(request);
@@ -59,7 +59,7 @@ public class AddressController extends BaseController {
 
     @GetMapping("/detail")
     @ApiOperation("地址详情")
-    public AjaxResult getAddressDetail(@RequestParam(value = "id")Long id)
+    public AjaxResult getAddressDetail(Long id)
     {
         return AjaxResult.success(addressService.getAddressDetail(id));
     }

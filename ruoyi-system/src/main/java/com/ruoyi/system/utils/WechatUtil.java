@@ -95,7 +95,6 @@ public class WechatUtil {
         return phone;
     }
 
-
     private static String getAccessTokenAndRefresh() {
         String appId = configService.selectConfigByKey("wechat_appid");
         String secret = configService.selectConfigByKey("wechat_secret");

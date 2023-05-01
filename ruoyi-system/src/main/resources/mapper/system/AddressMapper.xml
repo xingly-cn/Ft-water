@@ -3,10 +3,10 @@
 <mapper namespace="com.ruoyi.system.mapper.AddressMapper">
     <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.Address">
         <!--@Table address-->
-        <id column="id" jdbcType="VARCHAR" property="id"/>
-        <result column="user_id" jdbcType="INTEGER" property="userId"/>
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
-        <result column="province" jdbcType="VARCHAR" property="province"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="is_del" jdbcType="CHAR" property="isDel"/>
         <result column="is_default" jdbcType="CHAR" property="isDefault"/>
@@ -16,30 +16,25 @@
         id,
         user_id,
         phone,
-        province,
+        name,
         address,
         is_default,
         is_del,
         create_time
     </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from address
-        where id = #{id,jdbcType=VARCHAR}
+        where id = #{id} and is_del = 0
     </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete
-        from address
-        where id = #{id,jdbcType=VARCHAR}
-    </delete>
 
     <insert id="insert" parameterType="com.ruoyi.system.domain.Address">
         insert into address (user_id,
-                             phone, province, address,
+                             phone, name, address,
                              create_time)
         values (#{userId},
-                #{phone,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},
+                #{phone,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},
                 now())
     </insert>
 
@@ -55,8 +50,8 @@
             <if test="phone != null and phone != ''">
                 phone,
             </if>
-            <if test="province != null and province != ''">
-                province,
+            <if test="name != null and name != ''">
+                name,
             </if>
             <if test="address != null and address != ''">
                 address,
@@ -78,8 +73,8 @@
             <if test="phone != null and phone != ''">
                 #{phone,jdbcType=VARCHAR},
             </if>
-            <if test="province != null and province != ''">
-                #{province,jdbcType=VARCHAR},
+            <if test="name != null and name != ''">
+                #{name,jdbcType=VARCHAR},
             </if>
             <if test="address != null and address != ''">
                 #{address,jdbcType=VARCHAR},
@@ -102,8 +97,8 @@
             <if test="phone != null and phone != ''">
                 phone = #{phone,jdbcType=VARCHAR},
             </if>
-            <if test="province != null and province != ''">
-                province = #{province,jdbcType=VARCHAR},
+            <if test="name != null and name != ''">
+                name = #{name,jdbcType=VARCHAR},
             </if>
             <if test="address != null and address != ''">
                 address = #{address,jdbcType=VARCHAR},
@@ -115,15 +110,15 @@
                 create_time = #{createTime,jdbcType=TIMESTAMP},
             </if>
         </set>
-        where id = #{id,jdbcType=VARCHAR}
+        where id = #{id}
     </update>
 
     <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.domain.Address">
         update address
         set phone    = #{phone,jdbcType=VARCHAR},
-            province = #{province,jdbcType=VARCHAR},
+            name = #{name,jdbcType=VARCHAR},
             address  = #{address,jdbcType=VARCHAR}
-        where id = #{id,jdbcType=VARCHAR}
+        where id = #{id}
     </update>
 
     <update id="deleteAddressById">
@@ -158,7 +153,7 @@
         set is_default = 0 where is_del = 0
                              and id in
         <foreach collection="ids" item="key" index="index" open="(" close=")" separator=",">
-            #{key,jdbcType=VARCHAR}
+            #{key}
         </foreach>
     </update>
 
@@ -169,7 +164,7 @@
         where is_del = 0
           and user_id in
         <foreach collection="userIds" item="key" index="index" open="(" close=")" separator=",">
-            #{key,jdbcType=VARCHAR}
+            #{key}
         </foreach>
     </select>
 </mapper>

@@ -15,8 +15,6 @@ public interface AddressMapper{
 
     int insert(Address address);
 
-    int deleteByPrimaryKey(Long id);
-
     int insertSelective(Address record);
 
     Address selectByPrimaryKey(Long id);

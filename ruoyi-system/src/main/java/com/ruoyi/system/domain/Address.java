@@ -1,6 +1,5 @@
 package com.ruoyi.system.domain;
 
-import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -21,19 +20,15 @@ public class Address extends BaseEntity {
     private static final long serialVersionUID = 2856422720749910494L;
 
     @ApiModelProperty(value = "用户唯一标识")
-    @Excel(name = "用户唯一标识", width = 35)
     private Long userId;
 
     @ApiModelProperty(value = "手机号")
-    @Excel(name = "手机号")
     private String phone;
 
-    @ApiModelProperty(value = "省市区")
-    @Excel(name = "省市区")
-    private String province;
+    @ApiModelProperty(value = "名字")
+    private String name;
 
     @ApiModelProperty(value = "详细地址")
-    @Excel(name = "详细地址")
     private String address;
 
     @ApiModelProperty(value = "是否是默认地址")

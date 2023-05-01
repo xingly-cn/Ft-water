@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletRequest;
  * @Date 2023-03-30 15:37
  **/
 @RestController
-@RequestMapping("v1/user/user")
+@RequestMapping("v1/wechat/user")
 @Api(tags = "微信用户")
 public class UserController {
 

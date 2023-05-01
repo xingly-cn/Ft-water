@@ -5,8 +5,10 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.FtMessage;
 import com.ruoyi.system.domain.FtNotices;
+import com.ruoyi.system.domain.UserHome;
 import com.ruoyi.system.mapper.FtHomeMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
+import com.ruoyi.system.mapper.UserHomeMapper;
 import com.ruoyi.system.request.HomeRequest;
 import com.ruoyi.system.response.HomeResponse;
 import com.ruoyi.system.service.FtHomeService;
@@ -44,6 +46,9 @@ public class FtHomeServiceImpl implements FtHomeService {
 
     @Autowired
     private SysUserMapper userMapper;
+
+    @Autowired
+    private UserHomeMapper userHomeMapper;
 
     @Autowired
     private FtMessageServiceImpl messageService;
@@ -99,19 +104,19 @@ public class FtHomeServiceImpl implements FtHomeService {
         //添加消息 确认之后在入库
         Long userId = SecurityUtils.getUserId();
         //找该楼下面的管理员 发送消息
-        List<SysUser> users = userMapper.getUserByHomeIdAndRoleId(request.getId(), 7);
+        List<UserHome> userHomes = userHomeMapper.selectByHomeId(request.getId());
 
-        if (CollectionUtils.isEmpty(users)) {
+        if (CollectionUtils.isEmpty(userHomes)) {
             throw new SecurityException("该宿舍楼下没有管理员");
         }
 
         //消息
         List<FtMessage> messages = Lists.newArrayList();
-        for (SysUser user : users) {
+        for (UserHome user : userHomes) {
             FtMessage message = FtMessage.builder()
                     .number(request.getNumber())
                     .homeId(request.getId())
-                    .userId(user.getId())
+                    .userId(user.getUserId())
                     .confirm(false)
                     .build();
             message.setCreateBy(userId.toString());
@@ -165,24 +170,25 @@ public class FtHomeServiceImpl implements FtHomeService {
             throw new SecurityException("该用户不存在");
         }
 
-        //查询该用户是否在其他宿舍楼下面是管理员
-        List<SysUser> myUsers = userMapper.getUsersFindByRoleIdAndUserId(request.getUserId(), 7);
-        if (CollectionUtils.isNotEmpty(myUsers)) {
-            throw new SecurityException("该用户已经是其他宿舍楼管理员了");
-        }
-
-        //查询该宿舍楼下面的管理员 最多俩个 一个人只可以管理一个宿舍楼
-        List<SysUser> users = userMapper.getUserByHomeIdAndRoleId(request.getId(), 1);
-        if (users.size() >= 2) {
+        //查询该宿舍楼下面的管理员 最多俩个
+        List<UserHome> userHomes = userHomeMapper.selectByHomeId(request.getId());
+        if (userHomes.size() >= 2) {
             throw new SecurityException("该宿舍楼下面已经有两个管理员了，不能再添加了");
         }
+
         //查询该用户是否已经是管理员
-        users.stream().filter(u -> u.getId().equals(request.getUserId())).findAny().ifPresent(u -> {
+        userHomes.stream().filter(u -> u.getUserId().equals(request.getUserId())).findAny().ifPresent(u -> {
             throw new SecurityException("该用户已经是该宿舍楼管理员了");
         });
+
         //添加管理员
         user.setRoleIds(new Long[]{7L});
-        user.setHomeId(request.getId());
+//        user.setHomeId(request.getId());
+        UserHome userHome = UserHome.builder()
+                .homeId(request.getId())
+                .userId(request.getUserId())
+                .build();
+        userHomeMapper.insert(userHome);
         return userService.updateUser(user) > 0;
     }
 
@@ -203,6 +209,7 @@ public class FtHomeServiceImpl implements FtHomeService {
             return Lists.newArrayList();
         }
         List<HomeResponse> responses = Lists.newArrayList();
+
         Map<Long, List<SysUser>> userMap = getUserMap();
         for (FtHome home : homes) {
             HomeResponse response = new HomeResponse();
@@ -263,11 +270,19 @@ public class FtHomeServiceImpl implements FtHomeService {
 
     private Map<Long, List<SysUser>> getUserMap() {
         //找到所有的用户
-        List<SysUser> users = userMapper.getUsersFindByRoleId(7);
+        List<UserHome> userHomes = userHomeMapper.getUserHomes();
         Map<Long, List<SysUser>> userMap = new ConcurrentHashMap<>();
-        if (CollectionUtils.isNotEmpty(users)) {
-            users = users.stream().filter(u -> u.getHomeId() != null).collect(Collectors.toList());
-            return users.stream().collect(Collectors.groupingBy(SysUser::getHomeId));
+        if (CollectionUtils.isNotEmpty(userHomes)) {
+            List<Long> userIds = userHomes.stream().map(UserHome::getUserId).collect(Collectors.toList());
+            List<SysUser> users = userMapper.selectUserByIds(userIds);
+            userHomes.forEach(u -> {
+                List<SysUser> sysUsers = userMap.get(u.getHomeId());
+                if (CollectionUtils.isEmpty(sysUsers)) {
+                    sysUsers = Lists.newArrayList();
+                }
+                users.stream().filter(user -> user.getUserId().equals(u.getUserId())).findAny().ifPresent(sysUsers::add);
+                userMap.put(u.getHomeId(), sysUsers);
+            });
         }
         return userMap;
     }

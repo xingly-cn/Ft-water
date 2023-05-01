@@ -50,4 +50,10 @@
             #{userId}
         </foreach>
     </delete>
+
+    <select id="selectUserRoleByUserId" resultMap="SysUserRoleResult">
+        select user_id, role_id
+        from sys_user_role
+        where user_id = #{userId}
+    </select>
 </mapper>

@@ -148,4 +148,9 @@ public interface SysUserMapper {
                                                 @Param("roleId") int roleId);
 
     List<SysUser> search(String keyword);
+
+    void updateDefaultAddressById(@Param("userId") Long userId,
+                                  @Param("id") Long id);
+
+    List<SysUser> selectUserByIds(@Param("userIds") List<Long> userIds);
 }

@@ -1,13 +1,16 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.Address;
 import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.AddressMapper;
+import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.request.AddressRequest;
 import com.ruoyi.system.service.AddressService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,9 @@ public class AddressServiceImpl implements AddressService {
     @Resource
     private AddressMapper addressMapper;
 
+    @Autowired
+    private SysUserMapper userMapper;
+
     @Override
     @Transactional
     public Boolean insertAddress(AddressRequest request) {
@@ -35,7 +41,7 @@ public class AddressServiceImpl implements AddressService {
         Long userId = SecurityUtils.getUserId();
         request.setUserId(userId);
         //校验手机号
-        if (request.getPhone().length() > 11) {
+        if (StringUtils.isNotEmpty(request.getPhone()) && request.getPhone().length() > 11) {
             throw new ServiceException(1000, "请输入正确的手机号");
         }
         return addressMapper.insert(request) > 0;
@@ -58,12 +64,15 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<Address> getAddressList(AddressRequest request) {
+        log.info("getAddressList request[{}]", request);
+        //获取当前用户的地址列表
+        request.setUserId(SecurityUtils.getUserId());
         return addressMapper.getAddressList(request);
     }
 
     @Override
     public Address getAddressDetail(Long id) {
-        return selectByPrimaryKey(id);
+        return addressMapper.selectByPrimaryKey(id);
     }
 
     @Override
@@ -76,11 +85,9 @@ public class AddressServiceImpl implements AddressService {
         if (CollectionUtils.isNotEmpty(addresses)) {
             addressMapper.updateNoDefaultAddressByIds(addresses.stream().map(Address::getId).collect(Collectors.toList()));
         }
+        //更新用户·默认地址
+        userMapper.updateDefaultAddressById(SecurityUtils.getUserId(), id);
         return addressMapper.updateDefaultAddressById(id) > 0;
-    }
-
-    public Address selectByPrimaryKey(Long id) {
-        return addressMapper.selectByPrimaryKey(id);
     }
 
     public int updateByPrimaryKeySelective(Address record) {

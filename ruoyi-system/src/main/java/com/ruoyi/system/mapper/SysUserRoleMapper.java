@@ -60,4 +60,6 @@ public interface SysUserRoleMapper {
      */
     int deleteUserRoleInfos(@Param("roleId") Long roleId,
                             @Param("userIds") Long[] userIds);
+
+    List<SysUserRole> selectUserRoleByUserId(Long userId);
 }
