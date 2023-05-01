@@ -239,7 +239,7 @@ public class FtHomeServiceImpl implements FtHomeService {
      * @param id    下级id
      * @return 最上级id
      */
-    private Long getTopId(List<FtHome> homes, Long id) {
+    public Long getTopId(List<FtHome> homes, Long id) {
         FtHome home = homes.stream().filter(h -> h.getId().equals(id)).findAny().orElse(null);
         if (home == null) {
             return null;
@@ -248,6 +248,17 @@ public class FtHomeServiceImpl implements FtHomeService {
             return home.getId();
         }
         return getTopId(homes, home.getParentId());
+    }
+
+    public FtHome getTopHome(List<FtHome> homes, Long id) {
+        FtHome home = homes.stream().filter(h -> h.getId().equals(id)).findAny().orElse(null);
+        if (home == null) {
+            return null;
+        }
+        if (home.getParentId().equals(0L)) {
+            return home;
+        }
+        return getTopHome(homes, home.getParentId());
     }
 
     private List<HomeResponse> buildTree(List<FtHome> homes, Long parentId, Map<Long, List<SysUser>> userMap) {

@@ -9,6 +9,7 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanValidators;
 import com.ruoyi.common.utils.spring.SpringUtils;
+import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserRole;
@@ -74,6 +75,9 @@ public class SysUserServiceImpl implements ISysUserService {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private FtHomeServiceImpl homeService;
+
     /**
      * 根据条件分页查询用户列表
      *
@@ -82,7 +86,20 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     public List<UserResponse> selectUserList(UserRequest request) {
-        return userMapper.selectUserList(request);
+        List<UserResponse> userResponses = userMapper.selectUserList(request);
+        if (!CollectionUtils.isEmpty(userResponses)) {
+            List<FtHome> homes = homeService.getHomes();
+            userResponses.forEach(userResponse -> {
+                if (userResponse.getHomeId() != null) {
+                    FtHome home = homeService.getTopHome(homes, userResponse.getHomeId());
+                    if (home != null) {
+                        userResponse.setSchoolId(home.getId());
+                        userResponse.setSchoolName(home.getName());
+                    }
+                }
+            });
+        }
+        return userResponses;
     }
 
     /**

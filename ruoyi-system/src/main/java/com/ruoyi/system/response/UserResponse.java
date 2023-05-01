@@ -2,7 +2,6 @@ package com.ruoyi.system.response;
 
 
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.system.domain.Address;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,7 +25,11 @@ public class UserResponse extends SysUser {
     @ApiModelProperty(value = "楼栋ID")
     private String homeName;
 
-    private Address address;
+//    private Address address;
+
+    private Long schoolId;
+
+    private String schoolName;
 
     public String getDormTypeName() {
         if (StringUtils.isNotEmpty(dormTypeName)) {
