@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.request.OrderRequest;
@@ -9,6 +10,7 @@ import com.ruoyi.system.websocket.OrderWebSocket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -39,6 +41,9 @@ public class FtOrderServiceImpl implements FtOrderService {
     @Autowired
     private FtHomeServiceImpl homeService;
 
+    @Autowired
+    private FtNoticesServiceImpl noticesService;
+
     @Override
     public Boolean deleteByPrimaryKey(Long id) {
         return ftOrderMapper.deleteByPrimaryKey(id) > 0;
@@ -62,6 +67,10 @@ public class FtOrderServiceImpl implements FtOrderService {
 
     @Override
     public List<OrderResponse> selectOrderList(OrderRequest order) {
+        if (order.getFlag().equals(true)){
+            //小程序端
+            order.setUid(SecurityUtils.getUserId());
+        }
         return ftOrderMapper.selectList(order);
     }
 
@@ -75,10 +84,10 @@ public class FtOrderServiceImpl implements FtOrderService {
         ftOrder.setPayed(true);
         //发送消息
         //什么用户购买什么商品多少吧
-        String userName = userService.selectUserById(ftOrder.getUid()).getUserName();
-        String goodsName = goodsService.selectByPrimaryKey(ftOrder.getGoodId()).getTitle();
-        String schoolName = homeService.selectByPrimaryKey(ftOrder.getSchoolId()).getName();
-        orderWebSocket.sendMessage(userName + "在" + schoolName + "购买了" + goodsName + ftOrder.getNum() + "个");
+//        String userName = userService.selectUserById(ftOrder.getUid()).getUserName();
+//        String goodsName = goodsService.selectByPrimaryKey(ftOrder.getGoodId()).getTitle();
+//        String schoolName = homeService.selectByPrimaryKey(ftOrder.getSchoolId()).getName();
+//        orderWebSocket.sendMessage(userName + "在" + schoolName + "购买了" + goodsName + ftOrder.getNum() + "个");
         return updateOrder(ftOrder);
     }
 

@@ -23,8 +23,8 @@ public class OrderResponse extends FtOrder {
     @ApiModelProperty(value = "商品名称")
     private String goodName;
 
-    @ApiModelProperty(value = "学校名称")
-    private String schoolName;
+    @ApiModelProperty(value = "地址")
+    private String address;
 
     @ApiModelProperty(value = "用户名称")
     private String userName;

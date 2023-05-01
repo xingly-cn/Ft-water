@@ -8,21 +8,24 @@
         <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
         <result column="uid" jdbcType="BIGINT" property="uid"/>
         <result column="good_id" jdbcType="BIGINT" property="goodId"/>
-        <result column="school_id" jdbcType="BIGINT" property="schoolId"/>
+        <result column="address_id" jdbcType="BIGINT" property="addressId"/>
         <result column="num" jdbcType="INTEGER" property="num"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="payed" jdbcType="BOOLEAN" property="payed"/>
     </resultMap>
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
         deleted,
         `uid`,
         good_id,
-        school_id,
+        address_id,
         num,
-        create_time,
-        payed
+        payed,
+        status,
+        create_time
     </sql>
 
     <sql id="Base_Column_Goods_HOME_User_List">
@@ -32,15 +35,16 @@
                fo.num,
                fo.uid,
                fo.good_id,
-               fo.school_id,
-               fu.name        as userName,
-               fu.phone       as userPhone,
-               fg.title       as goodName,
-               fh.name as schoolName
+               fo.address_id,
+               fo.status,
+               fu.user_name   as userName,
+               fu.phonenumber as userPhone,
+               fg.title as goodName,
+               a.address
         from ft_order fo
                  inner join ft_goods fg on fo.good_id = fg.id
-                 inner join ft_home fh on fo.school_id = fh.id
-                 inner join ft_user fu on fo.uid = fu.id
+                 inner join address a on fo.address_id = a.id
+                 inner join sys_user fu on fo.uid = fu.user_id
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -50,35 +54,37 @@
         from ft_order
         where id = #{id}
     </select>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--@mbg.generated-->
-        update ft_order set deleted = 1 where id = #{id}
+        update ft_order
+        set deleted = 1
+        where id = #{id}
     </delete>
+
     <insert id="insert" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
-        insert into ft_order (id, deleted, `uid`,
-        good_id, school_id, num,
-        create_time, payed)
-        values (#{id}, #{deleted,jdbcType=BOOLEAN}, #{uid,jdbcType=BIGINT}, #{goodId,jdbcType=BIGINT}, #{schoolId,jdbcType=BIGINT}, #{num,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{payed,jdbcType=BOOLEAN})
+        insert into ft_order (`uid`,
+                              good_id, address_id, num, status,
+                              create_time, payed)
+        values (#{uid,jdbcType=BIGINT}, #{goodId,jdbcType=BIGINT}, #{addressId,jdbcType=BIGINT}, #{num,jdbcType=INTEGER},
+                #{status,jdbcType=INTEGER},
+                now(), #{payed,jdbcType=BOOLEAN})
     </insert>
-    <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true" parameterType="com.ruoyi.system.domain.FtOrder">
+
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         insert into ft_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="deleted != null">
-                deleted,
-            </if>
-            <if test="uid != null ">
+            <if test="uid != null">
                 `uid`,
             </if>
             <if test="goodId != null">
                 good_id,
             </if>
-            <if test="schoolId != null">
-                school_id,
+            <if test="addressId != null">
+                address_id,
             </if>
             <if test="num != null">
                 num,
@@ -89,22 +95,19 @@
             <if test="payed != null">
                 payed,
             </if>
+            <if test="status != null">
+                status,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                #{id},
-            </if>
-            <if test="deleted != null">
-                #{deleted,jdbcType=BOOLEAN},
-            </if>
-            <if test="uid != null ">
+            <if test="uid != null">
                 #{uid,jdbcType=BIGINT},
             </if>
             <if test="goodId != null">
                 #{goodId,jdbcType=BIGINT},
             </if>
-            <if test="schoolId != null">
-                #{schoolId,jdbcType=BIGINT},
+            <if test="addressId != null">
+                #{addressId,jdbcType=BIGINT},
             </if>
             <if test="num != null">
                 #{num,jdbcType=INTEGER},
@@ -115,32 +118,33 @@
             <if test="payed != null">
                 #{payed,jdbcType=BOOLEAN},
             </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
         </trim>
     </insert>
+
     <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         update ft_order
         <set>
-            <if test="deleted != null">
-                deleted = #{deleted,jdbcType=BOOLEAN},
-            </if>
-            <if test="uid != null ">
+            <if test="uid != null">
                 `uid` = #{uid,jdbcType=BIGINT},
             </if>
             <if test="goodId != null">
                 good_id = #{goodId,jdbcType=BIGINT},
             </if>
-            <if test="schoolId != null ">
-                school_id = #{schoolId,jdbcType=BIGINT},
+            <if test="addressId != null">
+                address_id = #{addressId,jdbcType=BIGINT},
             </if>
             <if test="num != null">
                 num = #{num,jdbcType=INTEGER},
             </if>
-            <if test="createTime != null">
-                create_time = #{createTime,jdbcType=TIMESTAMP},
-            </if>
             <if test="payed != null">
                 payed = #{payed,jdbcType=BOOLEAN},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=INTEGER},
             </if>
         </set>
         where id = #{id}
@@ -149,7 +153,12 @@
     <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         update ft_order
-        set deleted = #{deleted,jdbcType=BOOLEAN}, `uid` = #{uid,jdbcType=BIGINT}, good_id = #{goodId,jdbcType=BIGINT}, school_id = #{schoolId,jdbcType=BIGINT}, num = #{num,jdbcType=INTEGER}, createTime = #{createTime,jdbcType=TIMESTAMP}, payed = #{payed,jdbcType=BOOLEAN}
+        set `uid`     = #{uid,jdbcType=BIGINT},
+            good_id   = #{goodId,jdbcType=BIGINT},
+            address_id = #{addressId,jdbcType=BIGINT},
+            num       = #{num,jdbcType=INTEGER},
+            payed     = #{payed,jdbcType=BOOLEAN},
+            status    = #{status,jdbcType=INTEGER}
         where id = #{id}
     </update>
 
@@ -157,9 +166,7 @@
         <include refid="Base_Column_Goods_HOME_User_List"/>
         where fo.deleted = 0
           and fg.deleted = 0
-          and fh.deleted = 0
           and fu.deleted = 0
-          and fo.payed is not null
         <if test="order.keyword != null and order.keyword != ''">
             and (
                         fg.title like concat('%', #{order.keyword}, '%')
@@ -168,17 +175,18 @@
                     or fu.phone = #{order.keyword}
                 )
         </if>
-        <if test="order.schoolId != null">
-            and fh.id = #{order.schoolId}
+        <if test="order.addressId != null">
+            and a.id = #{order.addressId}
         </if>
         <if test="order.goodId != null">
             and fg.id = #{order.goodId}
         </if>
         <if test="order.uid != null">
-            and fu.id = #{order.uid}
+            and fu.user_id = #{order.uid}
+        </if>
+        <if test="order.status != null">
+            and fo.status = #{order.status}
         </if>
         order by fo.id desc
     </select>
-
-
 </mapper>

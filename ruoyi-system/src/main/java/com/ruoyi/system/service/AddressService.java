@@ -1,6 +1,5 @@
 package com.ruoyi.system.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.domain.Address;
 import com.ruoyi.system.request.AddressRequest;
 

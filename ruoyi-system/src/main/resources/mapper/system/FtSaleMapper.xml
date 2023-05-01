@@ -28,11 +28,11 @@
                fs.uId,
                fs.num,
                fs.operate_id,
-               fu.name  as userName,
-               fu2.name as operatorName
+               fu.user_name  as userName,
+               fu2.user_name as operatorName
         from ft_sale fs
-                 inner join ft_user fu on fs.uid = fu.id
-                 inner join ft_user fu2 on fs.operate_id = fu2.id
+                 inner join sys_user fu on fs.uid = fu.user_id
+                 inner join sys_user fu2 on fs.operate_id = fu2.user_id
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">

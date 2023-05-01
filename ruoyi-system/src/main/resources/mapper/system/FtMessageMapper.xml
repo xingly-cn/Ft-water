@@ -42,10 +42,10 @@
         m.create_time,
         m.update_time,
         h.name as homeName,
-        u.name as userName
+        u.user_name as userName
         from ft_message m
         inner join ft_home h on m.home_id = h.id
-        inner join ft_user u on m.user_id = u.id
+        inner join sys_user u on m.user_id = u.user_id
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.ruoyi.system.response.MessageResponse">

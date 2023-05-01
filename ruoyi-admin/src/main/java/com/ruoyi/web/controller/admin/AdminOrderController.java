@@ -21,7 +21,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("v1/admin/order")
-@Api(tags = "后台-订单")
+@Api(tags = "订单")
 public class AdminOrderController extends BaseController {
 
     @Resource
@@ -37,6 +37,7 @@ public class AdminOrderController extends BaseController {
     @ApiOperation("订单列表-分页")
     public TableDataInfo getOrderList(OrderRequest request) {
         startPage();
+        request.setFlag(false);
         List<OrderResponse> responses = orderService.selectOrderList(request);
         return getDataTable(responses);
     }
@@ -69,6 +70,7 @@ public class AdminOrderController extends BaseController {
     @GetMapping("/list")
     @ApiOperation("订单列表")
     public AjaxResult selectOrderList(OrderRequest order) {
+        order.setFlag(false);
         return AjaxResult.success(orderService.selectOrderList(order));
     }
 

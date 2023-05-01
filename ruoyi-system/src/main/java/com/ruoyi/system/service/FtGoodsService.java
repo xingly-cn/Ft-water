@@ -25,5 +25,4 @@ public interface FtGoodsService{
     FtGoods selectByPrimaryKey(Long id);
 
     Boolean setOpener(Long id, int flag);
-
 }

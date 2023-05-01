@@ -41,14 +41,17 @@ public class FtOrder extends BaseEntity implements Serializable {
     /**
      * 学校ID
      */
-    @ApiModelProperty(value = "学校ID")
-    private Long schoolId;
+    @ApiModelProperty(value = "地址ID")
+    private Long addressId;
 
     /**
      * 购买数量
      */
     @ApiModelProperty(value = "购买数量")
     private Integer num;
+
+    @ApiModelProperty(value = " -1 购物车 0待付款 1代取货 2已取货' ")
+    private Integer status;
 
     /**
      * 支付状态

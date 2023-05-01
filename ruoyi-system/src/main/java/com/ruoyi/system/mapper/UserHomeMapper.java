@@ -16,7 +16,7 @@ import java.util.List;
 public interface UserHomeMapper {
 
     boolean deleteUserHomeByUserIdAndHomeId(@Param("userId") Long userId,
-                                         @Param("homeId") Long homeId);
+                                            @Param("homeId") Long homeId);
 
     void batchUserHome(List<UserHome> userHomes);
 

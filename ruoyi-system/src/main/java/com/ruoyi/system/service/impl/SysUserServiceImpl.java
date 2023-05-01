@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -246,7 +245,6 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
-    @CachePut(value = "user", key = "#user.userId")
     public int insertUser(SysUser user) {
         // 新增用户信息
         int rows = userMapper.insertUser(user);
@@ -263,7 +261,6 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
-    @CachePut(value = "user", key = "#user.userId")
     public boolean registerUser(SysUser user) {
         return userMapper.insertUser(user) > 0;
     }
@@ -276,7 +273,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
-    @CachePut(value = "user", key = "#user.userId")
+    @CacheEvict(value = "user", key = "#user.userId")
     public int updateUser(SysUser user) {
         // 新增用户与角色管理
         insertUserRole(user);

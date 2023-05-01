@@ -6,7 +6,6 @@ import com.ruoyi.system.request.GoodRequest;
 import com.ruoyi.system.response.GoodsResponse;
 import com.ruoyi.system.service.FtGoodsService;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -26,19 +25,19 @@ public class FtGoodsServiceImpl implements FtGoodsService {
     private FtGoodsMapper ftGoodsMapper;
 
     @Override
-    @CacheEvict(value = "goods",key = "#id")
+    @CacheEvict(value = "goods", key = "#id")
     public Boolean deleteByPrimaryKey(Long id) {
         return ftGoodsMapper.deleteByPrimaryKey(id) > 0;
     }
 
     @Override
-    @CachePut(value = "goods", key = "#record.id")
+    @CacheEvict(value = "goods", key = "#record.id")
     public Boolean addGoods(FtGoods record) {
         return ftGoodsMapper.insertSelective(record) > 0;
     }
 
     @Override
-    @CachePut(value = "goods", key = "#record.id")
+    @CacheEvict(value = "goods", key = "#record.id")
     public Boolean updateGoods(FtGoods record) {
         return ftGoodsMapper.updateByPrimaryKeySelective(record) > 0;
     }
@@ -57,7 +56,7 @@ public class FtGoodsServiceImpl implements FtGoodsService {
     @Override
     @CacheEvict(value = "goods", key = "#id")
     public Boolean setOpener(Long id, int flag) {
-        return ftGoodsMapper.setOpen(id,flag);
+        return ftGoodsMapper.setOpen(id, flag);
     }
 
 }

@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping("v1/wechat/user")
 @Api(tags = "微信用户")
-public class UserController {
+public class WechatUserController {
 
     @Resource
     private ISysUserService userService;

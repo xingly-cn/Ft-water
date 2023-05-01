@@ -19,13 +19,15 @@ public interface FtOrderMapper {
 
     int deleteByPrimaryKey(Long id);
 
-    int insertSelective(FtOrder record);
+    int insert(FtOrder order);
+
+    int insertSelective(FtOrder order);
 
     FtOrder selectByPrimaryKey(Long id);
 
-    int updateByPrimaryKeySelective(FtOrder record);
+    int updateByPrimaryKeySelective(FtOrder order);
 
-    int updateByPrimaryKey(FtOrder record);
+    int updateByPrimaryKey(FtOrder order);
 
     List<OrderResponse> selectList(@Param("order") OrderRequest order);
 }
