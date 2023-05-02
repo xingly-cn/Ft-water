@@ -1,6 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.system.domain.Shop;
 import com.ruoyi.system.mapper.ShopMapper;
 import com.ruoyi.system.request.ShopRequest;
 import com.ruoyi.system.response.ShopResponse;
@@ -53,4 +54,5 @@ public class ShopServiceImpl implements ShopService {
     public void deleteShopsByIds(List<Long> ids) {
         shopMapper.deleteShopsByIds(ids);
     }
+
 }

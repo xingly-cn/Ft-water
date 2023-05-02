@@ -5,9 +5,11 @@ import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.domain.OrderElements;
 import com.ruoyi.system.domain.Shop;
+import com.ruoyi.system.domain.UserGoods;
 import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.mapper.OrderElementsMapper;
+import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.mapper.UserGoodsMapper;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.GoodsResponse;
@@ -19,6 +21,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,12 +54,6 @@ public class FtOrderServiceImpl implements FtOrderService {
     private FtHomeServiceImpl homeService;
 
     @Autowired
-    private FtNoticesServiceImpl noticesService;
-
-    @Autowired
-    private FtMessageServiceImpl messageService;
-
-    @Autowired
     private UserGoodsMapper userGoodsMapper;
 
     @Autowired
@@ -64,6 +61,9 @@ public class FtOrderServiceImpl implements FtOrderService {
 
     @Autowired
     private ShopServiceImpl shopService;
+
+    @Autowired
+    private SysUserMapper userMapper;
 
     @Override
     @Transactional(rollbackFor = ServiceException.class)
@@ -103,8 +103,12 @@ public class FtOrderServiceImpl implements FtOrderService {
         if (CollectionUtils.isEmpty(request.getShops())) {
             throw new ServiceException("商品不能为空");
         }
+        HomeResponse homeResponse = homeService.selectByPrimaryKey(user.getHomeId());
+        if (homeResponse == null) {
+            throw new ServiceException("宿舍不存在");
+        }
         //校验库存
-        checkGoodsNumber(request.getShops(), user.getHomeId());
+        checkGoodsNumber(request.getShops(), homeResponse.getNumber());
         //生成订单
         request.setUserId(userId);
         ftOrderMapper.insertSelective(request);
@@ -138,14 +142,42 @@ public class FtOrderServiceImpl implements FtOrderService {
         if (ftOrder == null) {
             throw new ServiceException("订单不存在");
         }
-        ftOrder.setPayed(true);
         //需要校验库存
-
+        List<OrderElements> elements = orderElementsMapper.selectElementsByOrderId(id);
+        if (CollectionUtils.isEmpty(elements)) {
+            throw new ServiceException("订单不存在");
+        }
+        SysUser user = SecurityUtils.getLoginUser().getUser();
+        Long homeId = user.getHomeId();
+        List<Shop> shops = Lists.newArrayList();
+        elements.forEach(element -> {
+            shops.add(Shop.builder()
+                    .goodsId(element.getGoodsId())
+                    .number(element.getNumber())
+                    .build());
+        });
+        HomeResponse homeResponse = homeService.selectByPrimaryKey(homeId);
+        checkGoodsNumber(shops, homeResponse.getNumber());
+        //找到对应的商品 - typer->1
+        List<Long> shopGoodsIds = shops.stream().map(Shop::getGoodsId).collect(Collectors.toList());
+        List<Long> goodsIds =  goodsService.selectGoodsByIdsAndType(shopGoodsIds, 1);
+        int number = 0;
+        if (CollectionUtils.isNotEmpty(goodsIds)) {
+            List<Shop> waterShops = shops.stream().filter(s -> goodsIds.contains(s.getGoodsId())).collect(Collectors.toList());
+            number = waterShops.stream().mapToInt(Shop::getNumber).sum();
+        }
+        ftOrder.setPayed(true);
+        ftOrder.setStatus(1);
         //发送消息 给对应宿管
+        homeService.sendMessageAndNotices(homeId,user.getId(),false,homeResponse.getNumber(),number);
         //什么用户购买什么商品多少吧
         OrderRequest orderRequest = new OrderRequest();
         BeanUtils.copyProperties(ftOrder, orderRequest);
-        return updateOrder(orderRequest);
+        updateOrder(orderRequest);
+        //async
+        addUserGoods(shops, user.getUserId());
+        //更新用户的水票
+        return userMapper.updateWaterNumberById(user.getId(), number);
     }
 
     @Override
@@ -167,13 +199,9 @@ public class FtOrderServiceImpl implements FtOrderService {
         return ftOrderMapper.selectList(orderRequest);
     }
 
-    private void checkGoodsNumber(List<Shop> shops, Long homeId) {
-        HomeResponse homeResponse = homeService.selectByPrimaryKey(homeId);
-        if (homeResponse == null) {
-            throw new ServiceException("宿舍不存在");
-        }
+    private void checkGoodsNumber(List<Shop> shops, Integer number) {
+
         //库存-该宿舍-楼
-        Integer number = homeResponse.getNumber();
         Map<Long, Integer> goodsMap = shops.stream().collect(Collectors.toMap(Shop::getGoodsId, Shop::getNumber));
         List<GoodsResponse> goodsResponses = goodsService.selectGoodsByIds(goodsMap.keySet());
         //校验商品是否存在
@@ -193,6 +221,21 @@ public class FtOrderServiceImpl implements FtOrderService {
                     throw new ServiceException(goodsResponse.getTitle() + "，库存不足");
                 }
             }
+        }
+    }
+
+    @Async
+    public void addUserGoods(List<Shop> shops, Long userId) {
+        //添加用户商品
+        if (CollectionUtils.isNotEmpty(shops)) {
+            List<UserGoods> userGoods = Lists.newArrayList();
+            shops.forEach(shop -> {
+                userGoods.add(UserGoods.builder()
+                        .goodsId(shop.getGoodsId())
+                        .userId(userId)
+                        .build());
+            });
+            userGoodsMapper.insertBatch(userGoods);
         }
     }
 }

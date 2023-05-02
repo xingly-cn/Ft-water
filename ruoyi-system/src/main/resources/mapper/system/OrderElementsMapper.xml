@@ -42,7 +42,6 @@
             <if test="orderId != null">
                 #{orderId,jdbcType=BIGINT},
             </if>
-
             <if test="goodsId != null">
                 #{goodsId,jdbcType=BIGINT},
             </if>
@@ -59,4 +58,8 @@
             (#{item.orderId,jdbcType=BIGINT}, #{item.goodsId,jdbcType=BIGINT}, #{item.number,jdbcType=INTEGER})
         </foreach>
     </insert>
+
+    <select id="selectElementsByOrderId" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/> where order_id = #{orderId,jdbcType=BIGINT}
+    </select>
 </mapper>

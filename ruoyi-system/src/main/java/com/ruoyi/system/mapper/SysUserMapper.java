@@ -153,4 +153,6 @@ public interface SysUserMapper {
                                   @Param("id") Long id);
 
     List<SysUser> selectUserByIds(@Param("userIds") List<Long> userIds);
+
+    Boolean updateWaterNumberById(@Param("id") Long id, @Param("number") int number);
 }

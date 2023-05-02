@@ -35,4 +35,7 @@ public interface FtGoodsMapper {
                     @Param("flag") int flag);
 
     List<GoodsResponse> selectGoodsByIds(@Param("ids") Set<Long> goodsIds);
+
+    List<Long> selectGoodsByIdsAndType(@Param("ids") List<Long> ids,
+                                       @Param("type") int type);
 }

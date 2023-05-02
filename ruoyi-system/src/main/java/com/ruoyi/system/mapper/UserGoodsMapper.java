@@ -26,4 +26,6 @@ public interface UserGoodsMapper {
     List<UserGoods> selectByUserId(Long userId);
 
     List<UserGoods> getUserGoods();
+
+    void insertBatch(List<UserGoods> userGoods);
 }

@@ -44,6 +44,7 @@ public class FtMessage extends BaseEntity {
 
     private Integer number;
 
+    private Boolean operator;
 
     @Tolerate
     public FtMessage() {

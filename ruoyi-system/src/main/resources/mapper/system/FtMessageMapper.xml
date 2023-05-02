@@ -10,6 +10,7 @@
         <result column="home_id" jdbcType="BIGINT" property="homeId"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="confirm" jdbcType="BOOLEAN" property="confirm"/>
+        <result column="operator" jdbcType="BOOLEAN" property="operator"/>
         <result column="create_by" jdbcType="BIGINT" property="createBy"/>
         <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
@@ -23,6 +24,7 @@
         home_id,
         user_id,
         confirm,
+        operator,
         create_by,
         update_by,
         create_time,
@@ -37,6 +39,7 @@
         m.home_id,
         m.user_id,
         m.confirm,
+        m.operator,
         m.create_by,
         m.update_by,
         m.create_time,
@@ -64,10 +67,11 @@
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.domain.FtMessage"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
-        insert into ft_message (number,deleted, home_id, user_id,
+        insert into ft_message (number, deleted, home_id, user_id, operator,
                                 confirm, create_by, update_by,
                                 create_time, update_time)
-        values (#{number,jdbcType=INTEGER},#{deleted,jdbcType=BOOLEAN}, #{homeId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT},
+        values (#{number,jdbcType=INTEGER}, #{deleted,jdbcType=BOOLEAN}, #{homeId,jdbcType=BIGINT},
+                #{userId,jdbcType=BIGINT}, #{operator,jdbcType=BOOLEAN},
                 #{confirm,jdbcType=BOOLEAN}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
                 #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
     </insert>
@@ -91,6 +95,9 @@
             </if>
             <if test="confirm != null">
                 confirm,
+            </if>
+            <if test="operator != null">
+                operator,
             </if>
             <if test="createBy != null">
                 create_by,
@@ -120,6 +127,9 @@
             </if>
             <if test="confirm != null">
                 #{confirm,jdbcType=BOOLEAN},
+            </if>
+            <if test="operator != null">
+                #{operator,jdbcType=BOOLEAN},
             </if>
             <if test="createBy != null">
                 #{createBy,jdbcType=BIGINT},
@@ -155,6 +165,9 @@
             <if test="confirm != null">
                 confirm = #{confirm,jdbcType=BOOLEAN},
             </if>
+            <if test="operator != null">
+                operator = #{operator,jdbcType=BOOLEAN},
+            </if>
             <if test="createBy != null">
                 create_by = #{createBy,jdbcType=BIGINT},
             </if>
@@ -178,6 +191,7 @@
             home_id     = #{homeId,jdbcType=BIGINT},
             user_id     = #{userId,jdbcType=BIGINT},
             confirm     = #{confirm,jdbcType=BOOLEAN},
+            operator    = #{operator,jdbcType=BOOLEAN},
             create_by   = #{createBy,jdbcType=BIGINT},
             update_by   = #{updateBy,jdbcType=BIGINT},
             create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -187,12 +201,12 @@
 
     <insert id="insertBatch">
         <!--@mbg.generated-->
-        insert into ft_message (number,home_id, user_id,
+        insert into ft_message (number,home_id, user_id,operator,
                                 confirm, create_by, update_by,
                                 create_time, update_time)
         values
         <foreach collection="messages" item="item" index="index" separator=",">
-            (#{item.number,jdbcType=INTEGER}, #{item.homeId,jdbcType=BIGINT}, #{item.userId,jdbcType=BIGINT},
+            (#{item.number,jdbcType=INTEGER}, #{item.homeId,jdbcType=BIGINT}, #{item.userId,jdbcType=BIGINT},#{item.operator,jdbcType=BOOLEAN},
              #{item.confirm,jdbcType=BOOLEAN}, #{item.createBy,jdbcType=BIGINT}, #{item.updateBy,jdbcType=BIGINT},
              #{item.createTime,jdbcType=TIMESTAMP}, now())
         </foreach>
@@ -220,6 +234,11 @@
             <trim prefix="user_id = case" suffix="end,">
                 <foreach collection="messages" index="index" item="item">
                     when id = #{item.id,jdbcType=BIGINT} then #{item.userId,jdbcType=BIGINT}
+                </foreach>
+            </trim>
+            <trim prefix="operator = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.operator,jdbcType=BOOLEAN}
                 </foreach>
             </trim>
             <trim prefix="confirm = case" suffix="end,">

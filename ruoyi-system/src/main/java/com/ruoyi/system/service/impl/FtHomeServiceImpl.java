@@ -103,48 +103,7 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         //添加消息 确认之后在入库
         Long userId = SecurityUtils.getUserId();
-        //找该楼下面的管理员 发送消息
-        List<UserHome> userHomes = userHomeMapper.selectByHomeId(request.getId());
-
-        if (CollectionUtils.isEmpty(userHomes)) {
-            throw new SecurityException("该宿舍楼下没有管理员");
-        }
-
-        //消息
-        List<FtMessage> messages = Lists.newArrayList();
-        for (UserHome user : userHomes) {
-            FtMessage message = FtMessage.builder()
-                    .number(request.getNumber())
-                    .homeId(request.getId())
-                    .userId(user.getUserId())
-                    .confirm(false)
-                    .build();
-            message.setCreateBy(userId.toString());
-            message.setUpdateBy(userId.toString());
-            message.setCreateTime(new Date());
-            messages.add(message);
-        }
-        messageService.addMessages(messages);
-        log.info("发送通知{}条", messages.size());
-        //日志 记录
-        //xxx学校xxx宿舍楼xxx用户xxx手机几点提货多少 - 剩余多少
-        //xxx学校xxx宿舍楼几点收货多少 - 剩余多少
-        List<FtHome> homes = getHomes();
-        Long topId = getTopId(homes, home.getId());
-        FtNotices notices = FtNotices.builder()
-                .type(0)
-                .homeId(request.getId())
-                //todo 需要逆向推算学校
-                .schoolId(topId)
-                .userId(userId)
-                .number(request.getNumber())
-                .residue(home.getNumber() + request.getNumber())
-                .build();
-        notices.setCreateBy(userId.toString());
-        notices.setUpdateBy(userId.toString());
-        notices.setCreateTime(new Date());
-        noticesService.insert(notices);
-        return true;
+        return sendMessageAndNotices(request.getId(), userId,true,home.getNumber(), request.getNumber());
     }
 
     @Override
@@ -184,7 +143,6 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         //添加管理员
         user.setRoleIds(new Long[]{7L});
-//        user.setHomeId(request.getId());
         UserHome userHome = UserHome.builder()
                 .homeId(request.getId())
                 .userId(request.getUserId())
@@ -297,5 +255,56 @@ public class FtHomeServiceImpl implements FtHomeService {
             });
         }
         return userMap;
+    }
+
+    public Boolean sendMessageAndNotices(Long homeId,Long userId, Boolean operator,Integer sourceNumber, Integer number) {
+        //找该楼下面的管理员 发送消息
+        List<UserHome> userHomes = userHomeMapper.selectByHomeId(homeId);
+
+        if (CollectionUtils.isEmpty(userHomes)) {
+            throw new SecurityException("该宿舍楼下没有管理员");
+        }
+
+        //消息
+        List<FtMessage> messages = Lists.newArrayList();
+        for (UserHome user : userHomes) {
+            FtMessage message = FtMessage.builder()
+                    .operator(operator)
+                    .number(number)
+                    .homeId(homeId)
+                    .userId(user.getUserId())
+                    .confirm(false)
+                    .build();
+            message.setCreateBy(userId.toString());
+            message.setUpdateBy(userId.toString());
+            message.setCreateTime(new Date());
+            messages.add(message);
+        }
+        messageService.addMessages(messages);
+        log.info("发送通知{}条", messages.size());
+        //日志 记录
+        //xxx学校xxx宿舍楼xxx用户xxx手机几点提货多少 - 剩余多少
+        //xxx学校xxx宿舍楼几点收货多少 - 剩余多少
+        List<FtHome> homes = getHomes();
+        Long topId = getTopId(homes, homeId);
+        int total;
+        if (operator){
+            total = sourceNumber + number;
+        }else {
+            total = sourceNumber - number;
+        }
+        FtNotices notices = FtNotices.builder()
+                .type(0)
+                .homeId(homeId)
+                //todo 需要逆向推算学校
+                .schoolId(topId)
+                .userId(userId)
+                .number(number)
+                .residue(total)
+                .build();
+        notices.setCreateBy(userId.toString());
+        notices.setUpdateBy(userId.toString());
+        notices.setCreateTime(new Date());
+        return noticesService.insert(notices)>0;
     }
 }

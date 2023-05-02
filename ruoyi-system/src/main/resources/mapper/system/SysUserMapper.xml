@@ -510,4 +510,8 @@
             #{userId}
         </foreach>
     </select>
+
+    <update id="updateWaterNumberById">
+        update sys_user set water_num = #{number} where user_id = #{id}
+    </update>
 </mapper>

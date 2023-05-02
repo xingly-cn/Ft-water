@@ -1,6 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.OrderElements;
+import com.ruoyi.system.response.OrderResponse;
 
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface OrderElementsMapper {
     int insertSelective(OrderElements orderElements);
 
     Boolean insertBatch(List<OrderElements> orderElements);
+
+    List<OrderElements> selectElementsByOrderId(Long orderId);
 }
