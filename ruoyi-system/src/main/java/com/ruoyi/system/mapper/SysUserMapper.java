@@ -6,6 +6,7 @@ import com.ruoyi.system.response.UserResponse;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 用户表 数据层
@@ -152,7 +153,7 @@ public interface SysUserMapper {
     void updateDefaultAddressById(@Param("userId") Long userId,
                                   @Param("id") Long id);
 
-    List<SysUser> selectUserByIds(@Param("userIds") List<Long> userIds);
+    List<SysUser> selectUserByIds(@Param("userIds") Set<Long> userIds);
 
     Boolean updateWaterNumberById(@Param("id") Long id,
                                   @Param("number") int number);

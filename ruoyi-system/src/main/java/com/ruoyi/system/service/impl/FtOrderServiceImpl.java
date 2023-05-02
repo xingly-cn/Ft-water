@@ -9,7 +9,6 @@ import com.ruoyi.system.domain.UserGoods;
 import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.mapper.OrderElementsMapper;
-import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.mapper.UserGoodsMapper;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.GoodsResponse;
@@ -29,6 +28,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -62,9 +62,6 @@ public class FtOrderServiceImpl implements FtOrderService {
     @Autowired
     private ShopServiceImpl shopService;
 
-    @Autowired
-    private SysUserMapper userMapper;
-
     @Override
     @Transactional(rollbackFor = ServiceException.class)
     public Boolean deleteByPrimaryKey(Long id) {
@@ -94,7 +91,8 @@ public class FtOrderServiceImpl implements FtOrderService {
     }
 
     @Override
-    public Boolean addOrder(OrderRequest request) {
+    @Transactional(rollbackFor = ServiceException.class)
+    public Long addOrder(OrderRequest request) {
         Long userId = SecurityUtils.getUserId();
         SysUser user = userService.selectUserById(userId);
         if (user == null) {
@@ -121,8 +119,12 @@ public class FtOrderServiceImpl implements FtOrderService {
                     .build());
         });
         //下单之后删除购物车里面的东西
-        shopService.deleteShopsByIds(request.getShops().stream().map(Shop::getId).collect(Collectors.toList()));
-        return orderElementsMapper.insertBatch(orderElements);
+        List<Long> shopIds = request.getShops().stream().map(Shop::getId).collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(shopIds)) {
+            shopService.deleteShopsByIds(shopIds);
+        }
+        orderElementsMapper.insertBatch(orderElements);
+        return request.getId();
     }
 
     @Override
@@ -137,12 +139,13 @@ public class FtOrderServiceImpl implements FtOrderService {
     @Override
     @Transactional(rollbackFor = ServiceException.class)
     public Boolean payOrder(Long id) {
-        //todo 收货的时候需要根据type=3的商品来增加用户的空桶数量
         log.info("really pay order");
+        //todo 水漂 单独走 水和空
         FtOrder ftOrder = selectByPrimaryKey(id);
         if (ftOrder == null) {
             throw new ServiceException("订单不存在");
         }
+        ftOrder.setStatus(1);
         //需要校验库存
         List<OrderElements> elements = orderElementsMapper.selectElementsByOrderId(id);
         if (CollectionUtils.isEmpty(elements)) {
@@ -160,25 +163,47 @@ public class FtOrderServiceImpl implements FtOrderService {
         HomeResponse homeResponse = homeService.selectByPrimaryKey(homeId);
         checkGoodsNumber(shops, homeResponse.getNumber());
         //找到对应的商品 - typer->1
-        List<Long> shopGoodsIds = shops.stream().map(Shop::getGoodsId).collect(Collectors.toList());
-        List<Long> goodsIds =  goodsService.selectGoodsByIdsAndType(shopGoodsIds, 1);
-        int number = 0;
-        if (CollectionUtils.isNotEmpty(goodsIds)) {
-            List<Shop> waterShops = shops.stream().filter(s -> goodsIds.contains(s.getGoodsId())).collect(Collectors.toList());
-            number = waterShops.stream().mapToInt(Shop::getNumber).sum();
-        }
+        Set<Long> shopGoodsIds = shops.stream().map(Shop::getGoodsId).collect(Collectors.toSet());
+        List<GoodsResponse> goods = goodsService.selectGoodsByIds(shopGoodsIds);
+        Map<Integer, List<GoodsResponse>> goodsMap = goods.stream().collect(Collectors.groupingBy(GoodsResponse::getTyper));
+        goodsMap.keySet().forEach(type -> {
+            List<GoodsResponse> goodsResponses = goodsMap.get(type);
+            List<Shop> shopList = shops.stream().filter(s -> goodsResponses.stream().map(GoodsResponse::getId).collect(Collectors.toList())
+                    .contains(s.getGoodsId())).collect(Collectors.toList());
+            //总数量
+            int number = shopList.stream().mapToInt(Shop::getNumber).sum();
+            switch (type) {
+                case 0:
+                    //水漂
+                    log.info("水漂 - number:{}", number);
+                    ftOrder.setStatus(2);
+                    //async 水漂 其他 是 核销之后 入这个表
+                    addUserGoods(shopList, user.getUserId());
+                    break;
+                case 1:
+                    //水
+                    //发送消息 给对应宿管
+                    log.info("水 - number:{}", number);
+                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false);
+                    break;
+                case 2:
+                    //桶
+                    //发送消息 给对应宿管
+                    log.info("桶 - number:{}", number);
+                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, 0, number, true);
+                    break;
+                default:
+                    break;
+            }
+        });
+
         ftOrder.setPayed(true);
-        ftOrder.setStatus(1);
-        //发送消息 给对应宿管
-        homeService.sendMessageAndNotices(homeId,user.getId(),false,homeResponse.getNumber(),number);
-        //什么用户购买什么商品多少吧
         OrderRequest orderRequest = new OrderRequest();
         BeanUtils.copyProperties(ftOrder, orderRequest);
-        updateOrder(orderRequest);
-        //async
-        addUserGoods(shops, user.getUserId());
-        //更新用户的水票
-        return userMapper.updateWaterNumberById(user.getId(), number);
+        //支付之后
+        //todo 收货的时候需要根据type=3的商品来增加用户的空桶数量
+//        userMapper.updateWaterNumberById(user.getUserId(), number);
+        return updateOrder(orderRequest);
     }
 
     @Override
@@ -205,6 +230,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         //库存-该宿舍-楼
         Map<Long, Integer> goodsMap = shops.stream().collect(Collectors.toMap(Shop::getGoodsId, Shop::getNumber));
         List<GoodsResponse> goodsResponses = goodsService.selectGoodsByIds(goodsMap.keySet());
+
         //校验商品是否存在
         if (CollectionUtils.isEmpty(goodsResponses)) {
             throw new ServiceException("商品不存在");
@@ -234,6 +260,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                 userGoods.add(UserGoods.builder()
                         .goodsId(shop.getGoodsId())
                         .userId(userId)
+                        .number(shop.getNumber())
                         .build());
             });
             userGoodsMapper.insertBatch(userGoods);

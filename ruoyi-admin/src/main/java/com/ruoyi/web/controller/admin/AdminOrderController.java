@@ -3,13 +3,15 @@ package com.ruoyi.web.controller.admin;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -52,18 +54,5 @@ public class AdminOrderController extends BaseController {
     @ApiOperation("套餐卷商品销量")
     public AjaxResult getCouponNum(String str) {
         return AjaxResult.success(orderService.getCouponNum(str));
-    }
-
-    @PostMapping("/shopCart")
-    @ApiOperation("加入购物车")
-    public AjaxResult shopCart(@RequestBody OrderRequest request) {
-        request.setFlag(false);
-        return AjaxResult.success(orderService.shopCart(request));
-    }
-
-    @PostMapping("/add")
-    @ApiOperation("下单")
-    public AjaxResult addOrder(@RequestBody OrderRequest request) {
-        return AjaxResult.success(orderService.addOrder(request));
     }
 }

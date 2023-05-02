@@ -60,6 +60,9 @@
     </insert>
 
     <select id="selectElementsByOrderId" resultMap="BaseResultMap">
-        select <include refid="Base_Column_List"/> where order_id = #{orderId,jdbcType=BIGINT}
+        select
+        <include refid="Base_Column_List"/>
+        from order_elements
+        where order_id = #{orderId,jdbcType=BIGINT}
     </select>
 </mapper>

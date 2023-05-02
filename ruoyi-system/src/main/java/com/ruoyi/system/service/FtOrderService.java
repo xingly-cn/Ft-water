@@ -22,7 +22,7 @@ public interface FtOrderService {
 
     Boolean updateOrder(OrderRequest request);
 
-    Boolean addOrder(OrderRequest request);
+    Long addOrder(OrderRequest request);
 
     List<OrderResponse> selectOrderList(OrderRequest order);
 

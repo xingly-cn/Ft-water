@@ -21,6 +21,7 @@ import java.util.List;
  */
 @RestController
 @Api(tags = "购物车")
+@RequestMapping("/shop")
 public class ShopController extends BaseController {
 
     @Autowired

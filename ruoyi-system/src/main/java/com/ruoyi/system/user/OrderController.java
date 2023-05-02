@@ -63,19 +63,19 @@ public class OrderController extends BaseController {
 
 //    @DeleteMapping("/remove")
 //    @ApiOperation("删除订单")
-    public AjaxResult delete(@RequestParam Long id) {
+    public AjaxResult delete(Long id) {
         return AjaxResult.success(orderService.deleteByPrimaryKey(id));
     }
 
     @PostMapping("/pay")
     @ApiOperation("支付订单")
-    public AjaxResult payOrder(@RequestParam Long id) {
+    public AjaxResult payOrder(Long id) {
         return AjaxResult.success(orderService.payOrder(id));
     }
 
     @GetMapping("/detail")
     @ApiOperation("订单详情")
-    public AjaxResult getOrderDetail(@RequestParam(value = "id") Long id) {
+    public AjaxResult getOrderDetail(Long id) {
         return AjaxResult.success(orderService.selectByPrimaryKey(id));
     }
 }

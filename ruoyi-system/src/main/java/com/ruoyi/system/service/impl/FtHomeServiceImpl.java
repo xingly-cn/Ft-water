@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -103,7 +104,7 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         //添加消息 确认之后在入库
         Long userId = SecurityUtils.getUserId();
-        return sendMessageAndNotices(request.getId(), userId,true,home.getNumber(), request.getNumber());
+        return sendMessageAndNotices(request.getId(), userId, true, home.getNumber(), request.getNumber(), false);
     }
 
     @Override
@@ -243,7 +244,7 @@ public class FtHomeServiceImpl implements FtHomeService {
         List<UserHome> userHomes = userHomeMapper.getUserHomes();
         Map<Long, List<SysUser>> userMap = new ConcurrentHashMap<>();
         if (CollectionUtils.isNotEmpty(userHomes)) {
-            List<Long> userIds = userHomes.stream().map(UserHome::getUserId).collect(Collectors.toList());
+            Set<Long> userIds = userHomes.stream().map(UserHome::getUserId).collect(Collectors.toSet());
             List<SysUser> users = userMapper.selectUserByIds(userIds);
             userHomes.forEach(u -> {
                 List<SysUser> sysUsers = userMap.get(u.getHomeId());
@@ -257,7 +258,18 @@ public class FtHomeServiceImpl implements FtHomeService {
         return userMap;
     }
 
-    public Boolean sendMessageAndNotices(Long homeId,Long userId, Boolean operator,Integer sourceNumber, Integer number) {
+    /**
+     * 发送消息和通知
+     *
+     * @param homeId       宿舍楼id
+     * @param userId       用户id
+     * @param operator     操作
+     * @param sourceNumber 源数量
+     * @param number       数量
+     * @param flag         是否是桶 桶不需要减库存
+     * @return 是否成功
+     */
+    public Boolean sendMessageAndNotices(Long homeId, Long userId, Boolean operator, Integer sourceNumber, Integer number, Boolean flag) {
         //找该楼下面的管理员 发送消息
         List<UserHome> userHomes = userHomeMapper.selectByHomeId(homeId);
 
@@ -280,6 +292,7 @@ public class FtHomeServiceImpl implements FtHomeService {
             message.setCreateTime(new Date());
             messages.add(message);
         }
+
         messageService.addMessages(messages);
         log.info("发送通知{}条", messages.size());
         //日志 记录
@@ -287,11 +300,14 @@ public class FtHomeServiceImpl implements FtHomeService {
         //xxx学校xxx宿舍楼几点收货多少 - 剩余多少
         List<FtHome> homes = getHomes();
         Long topId = getTopId(homes, homeId);
-        int total;
-        if (operator){
-            total = sourceNumber + number;
-        }else {
-            total = sourceNumber - number;
+        int total = 0;
+        //如果是桶不需要减库存
+        if (!flag) {
+            if (operator) {
+                total = sourceNumber + number;
+            } else {
+                total = sourceNumber - number;
+            }
         }
         FtNotices notices = FtNotices.builder()
                 .type(0)
@@ -305,6 +321,6 @@ public class FtHomeServiceImpl implements FtHomeService {
         notices.setCreateBy(userId.toString());
         notices.setUpdateBy(userId.toString());
         notices.setCreateTime(new Date());
-        return noticesService.insert(notices)>0;
+        return noticesService.insert(notices) > 0;
     }
 }

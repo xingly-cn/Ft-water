@@ -63,12 +63,12 @@ public class FtGoodsServiceImpl implements FtGoodsService {
         return ftGoodsMapper.setOpen(id, flag);
     }
 
-    @Cacheable(value = "goods", key = "#goodsIds", unless = "#result == null")
+//    @Cacheable(value = "goods", key = "#goodsIds", unless = "#result == null")
     public List<GoodsResponse> selectGoodsByIds(Set<Long> goodsIds) {
         return ftGoodsMapper.selectGoodsByIds(goodsIds);
     }
 
-    public List<Long> selectGoodsByIdsAndType(List<Long> ids, int type) {
+    public List<Long> selectGoodsByIdsAndType(Set<Long> ids, int type) {
         if (CollectionUtils.isEmpty(ids)){
             return Collections.emptyList();
         }

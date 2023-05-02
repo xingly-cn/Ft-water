@@ -7,6 +7,7 @@
     <resultMap type="com.ruoyi.system.domain.UserGoods" id="UserGoodsResult">
         <result property="userId" column="user_id"/>
         <result property="goodsId" column="goods_id"/>
+        <result property="number" column="number"/>
         <result property="isDeleted" column="is_deleted"/>
     </resultMap>
 
@@ -18,38 +19,38 @@
     </delete>
 
     <insert id="batchUserGoods">
-        insert into user_goods(user_id, goods_id) values
+        insert into user_goods(user_id, goods_id,number) values
         <foreach item="item" index="index" collection="list" separator=",">
-            (#{item.userId}, #{item.goodsId})
+            (#{item.userId}, #{item.goodsId},#{item.number})
         </foreach>
     </insert>
 
     <select id="selectByGoodsId" resultMap="UserGoodsResult">
-        select user_id, goods_id, is_deleted
+        select user_id, goods_id, is_deleted,number
         from user_goods
         where goods_id = #{goodsId}
     </select>
 
     <insert id="insert">
-        insert into user_goods(user_id, goods_id)
-        values (#{userId}, #{goodsId})
+        insert into user_goods(user_id, goods_id,number)
+        values (#{userId}, #{goodsId},#{number})
     </insert>
 
     <select id="selectByUserId" resultMap="UserGoodsResult">
-        select user_id, goods_id
+        select user_id, goods_id,number
         from user_goods
         where user_id = #{userId}
     </select>
 
     <select id="getUserGoods" resultMap="UserGoodsResult">
-        select user_id, goods_id
+        select user_id, goods_id,number
         from user_goods
     </select>
 
     <insert id="insertBatch">
-        insert into user_goods(user_id, goods_id) values
+        insert into user_goods(user_id, goods_id,number) values
         <foreach item="item" index="index" collection="list" separator=",">
-            (#{item.userId}, #{item.goodsId})
+            (#{item.userId}, #{item.goodsId},#{item.number})
         </foreach>
     </insert>
 </mapper>

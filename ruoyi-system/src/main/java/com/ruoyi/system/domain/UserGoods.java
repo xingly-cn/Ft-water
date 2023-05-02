@@ -20,6 +20,8 @@ public class UserGoods {
 
     private Long goodsId;
 
+    private Integer number;
+
     private Boolean isDeleted;
 
     @Tolerate
