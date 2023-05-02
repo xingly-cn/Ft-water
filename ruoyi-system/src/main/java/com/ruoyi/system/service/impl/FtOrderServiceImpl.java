@@ -3,8 +3,11 @@ package com.ruoyi.system.service.impl;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.FtOrder;
+import com.ruoyi.system.domain.OrderElements;
+import com.ruoyi.system.domain.Shop;
 import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.FtOrderMapper;
+import com.ruoyi.system.mapper.OrderElementsMapper;
 import com.ruoyi.system.mapper.UserGoodsMapper;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.GoodsResponse;
@@ -13,6 +16,7 @@ import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +26,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -54,6 +59,12 @@ public class FtOrderServiceImpl implements FtOrderService {
     @Autowired
     private UserGoodsMapper userGoodsMapper;
 
+    @Autowired
+    private OrderElementsMapper orderElementsMapper;
+
+    @Autowired
+    private ShopServiceImpl shopService;
+
     @Override
     @Transactional(rollbackFor = ServiceException.class)
     public Boolean deleteByPrimaryKey(Long id) {
@@ -84,21 +95,30 @@ public class FtOrderServiceImpl implements FtOrderService {
 
     @Override
     public Boolean addOrder(OrderRequest request) {
-        //批量下单  一个订单对应多个商品
         Long userId = SecurityUtils.getUserId();
         SysUser user = userService.selectUserById(userId);
         if (user == null) {
             throw new ServiceException("用户不存在");
         }
-        if (CollectionUtils.isEmpty(request.getOrders())) {
+        if (CollectionUtils.isEmpty(request.getShops())) {
             throw new ServiceException("商品不能为空");
         }
         //校验库存
-        checkGoodsNumber(request.getOrders(), user.getHomeId());
-        //进行下单
-        //status 0待付款 1代取货 2已取货  (-1 ->0)
-        //补充地址 有id
-        return null;
+        checkGoodsNumber(request.getShops(), user.getHomeId());
+        //生成订单
+        request.setUserId(userId);
+        ftOrderMapper.insertSelective(request);
+        List<OrderElements> orderElements = Lists.newArrayList();
+        request.getShops().forEach(shop -> {
+            orderElements.add(OrderElements.builder()
+                    .orderId(request.getId())
+                    .goodsId(shop.getGoodsId())
+                    .number(shop.getNumber())
+                    .build());
+        });
+        //下单之后删除购物车里面的东西
+        shopService.deleteShopsByIds(request.getShops().stream().map(Shop::getId).collect(Collectors.toList()));
+        return orderElementsMapper.insertBatch(orderElements);
     }
 
     @Override
@@ -147,15 +167,14 @@ public class FtOrderServiceImpl implements FtOrderService {
         return ftOrderMapper.selectList(orderRequest);
     }
 
-    private void checkGoodsNumber(List<OrderRequest> requests, Long homeId) {
+    private void checkGoodsNumber(List<Shop> shops, Long homeId) {
         HomeResponse homeResponse = homeService.selectByPrimaryKey(homeId);
         if (homeResponse == null) {
             throw new ServiceException("宿舍不存在");
         }
         //库存-该宿舍-楼
         Integer number = homeResponse.getNumber();
-//        Map<Long, Integer> goodsMap = requests.stream().collect(Collectors.toMap(OrderRequest::getGoodId, OrderRequest::getNum));
-        Map<Long, Integer> goodsMap = null;
+        Map<Long, Integer> goodsMap = shops.stream().collect(Collectors.toMap(Shop::getGoodsId, Shop::getNumber));
         List<GoodsResponse> goodsResponses = goodsService.selectGoodsByIds(goodsMap.keySet());
         //校验商品是否存在
         if (CollectionUtils.isEmpty(goodsResponses)) {

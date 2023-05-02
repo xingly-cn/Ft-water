@@ -51,4 +51,12 @@
             </if>
         </trim>
     </insert>
+
+    <insert id="insertBatch">
+        insert into order_elements (order_id, goods_id, `number`)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.orderId,jdbcType=BIGINT}, #{item.goodsId,jdbcType=BIGINT}, #{item.number,jdbcType=INTEGER})
+        </foreach>
+    </insert>
 </mapper>

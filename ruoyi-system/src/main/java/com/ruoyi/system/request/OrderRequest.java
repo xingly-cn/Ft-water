@@ -1,7 +1,7 @@
 package com.ruoyi.system.request;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.system.domain.FtOrder;
+import com.ruoyi.system.domain.Shop;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,5 +26,5 @@ public class OrderRequest extends FtOrder {
     @ApiModelProperty(value = "是否是小程序")
     private Boolean flag;
 
-    private List<OrderRequest> orders;
+    private List<Shop> shops;
 }

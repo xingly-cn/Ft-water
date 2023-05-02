@@ -2,6 +2,8 @@ package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.OrderElements;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  *
@@ -14,4 +16,5 @@ public interface OrderElementsMapper {
 
     int insertSelective(OrderElements orderElements);
 
+    Boolean insertBatch(List<OrderElements> orderElements);
 }

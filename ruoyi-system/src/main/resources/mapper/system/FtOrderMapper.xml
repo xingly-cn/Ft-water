@@ -103,6 +103,7 @@
             <if test="status != null">
                 status,
             </if>
+            create_time,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="userId != null">
@@ -120,6 +121,7 @@
             <if test="status != null">
                 #{status,jdbcType=INTEGER},
             </if>
+            now(),
         </trim>
     </insert>
 
@@ -159,7 +161,7 @@
                     fg.title like concat('%', #{order.keyword}, '%')
 <!--                    or fh.name like concat('%', #{order.keyword}, '%')-->
                     or fu.user_name like concat('%', #{order.keyword}, '%')
-                    or fu.phone = #{order.keyword}
+                    or fu.phonenumber = #{order.keyword}
                 )
         </if>
 

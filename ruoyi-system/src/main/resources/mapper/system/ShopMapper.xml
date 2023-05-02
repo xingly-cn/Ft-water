@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.ShopMapper">
-    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.Shop">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.response.ShopResponse">
         <!--@mbg.generated-->
         <!--@Table shop-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -9,6 +9,8 @@
         <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
         <result column="number" jdbcType="INTEGER" property="number"/>
         <result column="is_deleted" jdbcType="BOOLEAN" property="isDeleted"/>
+        <association property="goodsResponse" javaType="com.ruoyi.system.response.GoodsResponse"
+                     resultMap="com.ruoyi.system.mapper.FtGoodsMapper.BaseResponseMap"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -20,12 +22,33 @@
         is_deleted
     </sql>
 
+    <sql id ="Base_Shop_Goods_List">
+        select
+            s.id,
+            s.user_id,
+            s.goods_id,
+            s.number,
+            g.id,
+            g.title,
+            g.price,
+            g.remark,
+            g.avatar,
+            g.deleted,
+            g.typer,
+            g.opener,
+            g.run_price,
+            g.water_num,
+            g.min_num,
+            g.max_num,
+            g.good_sex,
+            g.get_type
+        from shop s left join ft_goods g on s.goods_id = g.id
+    </sql>
+
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         <!--@mbg.generated-->
-        select
-        <include refid="Base_Column_List"/>
-        from shop
-        where id = #{id,jdbcType=BIGINT}
+        <include refid="Base_Shop_Goods_List"/>
+        where s.id = #{id,jdbcType=BIGINT}
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -58,9 +81,6 @@
             <if test="number != null">
                 `number`,
             </if>
-            <if test="isDeleted != null">
-                is_deleted,
-            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="userId != null">
@@ -71,9 +91,6 @@
             </if>
             <if test="number != null">
                 #{number,jdbcType=INTEGER},
-            </if>
-            <if test="isDeleted != null">
-                #{isDeleted,jdbcType=BOOLEAN},
             </if>
         </trim>
     </insert>
@@ -91,9 +108,6 @@
             <if test="number != null">
                 `number` = #{number,jdbcType=INTEGER},
             </if>
-            <if test="isDeleted != null">
-                is_deleted = #{isDeleted,jdbcType=BOOLEAN},
-            </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
@@ -106,5 +120,25 @@
             `number`   = #{number,jdbcType=INTEGER},
             is_deleted = #{isDeleted,jdbcType=BOOLEAN}
         where id = #{id,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectShopList" resultType="com.ruoyi.system.response.ShopResponse">
+        <include refid="Base_Shop_Goods_List"/>
+        <where>
+            is_deleted = 0
+            <if test="userId != null">
+                and s.user_id = #{userId,jdbcType=BIGINT}
+            </if>
+            <if test="goodsId != null">
+                and s.goods_id = #{goodsId,jdbcType=BIGINT}
+            </if>
+        </where>
+    </select>
+
+    <update id="deleteShopsByIds">
+        update shop set is_deleted=1 where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </update>
 </mapper>

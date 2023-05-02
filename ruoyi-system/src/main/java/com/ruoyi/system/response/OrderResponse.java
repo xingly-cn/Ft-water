@@ -24,8 +24,8 @@ public class OrderResponse extends FtOrder {
     @ApiModelProperty(value = "地址")
     private String address;
 
-    @ApiModelProperty(value = "总价")
-    private BigDecimal total;
+//    @ApiModelProperty(value = "总价")
+//    private BigDecimal total;
 
     private String userName;
 

@@ -1,6 +1,11 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.Shop;
+import com.ruoyi.system.request.ShopRequest;
+import com.ruoyi.system.response.ShopResponse;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -9,7 +14,7 @@ import com.ruoyi.system.domain.Shop;
  */
 public interface ShopMapper {
 
-    Shop selectByPrimaryKey(Long id);
+    ShopResponse selectByPrimaryKey(Long id);
 
     int updateByPrimaryKeySelective(Shop shop);
 
@@ -20,4 +25,8 @@ public interface ShopMapper {
     int insertSelective(Shop shop);
 
     int deleteByPrimaryKey(Long id);
+
+    List<ShopResponse> selectShopList(ShopRequest request);
+
+    void deleteShopsByIds(@Param("ids") List<Long> ids);
 }

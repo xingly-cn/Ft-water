@@ -1,7 +1,9 @@
 package com.ruoyi.system.domain;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
+import lombok.experimental.Tolerate;
 
 /**
  * Created by IntelliJ IDEA.
@@ -11,6 +13,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
+@Builder
 public class OrderElements {
 
     private Long orderId;
@@ -18,4 +21,7 @@ public class OrderElements {
     private Long goodsId;
 
     private Integer number;
+
+    @Tolerate
+    public OrderElements() {}
 }
