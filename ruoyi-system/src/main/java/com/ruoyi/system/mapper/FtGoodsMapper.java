@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,4 +34,5 @@ public interface FtGoodsMapper {
     Boolean setOpen(@Param("id") Long id,
                     @Param("flag") int flag);
 
+    List<GoodsResponse> selectGoodsByIds(@Param("ids") Set<Long> goodsIds);
 }

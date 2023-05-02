@@ -148,6 +148,7 @@ public class FtHomeServiceImpl implements FtHomeService {
     }
 
     @Override
+    @Cacheable(value = "home", key = "#id")
     public HomeResponse selectByPrimaryKey(Long id) {
         FtHome home = homeMapper.selectByPrimaryKey(id);
         if (home != null) {

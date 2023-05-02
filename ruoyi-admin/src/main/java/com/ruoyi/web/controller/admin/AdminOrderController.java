@@ -54,36 +54,16 @@ public class AdminOrderController extends BaseController {
         return AjaxResult.success(orderService.getCouponNum(str));
     }
 
-
-    @PostMapping("/insert")
-    @ApiOperation("新增订单")
-    public AjaxResult addOrder(@RequestBody FtOrder order) {
-        return AjaxResult.success(orderService.addOrder(order));
+    @PostMapping("/shopCart")
+    @ApiOperation("加入购物车")
+    public AjaxResult shopCart(@RequestBody OrderRequest request) {
+        request.setFlag(false);
+        return AjaxResult.success(orderService.shopCart(request));
     }
 
-    @PostMapping("/update")
-    @ApiOperation("修改订单")
-    public AjaxResult updateOrder(@RequestBody FtOrder order) {
-        return AjaxResult.success(orderService.updateOrder(order));
+    @PostMapping("/add")
+    @ApiOperation("下单")
+    public AjaxResult addOrder(@RequestBody OrderRequest request) {
+        return AjaxResult.success(orderService.addOrder(request));
     }
-
-    @GetMapping("/list")
-    @ApiOperation("订单列表")
-    public AjaxResult selectOrderList(OrderRequest order) {
-        order.setFlag(false);
-        return AjaxResult.success(orderService.selectOrderList(order));
-    }
-
-    @DeleteMapping("/remove")
-    @ApiOperation("删除订单")
-    public AjaxResult delete(@RequestParam Long id) {
-        return AjaxResult.success(orderService.deleteByPrimaryKey(id));
-    }
-
-    @PostMapping("/pay")
-    @ApiOperation("支付订单")
-    public AjaxResult payOrder(@RequestParam Long id) {
-        return AjaxResult.success(orderService.payOrder(id));
-    }
-
 }

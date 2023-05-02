@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -59,4 +60,8 @@ public class FtGoodsServiceImpl implements FtGoodsService {
         return ftGoodsMapper.setOpen(id, flag);
     }
 
+    @Cacheable(value = "goods", key = "#goodsIds", unless = "#result == null")
+    public List<GoodsResponse> selectGoodsByIds(Set<Long> goodsIds) {
+        return ftGoodsMapper.selectGoodsByIds(goodsIds);
+    }
 }

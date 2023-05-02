@@ -16,11 +16,13 @@ public interface FtOrderService {
 
     Boolean deleteByPrimaryKey(Long id);
 
-    Boolean addOrder(FtOrder record);
+    Boolean shopCart(OrderRequest request);
 
     FtOrder selectByPrimaryKey(Long id);
 
-    Boolean updateOrder(FtOrder record);
+    Boolean updateOrder(OrderRequest request);
+
+    Boolean addOrder(OrderRequest request);
 
     List<OrderResponse> selectOrderList(OrderRequest order);
 

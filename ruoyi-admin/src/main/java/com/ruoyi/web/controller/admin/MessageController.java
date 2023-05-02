@@ -44,8 +44,8 @@ public class MessageController extends BaseController {
 
     @PostMapping("/confirm")
     @ApiOperation("确认消息")
-    public AjaxResult addMessage(@RequestParam(value = "id") Long id) {
-        return AjaxResult.success(messageService.addMessage(id));
+    public AjaxResult confirmMessage(@RequestParam(value = "id") Long id) {
+        return AjaxResult.success(messageService.confirmMessage(id));
     }
 
 }

@@ -34,9 +34,10 @@ public class UserHomeServiceImpl implements UserHomeService {
             throw new ServiceException("该用户不是任何宿舍的管理员");
         }
         //检查这个用户是不是这个宿舍的管理员
-        userHomes.stream().filter(userHome -> !userHome.getHomeId().equals(homeId)).findAny().ifPresent(u -> {
-            throw new SecurityException("该用户不是该宿舍楼管理员");
-        });
+        long count = userHomes.stream().filter(userHome -> userHome.getHomeId().equals(homeId)).count();
+        if (count == 0) {
+            throw new ServiceException("该用户不是该宿舍的管理员");
+        }
         //删除
         if (userHomes.size()==1){
             //需要删除用户与角色的关系

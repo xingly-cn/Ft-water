@@ -11,7 +11,7 @@
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
         <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
         <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
-        <result column="typer" jdbcType="BOOLEAN" property="typer"/>
+        <result column="typer" jdbcType="INTEGER" property="typer"/>
         <result column="opener" jdbcType="BOOLEAN" property="opener"/>
         <result column="run_price" jdbcType="DECIMAL" property="runPrice"/>
         <result column="water_num" jdbcType="INTEGER" property="waterNum"/>
@@ -115,7 +115,7 @@
                 #{avatar,jdbcType=VARCHAR},
             </if>
             <if test="typer != null">
-                #{typer,jdbcType=BOOLEAN},
+                #{typer,jdbcType=INTEGER},
             </if>
             <if test="opener != null">
                 #{opener,jdbcType=BOOLEAN},
@@ -148,7 +148,7 @@
             title     = #{title,jdbcType=VARCHAR},
             remark    = #{remark,jdbcType=VARCHAR},
             avatar    = #{avatar,jdbcType=VARCHAR},
-            typer     = #{typer,jdbcType=BOOLEAN},
+            typer     = #{typer,jdbcType=INTEGER},
             opener    = #{opener,jdbcType=BOOLEAN},
             price     = #{price,jdbcType=DECIMAL},
             run_price = #{runPrice,jdbcType=DECIMAL},
@@ -186,6 +186,18 @@
         <if test="goods.title != null and goods.title != ''">
             and title like concat('%', #{goods.title}, '%')
         </if>
+        order by id desc
+    </select>
+
+    <select id="selectGoodsByIds" resultMap="BaseResponseMap">
+        select
+        <include refid="Base_Column_List"/>
+        from ft_goods
+        where deleted = 0
+        and id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
         order by id desc
     </select>
 </mapper>

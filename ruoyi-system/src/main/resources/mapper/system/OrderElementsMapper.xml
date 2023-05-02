@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.OrderElementsMapper">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.OrderElements">
+        <!--@mbg.generated-->
+        <!--@Table order_elements-->
+        <result column="order_id" jdbcType="BIGINT" property="orderId"/>
+        <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
+        <result column="number" jdbcType="INTEGER" property="number"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        order_id,
+        goods_id,
+        `number`
+    </sql>
+
+    <insert id="insert" parameterType="com.ruoyi.system.domain.OrderElements">
+        <!--@mbg.generated-->
+        insert into order_elements (order_id, goods_id,
+                                    `number`)
+        values (#{orderId,jdbcType=BIGINT}, #{goodsId,jdbcType=BIGINT},
+                #{number,jdbcType=INTEGER})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.ruoyi.system.domain.OrderElements">
+        <!--@mbg.generated-->
+        insert into order_elements
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">
+                order_id,
+            </if>
+            <if test="goodsId != null">
+                goods_id,
+            </if>
+            <if test="number != null">
+                `number`,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="orderId != null">
+                #{orderId,jdbcType=BIGINT},
+            </if>
+
+            <if test="goodsId != null">
+                #{goodsId,jdbcType=BIGINT},
+            </if>
+            <if test="number != null">
+                #{number,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+</mapper>

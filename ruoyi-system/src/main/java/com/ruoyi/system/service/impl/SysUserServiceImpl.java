@@ -10,7 +10,6 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.common.utils.bean.BeanValidators;
 import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.FtHome;
-import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.mapper.*;
@@ -35,10 +34,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -335,6 +331,7 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 结果
      */
     @Override
+    @CacheEvict(value = "user", key = "#user.userId")
     public int updateUserProfile(SysUser user) {
         return userMapper.updateUser(user);
     }
@@ -455,13 +452,13 @@ public class SysUserServiceImpl implements ISysUserService {
     public ConcurrentHashMap<String, Integer> checkCoupon(HttpServletRequest request) {
         Long userId = SecurityUtils.getUserId();
         OrderRequest orderRequest = new OrderRequest();
-        orderRequest.setUid(userId);
+        orderRequest.setUserId(userId);
         List<OrderResponse> ftOrders = ftOrderMapper.selectList(orderRequest);
-        int totalNum = ftOrders.stream().mapToInt(FtOrder::getNum).sum();
+//        int totalNum = ftOrders.stream().mapToInt(FtOrder::getNum).sum();
         SysUser user = userMapper.selectUserById(userId);
         Integer waterNum = user.getWaterNum();
         ConcurrentHashMap<String, Integer> result = new ConcurrentHashMap<>();
-        result.put("usedNum", totalNum - waterNum);
+//        result.put("usedNum", totalNum - waterNum);
         result.put("unUsedNum", waterNum);
         return result;
     }
@@ -638,17 +635,18 @@ public class SysUserServiceImpl implements ISysUserService {
             if (StringUtils.isNotEmpty(userRoleList)) {
                 List<Long> userRoleIdList = userRoleList.stream().map(SysUserRole::getRoleId).collect(Collectors.toList());
                 List<Long> roleIdList = Arrays.asList(roleIds);
-                roleIdList.removeAll(userRoleIdList);
-                if (StringUtils.isNotEmpty(roleIdList)) {
-                    List<SysUserRole> list = new ArrayList<>(roleIdList.size());
-                    for (Long roleId : roleIdList) {
-                        SysUserRole ur = new SysUserRole();
-                        ur.setUserId(userId);
-                        ur.setRoleId(roleId);
-                        list.add(ur);
-                    }
-                    userRoleMapper.batchUserRole(list);
+
+                if (new HashSet<>(userRoleIdList).containsAll(roleIdList)) {
+                    return;
                 }
+                List<SysUserRole> list = new ArrayList<>(roleIdList.size());
+                for (Long roleId : roleIdList) {
+                    SysUserRole ur = new SysUserRole();
+                    ur.setUserId(userId);
+                    ur.setRoleId(roleId);
+                    list.add(ur);
+                }
+                userRoleMapper.batchUserRole(list);
             } else {
                 // 新增用户与角色管理
                 List<SysUserRole> list = new ArrayList<SysUserRole>(roleIds.length);

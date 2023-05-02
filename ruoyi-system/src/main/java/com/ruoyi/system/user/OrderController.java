@@ -34,4 +34,48 @@ public class OrderController extends BaseController {
         List<OrderResponse> responses = orderService.selectOrderList(request);
         return getDataTable(responses);
     }
+
+    @PostMapping("/shopCart")
+    @ApiOperation("加入购物车")
+    public AjaxResult shopCart(@RequestBody OrderRequest request) {
+        request.setFlag(true);
+        return AjaxResult.success(orderService.shopCart(request));
+    }
+
+    @PostMapping("/update")
+    @ApiOperation("修改订单")
+    public AjaxResult updateOrder(@RequestBody OrderRequest request) {
+        return AjaxResult.success(orderService.updateOrder(request));
+    }
+
+    @PostMapping("/add")
+    @ApiOperation("下单")
+    public AjaxResult addOrder(@RequestBody OrderRequest request) {
+        return AjaxResult.success(orderService.addOrder(request));
+    }
+
+    @GetMapping("/list")
+    @ApiOperation("订单列表")
+    public AjaxResult selectOrderList(OrderRequest order) {
+        order.setFlag(false);
+        return AjaxResult.success(orderService.selectOrderList(order));
+    }
+
+    @DeleteMapping("/remove")
+    @ApiOperation("删除订单")
+    public AjaxResult delete(@RequestParam Long id) {
+        return AjaxResult.success(orderService.deleteByPrimaryKey(id));
+    }
+
+    @PostMapping("/pay")
+    @ApiOperation("支付订单")
+    public AjaxResult payOrder(@RequestParam Long id) {
+        return AjaxResult.success(orderService.payOrder(id));
+    }
+
+    @GetMapping("/detail")
+    @ApiOperation("订单详情")
+    public AjaxResult getOrderDetail(@RequestParam(value = "id") Long id) {
+        return AjaxResult.success(orderService.selectByPrimaryKey(id));
+    }
 }

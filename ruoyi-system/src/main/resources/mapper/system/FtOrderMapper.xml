@@ -1,30 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.FtOrderMapper">
-    <resultMap id="BaseResultMap" type="com.ruoyi.system.domain.FtOrder">
+    <resultMap id="BaseResultMap" type="com.ruoyi.system.response.OrderResponse">
         <!--@mbg.generated-->
         <!--@Table ft_order-->
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
-        <result column="uid" jdbcType="BIGINT" property="uid"/>
-        <result column="good_id" jdbcType="BIGINT" property="goodId"/>
         <result column="address_id" jdbcType="BIGINT" property="addressId"/>
-        <result column="num" jdbcType="INTEGER" property="num"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="payed" jdbcType="BOOLEAN" property="payed"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="user_name" jdbcType="BIGINT" property="userName"/>
+        <result column="user_phone" jdbcType="BIGINT" property="userPhone"/>
+        <collection property="orderElementsResponses"
+                    javaType="java.util.List" resultMap="elements"/>
+    </resultMap>
+
+    <resultMap id="elements" type="com.ruoyi.system.response.OrderElementsResponse">
+        <result column="order_id" jdbcType="BOOLEAN" property="orderId"/>
+        <result column="goods_id" jdbcType="INTEGER" property="goodsId"/>
+        <result column="goods_name" jdbcType="TIMESTAMP" property="goodName"/>
+        <result column="number" jdbcType="TIMESTAMP" property="number"/>
+        <result column="price" jdbcType="DECIMAL" property="price"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
-        deleted,
-        `uid`,
-        good_id,
-        address_id,
-        num,
-        payed,
         status,
+        payed,
+        user_id,
+        address_id,
+        deleted,
         create_time
     </sql>
 
@@ -32,19 +41,22 @@
         select fo.id,
                fo.create_time,
                fo.payed,
-               fo.num,
-               fo.uid,
-               fo.good_id,
                fo.address_id,
                fo.status,
-               fu.user_name   as userName,
-               fu.phonenumber as userPhone,
-               fg.title as goodName,
-               a.address
+               fo.user_id,
+               fu.user_name   as user_name,
+               fu.phonenumber as user_phone,
+               fg.title       as goods_name,
+               fg.price,
+               a.address,
+               oe.goods_id,
+               oe.number,
+               oe.order_id
         from ft_order fo
-                 inner join ft_goods fg on fo.good_id = fg.id
                  inner join address a on fo.address_id = a.id
-                 inner join sys_user fu on fo.uid = fu.user_id
+                 inner join order_elements oe on fo.id = oe.order_id
+                 inner join ft_goods fg on oe.goods_id = fg.id
+                 inner join sys_user fu on fo.user_id = fu.user_id
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
@@ -64,11 +76,10 @@
 
     <insert id="insert" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
-        insert into ft_order (`uid`,
-                              good_id, address_id, num, status,
+        insert into ft_order (address_id, status,user_id,
                               create_time, payed)
-        values (#{uid,jdbcType=BIGINT}, #{goodId,jdbcType=BIGINT}, #{addressId,jdbcType=BIGINT}, #{num,jdbcType=INTEGER},
-                #{status,jdbcType=INTEGER},
+        values (#{addressId,jdbcType=BIGINT},
+                #{status,jdbcType=INTEGER},#{userId,jdbcType=BIGINT},
                 now(), #{payed,jdbcType=BOOLEAN})
     </insert>
 
@@ -77,17 +88,11 @@
         <!--@mbg.generated-->
         insert into ft_order
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="uid != null">
-                `uid`,
-            </if>
-            <if test="goodId != null">
-                good_id,
+            <if test="userId != null">
+                user_id,
             </if>
             <if test="addressId != null">
                 address_id,
-            </if>
-            <if test="num != null">
-                num,
             </if>
             <if test="createTime != null">
                 create_time,
@@ -100,17 +105,11 @@
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="uid != null">
-                #{uid,jdbcType=BIGINT},
-            </if>
-            <if test="goodId != null">
-                #{goodId,jdbcType=BIGINT},
+            <if test="userId != null">
+                #{userId,jdbcType=BIGINT},
             </if>
             <if test="addressId != null">
                 #{addressId,jdbcType=BIGINT},
-            </if>
-            <if test="num != null">
-                #{num,jdbcType=INTEGER},
             </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
@@ -128,17 +127,8 @@
         <!--@mbg.generated-->
         update ft_order
         <set>
-            <if test="uid != null">
-                `uid` = #{uid,jdbcType=BIGINT},
-            </if>
-            <if test="goodId != null">
-                good_id = #{goodId,jdbcType=BIGINT},
-            </if>
             <if test="addressId != null">
                 address_id = #{addressId,jdbcType=BIGINT},
-            </if>
-            <if test="num != null">
-                num = #{num,jdbcType=INTEGER},
             </if>
             <if test="payed != null">
                 payed = #{payed,jdbcType=BOOLEAN},
@@ -153,37 +143,34 @@
     <update id="updateByPrimaryKey" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         update ft_order
-        set `uid`     = #{uid,jdbcType=BIGINT},
-            good_id   = #{goodId,jdbcType=BIGINT},
-            address_id = #{addressId,jdbcType=BIGINT},
-            num       = #{num,jdbcType=INTEGER},
+        set address_id = #{addressId,jdbcType=BIGINT},
             payed     = #{payed,jdbcType=BOOLEAN},
             status    = #{status,jdbcType=INTEGER}
         where id = #{id}
     </update>
 
-    <select id="selectList" resultType="com.ruoyi.system.response.OrderResponse">
+    <select id="selectList" resultMap="BaseResultMap">
         <include refid="Base_Column_Goods_HOME_User_List"/>
         where fo.deleted = 0
           and fg.deleted = 0
-          and fu.deleted = 0
+          and fu.del_flag = 0
         <if test="order.keyword != null and order.keyword != ''">
             and (
-                        fg.title like concat('%', #{order.keyword}, '%')
-                    or fh.name like concat('%', #{order.keyword}, '%')
-                    or fu.name like concat('%', #{order.keyword}, '%')
+                    fg.title like concat('%', #{order.keyword}, '%')
+<!--                    or fh.name like concat('%', #{order.keyword}, '%')-->
+                    or fu.user_name like concat('%', #{order.keyword}, '%')
                     or fu.phone = #{order.keyword}
                 )
         </if>
+
         <if test="order.addressId != null">
             and a.id = #{order.addressId}
         </if>
-        <if test="order.goodId != null">
-            and fg.id = #{order.goodId}
+
+        <if test="order.userId != null">
+            and fo.user_id = #{order.userId}
         </if>
-        <if test="order.uid != null">
-            and fu.user_id = #{order.uid}
-        </if>
+
         <if test="order.status != null">
             and fo.status = #{order.status}
         </if>

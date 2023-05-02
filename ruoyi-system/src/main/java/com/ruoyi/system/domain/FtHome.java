@@ -24,9 +24,6 @@ public class FtHome extends BaseEntity {
     @ApiModelProperty(value = "父级id")
     private Long parentId;
 
-  /*  @ApiModelProperty(value = "备注")
-    private String remark;*/
-
     @ApiModelProperty(value = "名字")
     private String name;
 

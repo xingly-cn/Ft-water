@@ -14,6 +14,7 @@ import java.math.BigDecimal;
  * @Author : 镜像
  * @create 2023/3/30 15:59
  */
+
 /**
  * 商品表
  */
@@ -39,19 +40,13 @@ public class FtGoods extends BaseEntity implements Serializable {
     private BigDecimal price;
 
     /**
-     * 商品信息（备注）
-     */
-//    @ApiModelProperty(value = "商品信息（备注）")
-//    private String remark;
-
-    /**
      * 商品图片
      */
     @ApiModelProperty(value = "商品图片")
     private String avatar;
 
-    @ApiModelProperty(value = "商品类型")
-    private Boolean typer;
+    @ApiModelProperty(value = "商品类型 0 套餐 1 商品 2空桶")
+    private Integer typer;
 
     @ApiModelProperty(value = "上架状态")
     private Boolean opener;

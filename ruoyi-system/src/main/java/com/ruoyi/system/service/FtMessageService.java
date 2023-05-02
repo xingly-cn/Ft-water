@@ -26,7 +26,7 @@ public interface FtMessageService {
 
     int updateByPrimaryKey(FtMessage record);
 
-    Boolean addMessage(Long id);
+    Boolean confirmMessage(Long id);
 
     List<MessageResponse> getMessageList(MessageRequest request);
 }

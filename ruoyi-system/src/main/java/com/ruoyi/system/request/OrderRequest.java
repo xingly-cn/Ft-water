@@ -1,5 +1,6 @@
 package com.ruoyi.system.request;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.system.domain.FtOrder;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

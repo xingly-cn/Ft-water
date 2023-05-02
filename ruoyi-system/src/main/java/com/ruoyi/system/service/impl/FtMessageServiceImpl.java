@@ -11,6 +11,7 @@ import com.ruoyi.system.service.FtHomeService;
 import com.ruoyi.system.service.FtMessageService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -65,7 +66,8 @@ public class FtMessageServiceImpl implements FtMessageService {
     }
 
     @Override
-    public Boolean addMessage(Long id) {
+    @CacheEvict(value = "home", allEntries = true)
+    public Boolean confirmMessage(Long id) {
         //确认收获
         FtMessage message = selectByPrimaryKey(id);
         if (message == null) {

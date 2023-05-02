@@ -1,11 +1,13 @@
 package com.ruoyi.system.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.common.core.domain.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,17 +28,6 @@ import java.io.Serializable;
 public class FtOrder extends BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 8951707551796931522L;
-    /**
-     * 学生ID
-     */
-    @ApiModelProperty(value = "学生ID")
-    private Long uid;
-
-    /**
-     * 商品ID
-     */
-    @ApiModelProperty(value = "商品ID")
-    private Long goodId;
 
     /**
      * 学校ID
@@ -44,13 +35,10 @@ public class FtOrder extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "地址ID")
     private Long addressId;
 
-    /**
-     * 购买数量
-     */
-    @ApiModelProperty(value = "购买数量")
-    private Integer num;
+    @ApiModelProperty(value = "用户ID")
+    private Long userId;
 
-    @ApiModelProperty(value = " -1 购物车 0待付款 1代取货 2已取货' ")
+    @ApiModelProperty(value = "0待付款 1代取货 2已取货")
     private Integer status;
 
     /**
@@ -58,4 +46,7 @@ public class FtOrder extends BaseEntity implements Serializable {
      */
     @ApiModelProperty(value = "支付状态")
     private Boolean payed;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<OrderElements> orderElements;
 }
