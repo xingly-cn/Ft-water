@@ -1,7 +1,6 @@
 package com.ruoyi.system.user;
 
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.request.WechatUserInfo;
 import com.ruoyi.system.service.ISysUserService;
@@ -27,7 +26,7 @@ public class WechatUserController {
 
     @PostMapping("/login")
     @ApiOperation("登陆")
-    public AjaxResult login(@RequestBody LoginRequest request) {
+    public AjaxResult login(@RequestBody UserRequest request) {
         // 学生使用微信登陆, 所以没有密码, 直接生成token
         return AjaxResult.success(userService.loginUser(request));
     }

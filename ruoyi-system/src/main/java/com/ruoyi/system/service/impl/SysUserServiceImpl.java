@@ -13,7 +13,6 @@ import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserRole;
 import com.ruoyi.system.mapper.*;
-import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.request.WechatUserInfo;
@@ -492,14 +491,14 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Override
     @Transactional
-    public UserResponse loginUser(LoginRequest request) {
+    public UserResponse loginUser(UserRequest request) {
         if (StringUtils.isEmpty(request.getCode())) {
             throw new ServiceException("code不能为空");
         }
         String[] codeArray = WechatUtil.getOpenId(request.getCode());
         String openId = codeArray[0];
 
-        String phone = request.getPhone();
+        String phone = request.getPhonenumber();
 
         if (StringUtils.isEmpty(phone)) {
             throw new ServiceException("手机号不能为空");
@@ -511,16 +510,10 @@ public class SysUserServiceImpl implements ISysUserService {
         if (user == null) {
             //register
             user = new SysUser();
+            BeanUtils.copyProperties(request, user);
             user.setOpenId(openId);
             user.setPhonenumber(phone);
-            user.setDormType(request.getDormType());
-            user.setAvatar(request.getAvatar());
             user.setCreateTime(new Date());
-            user.setHomeId(user.getHomeId());
-            user.setHomeId(request.getHomeId());
-            user.setSex(String.valueOf(request.getSex()));
-            user.setUserName(request.getName());
-            user.setAddressId(request.getAddressId());
             user.setRoleIds(new Long[]{2L});
             insertUser(user);
         }

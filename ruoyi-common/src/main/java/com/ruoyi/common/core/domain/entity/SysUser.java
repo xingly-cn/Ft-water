@@ -143,6 +143,11 @@ public class SysUser extends BaseEntity {
 
     private String openId;
 
+    /**
+     * 空桶数量
+     */
+    private Integer barrelNumber;
+
     public SysUser() {
 
     }
@@ -380,5 +385,13 @@ public class SysUser extends BaseEntity {
                 ", dormType=" + dormType +
                 ", openId='" + openId + '\'' +
                 '}';
+    }
+
+    public Integer getBarrelNumber() {
+        return barrelNumber;
+    }
+
+    public void setBarrelNumber(Integer barrelNumber) {
+        this.barrelNumber = barrelNumber;
     }
 }

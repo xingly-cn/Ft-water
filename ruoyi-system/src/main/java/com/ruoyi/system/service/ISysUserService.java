@@ -1,7 +1,6 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
-import com.ruoyi.system.request.LoginRequest;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.request.WechatUserInfo;
 import com.ruoyi.system.response.UserResponse;
@@ -207,7 +206,7 @@ public interface ISysUserService {
 
     String change(UserRequest request);
 
-    UserResponse loginUser(LoginRequest request);
+    UserResponse loginUser(UserRequest request);
 
     SysUser checkPhone(String phone, String code);
 

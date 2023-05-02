@@ -154,5 +154,9 @@ public interface SysUserMapper {
 
     List<SysUser> selectUserByIds(@Param("userIds") List<Long> userIds);
 
-    Boolean updateWaterNumberById(@Param("id") Long id, @Param("number") int number);
+    Boolean updateWaterNumberById(@Param("id") Long id,
+                                  @Param("number") int number);
+
+    Boolean updateBarrelNumberById(@Param("id") Long id,
+                                   @Param("number") int number);
 }

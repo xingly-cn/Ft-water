@@ -137,6 +137,7 @@ public class FtOrderServiceImpl implements FtOrderService {
     @Override
     @Transactional(rollbackFor = ServiceException.class)
     public Boolean payOrder(Long id) {
+        //todo 收货的时候需要根据type=3的商品来增加用户的空桶数量
         log.info("really pay order");
         FtOrder ftOrder = selectByPrimaryKey(id);
         if (ftOrder == null) {

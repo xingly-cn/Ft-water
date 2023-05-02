@@ -25,8 +25,6 @@ public class UserResponse extends SysUser {
     @ApiModelProperty(value = "楼栋ID")
     private String homeName;
 
-//    private Address address;
-
     private Long schoolId;
 
     private String schoolName;

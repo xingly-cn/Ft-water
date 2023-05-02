@@ -3,7 +3,6 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.SysUserMapper">
-
     <resultMap type="com.ruoyi.common.core.domain.entity.SysUser" id="BaseUserResult">
         <id property="userId" column="user_id"/>
         <result property="userName" column="user_name"/>
@@ -19,6 +18,7 @@
         <result property="addressId" column="address"/>
         <result property="dormType" column="dorm_type"/>
         <result property="homeId" column="home_id"/>
+        <result property="barrelNumber" column="barrel_number"/>
         <result property="delFlag" column="del_flag"/>
         <result property="loginIp" column="login_ip"/>
         <result property="loginDate" column="login_date"/>
@@ -62,6 +62,7 @@
                u.address,
                u.dorm_type,
                u.home_id,
+               u.barrel_number,
                u.status,
                u.del_flag,
                u.login_ip,
@@ -95,6 +96,7 @@
                u.address,
                u.dorm_type,
                u.home_id,
+               u.barrel_number,
                u.status,
                u.del_flag,
                u.login_ip,
@@ -109,37 +111,38 @@
 
     <select id="selectUserList" parameterType="com.ruoyi.system.request.UserRequest" resultMap="sysUserResponse">
         select u.user_id,
-        u.user_name,
-        u.nick_name,
-        u.email,
-        u.avatar,
-        u.phonenumber,
-        u.password,
-        u.sex,
-        u.open_id,
-        u.water_num,
-        u.address,
-        u.dorm_type,
-        u.home_id,
-        u.status,
-        u.del_flag,
-        u.login_ip,
-        u.login_date,
-        u.create_by,
-        u.create_time,
-        u.update_by,
-        u.update_time,
-        u.remark,
-        r.role_id,
-        r.role_name,
-        r.role_key,
-        r.role_sort,
-        r.status as role_status,
-        h.name as home_name
+               u.user_name,
+               u.nick_name,
+               u.email,
+               u.avatar,
+               u.phonenumber,
+               u.password,
+               u.sex,
+               u.open_id,
+               u.water_num,
+               u.address,
+               u.dorm_type,
+               u.home_id,
+               u.barrel_number,
+               u.status,
+               u.del_flag,
+               u.login_ip,
+               u.login_date,
+               u.create_by,
+               u.create_time,
+               u.update_by,
+               u.update_time,
+               u.remark,
+               r.role_id,
+               r.role_name,
+               r.role_key,
+               r.role_sort,
+               r.status as role_status,
+               h.name   as home_name
         from sys_user u
-        left join sys_user_role ur on u.user_id = ur.user_id
-        left join sys_role r on r.role_id = ur.role_id
-        left join ft_home h on u.home_id = h.id
+                 left join sys_user_role ur on u.user_id = ur.user_id
+                 left join sys_role r on r.role_id = ur.role_id
+                 left join ft_home h on u.home_id = h.id
         where u.del_flag = '0'
         <if test="userId != null and userId != 0">
             AND u.user_id = #{userId}
@@ -460,20 +463,26 @@
 
     <select id="getUserByPhone" resultMap="SysUserResult">
         <include refid="userSelf"/>
-         where phonenumber = #{phone} and del_flag = '0'
+        where phonenumber = #{phone}
+          and del_flag = '0'
     </select>
 
     <update id="updateOpenIdByPhone">
-        update sys_user set open_id = #{openId} where phone = #{phone}
+        update sys_user
+        set open_id = #{openId}
+        where phone = #{phone}
     </update>
 
     <update id="updatePhoneById">
-        update sys_user set phone = #{phonenumber} where user_id = #{userId}
+        update sys_user
+        set phone = #{phonenumber}
+        where user_id = #{userId}
     </update>
 
     <select id="getUserByOpenId" resultMap="SysUserResult">
         <include refid="userSelf"/>
-         where open_id = #{openId} and del_flag = '0'
+        where open_id = #{openId}
+          and del_flag = '0'
     </select>
 
     <select id="getUsersFindByRoleId" resultMap="SysUserResult">
@@ -497,21 +506,33 @@
 
     <select id="search" resultMap="SysUserResult">
         <include refid="selectUserVo"/>
-        where u.phonenumber like concat('%', #{keyword}, '%') and u.del_flag = '0'
+        where u.phonenumber like concat('%', #{keyword}, '%')
+          and u.del_flag = '0'
     </select>
 
     <update id="updateDefaultAddressById">
-        update sys_user set address = #{id} where user_id = #{userId}
+        update sys_user
+        set address = #{id}
+        where user_id = #{userId}
     </update>
 
     <select id="selectUserByIds" resultMap="BaseUserResult">
-       <include refid="userSelf"/> where u.user_id in
+        <include refid="userSelf"/>
+        where u.user_id in
         <foreach collection="userIds" item="userId" open="(" separator="," close=")">
             #{userId}
         </foreach>
     </select>
 
     <update id="updateWaterNumberById">
-        update sys_user set water_num = #{number} where user_id = #{id}
+        update sys_user
+        set water_num = #{number}
+        where user_id = #{id}
+    </update>
+
+    <update id="updateBarrelNumberById">
+        update sys_user
+        set barrel_number = #{number}
+        where user_id = #{id}
     </update>
 </mapper>
