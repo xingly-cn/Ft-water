@@ -1,7 +1,7 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.system.domain.Shop;
+import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.ShopMapper;
 import com.ruoyi.system.request.ShopRequest;
 import com.ruoyi.system.response.ShopResponse;
@@ -28,6 +28,9 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public Boolean insertShop(ShopRequest request) {
         request.setUserId(SecurityUtils.getUserId());
+        if (request.getGoodsId() == null) {
+            throw new ServiceException("商品不能为空");
+        }
         return shopMapper.insertSelective(request) > 0;
     }
 

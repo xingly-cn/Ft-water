@@ -35,13 +35,6 @@ public class OrderController extends BaseController {
         return getDataTable(responses);
     }
 
-    @PostMapping("/shopCart")
-    @ApiOperation("加入购物车")
-    public AjaxResult shopCart(@RequestBody OrderRequest request) {
-        request.setFlag(true);
-        return AjaxResult.success(orderService.shopCart(request));
-    }
-
     @PostMapping("/update")
     @ApiOperation("修改订单")
     public AjaxResult updateOrder(@RequestBody OrderRequest request) {

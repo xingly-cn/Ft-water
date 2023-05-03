@@ -69,17 +69,6 @@ public class FtOrderServiceImpl implements FtOrderService {
     }
 
     @Override
-    @Transactional(rollbackFor = ServiceException.class)
-    public Boolean shopCart(OrderRequest request) {
-        request.setCreateTime(new Date());
-        if (request.getFlag().equals(true)) {
-            //小程序端
-            request.setUserId(SecurityUtils.getUserId());
-        }
-        return ftOrderMapper.insertSelective(request) > 0;
-    }
-
-    @Override
     public FtOrder selectByPrimaryKey(Long id) {
         return ftOrderMapper.selectByPrimaryKey(id);
     }

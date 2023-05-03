@@ -53,7 +53,7 @@
                oe.number,
                oe.order_id
         from ft_order fo
-                 inner join address a on fo.address_id = a.id
+                 left join address a on fo.address_id = a.id
                  inner join order_elements oe on fo.id = oe.order_id
                  inner join ft_goods fg on oe.goods_id = fg.id
                  inner join sys_user fu on fo.user_id = fu.user_id

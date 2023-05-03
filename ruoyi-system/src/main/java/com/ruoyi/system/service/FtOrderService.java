@@ -16,8 +16,6 @@ public interface FtOrderService {
 
     Boolean deleteByPrimaryKey(Long id);
 
-    Boolean shopCart(OrderRequest request);
-
     FtOrder selectByPrimaryKey(Long id);
 
     Boolean updateOrder(OrderRequest request);
