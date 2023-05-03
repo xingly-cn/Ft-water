@@ -7,6 +7,7 @@
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
         <result column="address_id" jdbcType="BIGINT" property="addressId"/>
+        <result column="home_id" jdbcType="BIGINT" property="homeId"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
@@ -32,6 +33,7 @@
         status,
         payed,
         user_id,
+        home_id,
         address_id,
         deleted,
         create_time
@@ -42,6 +44,7 @@
                fo.create_time,
                fo.payed,
                fo.address_id,
+               fo.home_id,
                fo.status,
                fo.user_id,
                fu.user_name   as user_name,
@@ -76,10 +79,10 @@
 
     <insert id="insert" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
-        insert into ft_order (address_id, status,user_id,
+        insert into ft_order (address_id, status,user_id,home_id,
                               create_time, payed)
         values (#{addressId,jdbcType=BIGINT},
-                #{status,jdbcType=INTEGER},#{userId,jdbcType=BIGINT},
+                #{status,jdbcType=INTEGER},#{userId,jdbcType=BIGINT},#{homeId,jdbcType=BIGINT},
                 now(), #{payed,jdbcType=BOOLEAN})
     </insert>
 
@@ -93,6 +96,9 @@
             </if>
             <if test="addressId != null">
                 address_id,
+            </if>
+            <if test="homeId != null">
+                home_id,
             </if>
             <if test="createTime != null">
                 create_time,
@@ -111,6 +117,9 @@
             </if>
             <if test="addressId != null">
                 #{addressId,jdbcType=BIGINT},
+            </if>
+            <if test="homeId != null">
+                #{homeId,jdbcType=BIGINT},
             </if>
             <if test="createTime != null">
                 #{createTime,jdbcType=TIMESTAMP},
@@ -132,6 +141,9 @@
             <if test="addressId != null">
                 address_id = #{addressId,jdbcType=BIGINT},
             </if>
+            <if test="homeId != null">
+                home_id = #{homeId,jdbcType=BIGINT},
+            </if>
             <if test="payed != null">
                 payed = #{payed,jdbcType=BOOLEAN},
             </if>
@@ -146,6 +158,7 @@
         <!--@mbg.generated-->
         update ft_order
         set address_id = #{addressId,jdbcType=BIGINT},
+            home_id    = #{homeId,jdbcType=BIGINT},
             payed     = #{payed,jdbcType=BOOLEAN},
             status    = #{status,jdbcType=INTEGER}
         where id = #{id}

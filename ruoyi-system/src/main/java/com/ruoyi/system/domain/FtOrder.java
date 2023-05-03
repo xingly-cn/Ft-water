@@ -38,6 +38,8 @@ public class FtOrder extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "用户ID")
     private Long userId;
 
+    private Long homeId;
+
     @ApiModelProperty(value = "0待付款 1代取货 2已取货")
     private Integer status;
 

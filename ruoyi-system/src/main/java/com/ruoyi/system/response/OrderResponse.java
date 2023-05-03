@@ -24,13 +24,16 @@ public class OrderResponse extends FtOrder {
     @ApiModelProperty(value = "地址")
     private String address;
 
-//    @ApiModelProperty(value = "总价")
-//    private BigDecimal total;
-
     private String userName;
 
     @ApiModelProperty(value = "用户电话")
     private String userPhone;
+
+    private String homeName;
+
+    private String schoolName;
+
+    private Long schoolId;
 
     private List<OrderElementsResponse> orderElementsResponses;
 }

@@ -67,5 +67,4 @@ public class ShopServiceImpl implements ShopService {
     public void deleteShopsByIds(List<Long> ids) {
         shopMapper.deleteShopsByIds(ids);
     }
-
 }
