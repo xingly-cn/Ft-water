@@ -27,10 +27,19 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public Boolean insertShop(ShopRequest request) {
-        request.setUserId(SecurityUtils.getUserId());
+        Long userId = SecurityUtils.getUserId();
+        request.setUserId(userId);
         if (request.getGoodsId() == null) {
             throw new ServiceException("商品不能为空");
         }
+        //先去查询是否已经存在该商品 存在 累加
+        ShopResponse shopResponse = shopMapper.selectByGoodsId(userId,request.getGoodsId());
+        if (shopResponse != null) {
+            log.info("已经存在该商品，累加数量");
+            request.setNumber(shopResponse.getNumber() + request.getNumber());
+            return shopMapper.updateByPrimaryKeySelective(request) > 0;
+        }
+        log.info("不存在该商品，新增");
         return shopMapper.insertSelective(request) > 0;
     }
 
@@ -46,6 +55,7 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public List<ShopResponse> getShopList(ShopRequest request) {
+        request.setUserId(SecurityUtils.getUserId());
         return shopMapper.selectShopList(request);
     }
 

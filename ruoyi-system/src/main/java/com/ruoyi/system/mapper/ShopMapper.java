@@ -16,6 +16,9 @@ public interface ShopMapper {
 
     ShopResponse selectByPrimaryKey(Long id);
 
+    ShopResponse selectByGoodsId(@Param("userId") Long userId,
+                                 @Param("goodsId") Long goodsId);
+
     int updateByPrimaryKeySelective(Shop shop);
 
     int updateByPrimaryKey(Shop shop);

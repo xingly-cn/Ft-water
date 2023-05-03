@@ -9,7 +9,7 @@
         <result column="goods_id" jdbcType="BIGINT" property="goodsId"/>
         <result column="number" jdbcType="INTEGER" property="number"/>
         <result column="is_deleted" jdbcType="BOOLEAN" property="isDeleted"/>
-        <association property="goodsResponse" javaType="com.ruoyi.system.response.GoodsResponse"
+        <association property="goodsResponse" column="goods_id" javaType="com.ruoyi.system.response.GoodsResponse"
                      resultMap="com.ruoyi.system.mapper.FtGoodsMapper.BaseResponseMap"/>
     </resultMap>
 
@@ -30,7 +30,7 @@
             s.number,
             g.id,
             g.title,
-            g.price,
+            sum(g.price) as price
             g.remark,
             g.avatar,
             g.deleted,
@@ -48,7 +48,7 @@
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         <!--@mbg.generated-->
         <include refid="Base_Shop_Goods_List"/>
-        where s.id = #{id,jdbcType=BIGINT}
+        where s.id = #{id,jdbcType=BIGINT} group by s.goods_id
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
@@ -122,7 +122,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="selectShopList" resultType="com.ruoyi.system.response.ShopResponse">
+    <select id="selectShopList" resultMap="BaseResultMap">
         <include refid="Base_Shop_Goods_List"/>
         <where>
             is_deleted = 0
@@ -133,6 +133,7 @@
                 and s.goods_id = #{goodsId,jdbcType=BIGINT}
             </if>
         </where>
+        group by s.goods_id
     </select>
 
     <update id="deleteShopsByIds">
@@ -141,4 +142,18 @@
             #{id}
         </foreach>
     </update>
+
+    <select id="selectByGoodsId" resultMap="BaseResultMap">
+        <include refid="Base_Shop_Goods_List"/>
+        <where>
+            is_deleted = 0
+            <if test="goodsId != null">
+                and s.goods_id = #{goodsId,jdbcType=BIGINT}
+            </if>
+            <if test="userId != null">
+                and s.user_id = #{userId,jdbcType=BIGINT}
+            </if>
+        </where>
+        group by s.goods_id
+    </select>
 </mapper>
