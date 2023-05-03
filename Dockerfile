@@ -1,5 +1,7 @@
 FROM openjdk:8
 
+sleep 600
+
 LABEL authors="方糖科技"
 
 LABEL maintainer="admin@asugar.cn
