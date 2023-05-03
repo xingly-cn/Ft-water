@@ -148,7 +148,8 @@ public class FtOrderServiceImpl implements FtOrderService {
             throw new ServiceException("订单不存在");
         }
         SysUser user = SecurityUtils.getLoginUser().getUser();
-        Long homeId = user.getHomeId();
+        //订单的homeId
+        Long homeId = ftOrder.getHomeId();
         List<Shop> shops = Lists.newArrayList();
         elements.forEach(element -> {
             shops.add(Shop.builder()
@@ -156,6 +157,9 @@ public class FtOrderServiceImpl implements FtOrderService {
                     .number(element.getNumber())
                     .build());
         });
+        if (homeId == null) {
+            throw new ServiceException("宿舍不存在");
+        }
         HomeResponse homeResponse = homeService.selectByPrimaryKey(homeId);
         checkGoodsNumber(shops, homeResponse.getNumber());
         //找到对应的商品 - typer->1
