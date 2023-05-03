@@ -28,9 +28,9 @@
             s.user_id,
             s.goods_id,
             s.number,
-            g.id,
+<!--            g.id,-->
             g.title,
-            sum(g.price) as price
+            sum(g.price) as price,
             g.remark,
             g.avatar,
             g.deleted,
