@@ -27,6 +27,13 @@ public class GoodsController extends BaseController {
     @Resource
     private FtGoodsService goodsService;
 
+    @GetMapping
+    @ApiOperation("统计查询")
+    public AjaxResult count() {
+        return AjaxResult.success(goodsService.ftCount());
+    }
+
+
     @GetMapping("/page")
     @ApiOperation("商品列表-已上架")
     public TableDataInfo getGoodsList(GoodRequest goodRequest) {

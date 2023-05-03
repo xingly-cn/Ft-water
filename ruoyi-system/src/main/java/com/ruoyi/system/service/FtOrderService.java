@@ -29,4 +29,8 @@ public interface FtOrderService {
     List<OrderResponse> searchByPhone(String phone);
 
     List<OrderResponse> getCouponNum(String str);
+
+    String createOrderCQ(String orderId);
+
+    String checkOrderCQ(String encBody);
 }

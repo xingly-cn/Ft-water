@@ -212,4 +212,8 @@
         and typer = #{type}
         order by id desc
     </select>
+
+    <select id="ftCount" resultType="com.ruoyi.system.response.FtCountResponse">
+        SELECT f.typer type, COUNT(*) num FROM `user_goods` u join ft_goods f on u.goods_id = f.id GROUP BY f.typer
+    </select>
 </mapper>

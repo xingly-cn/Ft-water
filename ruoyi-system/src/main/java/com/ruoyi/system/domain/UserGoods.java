@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
@@ -14,6 +15,7 @@ import lombok.experimental.Tolerate;
 @Data
 @ToString
 @Builder
+@AllArgsConstructor
 public class UserGoods {
 
     private Long userId;

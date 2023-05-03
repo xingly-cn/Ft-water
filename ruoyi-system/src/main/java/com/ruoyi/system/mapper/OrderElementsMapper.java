@@ -1,7 +1,7 @@
 package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.OrderElements;
-import com.ruoyi.system.response.OrderResponse;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,4 +20,6 @@ public interface OrderElementsMapper {
     Boolean insertBatch(List<OrderElements> orderElements);
 
     List<OrderElements> selectElementsByOrderId(Long orderId);
+
+
 }

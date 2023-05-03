@@ -65,4 +65,5 @@
         from order_elements
         where order_id = #{orderId,jdbcType=BIGINT}
     </select>
+
 </mapper>

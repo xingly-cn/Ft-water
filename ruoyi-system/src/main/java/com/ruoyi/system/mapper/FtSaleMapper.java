@@ -28,4 +28,6 @@ public interface FtSaleMapper {
     int updateByPrimaryKey(FtSale record);
 
     List<SaleResponse> selectList(@Param("sale") SaleRequest sale);
+
+    FtSale checkExist(String orderId);
 }

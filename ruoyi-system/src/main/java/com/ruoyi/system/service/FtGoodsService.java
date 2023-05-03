@@ -3,6 +3,7 @@ package com.ruoyi.system.service;
 
 import com.ruoyi.system.domain.FtGoods;
 import com.ruoyi.system.request.GoodRequest;
+import com.ruoyi.system.response.FtCountResponse;
 import com.ruoyi.system.response.GoodsResponse;
 
 import java.util.List;
@@ -25,4 +26,7 @@ public interface FtGoodsService{
     FtGoods selectByPrimaryKey(Long id);
 
     Boolean setOpener(Long id, int flag);
+
+
+    List<FtCountResponse> ftCount();
 }

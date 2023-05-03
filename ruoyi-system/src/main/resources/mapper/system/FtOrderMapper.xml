@@ -178,4 +178,9 @@
         </if>
         order by fo.id desc
     </select>
+
+    <select id="createOrderCQ" resultType="com.ruoyi.system.response.CQ">
+        SELECT f.id, f.user_id userId,f.home_id homeId,o.number, o.goods_id goodId from ft_order f join order_elements o on f.id = o.order_id
+        where f.id = #{orderId}
+    </select>
 </mapper>

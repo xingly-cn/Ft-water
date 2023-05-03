@@ -29,6 +29,18 @@ public class AdminOrderController extends BaseController {
     @Resource
     private FtOrderService orderService;
 
+    @GetMapping("createCQ")
+    @ApiOperation("生成二维码")
+    public AjaxResult createOrderCQ(String orderId) {
+        return AjaxResult.success(orderService.createOrderCQ(orderId));
+    }
+
+    @GetMapping("/checkCQ")
+    @ApiOperation("二维码核销")
+    public AjaxResult checkOrderCQ(String encBody) {
+        return AjaxResult.success(orderService.checkOrderCQ(encBody));
+    }
+
     @GetMapping("/search")
     @ApiOperation("订单搜索")
     public AjaxResult orderSearch(String phone) {

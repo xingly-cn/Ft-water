@@ -3,6 +3,7 @@ package com.ruoyi.system.service.impl;
 import com.ruoyi.system.domain.FtGoods;
 import com.ruoyi.system.mapper.FtGoodsMapper;
 import com.ruoyi.system.request.GoodRequest;
+import com.ruoyi.system.response.FtCountResponse;
 import com.ruoyi.system.response.GoodsResponse;
 import com.ruoyi.system.service.FtGoodsService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -11,7 +12,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +27,7 @@ public class FtGoodsServiceImpl implements FtGoodsService {
 
     @Resource
     private FtGoodsMapper ftGoodsMapper;
+
 
     @Override
     @CacheEvict(value = "goods", key = "#id")
@@ -63,7 +64,12 @@ public class FtGoodsServiceImpl implements FtGoodsService {
         return ftGoodsMapper.setOpen(id, flag);
     }
 
-//    @Cacheable(value = "goods", key = "#goodsIds", unless = "#result == null")
+    @Override
+    public List<FtCountResponse> ftCount() {
+        return ftGoodsMapper.ftCount();
+    }
+
+    //    @Cacheable(value = "goods", key = "#goodsIds", unless = "#result == null")
     public List<GoodsResponse> selectGoodsByIds(Set<Long> goodsIds) {
         return ftGoodsMapper.selectGoodsByIds(goodsIds);
     }

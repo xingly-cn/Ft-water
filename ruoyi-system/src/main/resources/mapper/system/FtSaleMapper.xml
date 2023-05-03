@@ -133,4 +133,10 @@
         </if>
         order by fs.id desc
     </select>
+
+    <select id="checkExist" resultType="com.ruoyi.system.domain.FtSale">
+        select * from ft_sale
+        where num = #{orderId}
+          and deleted = 0
+    </select>
 </mapper>

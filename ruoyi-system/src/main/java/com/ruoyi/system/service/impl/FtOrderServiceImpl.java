@@ -1,16 +1,14 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.crypto.SecureUtil;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
-import com.ruoyi.system.domain.FtOrder;
-import com.ruoyi.system.domain.OrderElements;
-import com.ruoyi.system.domain.Shop;
-import com.ruoyi.system.domain.UserGoods;
+import com.ruoyi.system.domain.*;
 import com.ruoyi.system.exception.ServiceException;
-import com.ruoyi.system.mapper.FtOrderMapper;
-import com.ruoyi.system.mapper.OrderElementsMapper;
-import com.ruoyi.system.mapper.UserGoodsMapper;
+import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.request.OrderRequest;
+import com.ruoyi.system.response.CQ;
 import com.ruoyi.system.response.GoodsResponse;
 import com.ruoyi.system.response.HomeResponse;
 import com.ruoyi.system.response.OrderResponse;
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -61,6 +58,16 @@ public class FtOrderServiceImpl implements FtOrderService {
 
     @Autowired
     private ShopServiceImpl shopService;
+
+    @Resource
+    private FtSaleMapper ftSaleMapper;
+
+    @Resource
+    private FtHomeMapper ftHomeMapper;
+
+
+    @Resource
+    private FtGoodsMapper ftGoodsMapper;
 
     @Override
     @Transactional(rollbackFor = ServiceException.class)
@@ -212,6 +219,104 @@ public class FtOrderServiceImpl implements FtOrderService {
         }
         orderRequest.setKeyword(str);
         return ftOrderMapper.selectList(orderRequest);
+    }
+
+    @Override
+    public String createOrderCQ(String orderId) {
+        Long userId = SecurityUtils.getUserId();
+
+        FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(Long.valueOf(orderId));
+        if (!ftOrder.getPayed()) {
+            return "订单未支付";
+        }
+
+        if (ftOrder.getUserId() != userId) {
+            return "订单不属于当前用户, 非法操作已记录 ";
+        }
+
+        CQ orderCQ = ftOrderMapper.createOrderCQ(orderId);
+        // 生成二维码
+        String body = orderCQ.getId() + "_" + orderCQ.getUserId() + "_" + orderCQ.getHomeId() + "_" + orderCQ.getNumber() + "_" + orderCQ.getGoodId()  + "_" + LocalDateTimeUtil.now();
+        String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
+        return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encBody;
+    }
+
+    @Override
+    public String checkOrderCQ(String encBody) {
+        // 解密数据
+        String s = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).decryptStr(encBody);
+        String[] split = s.split("_");
+
+        Long operatorId = SecurityUtils.getUserId();    // 操作员ID
+        long usedNum = Long.parseLong(split[3]);    // 核销数量
+
+        // 核销校验-是否已核销
+        FtSale f = ftSaleMapper.checkExist(split[0]);
+        if (f != null) {
+            return "该订单已核销, 非法操作已记录, 用户ID：" + split[0];
+        }
+
+        // 获取核销类型
+        FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey(Long.parseLong(split[4]));
+        Integer typer = ftGoods.getTyper();
+
+        //--------------------水商品 和 空桶商品 核销--------------------
+        switch (typer) {
+            case 0:
+                return "该订单为水票券, 不需要核销, 订单ID：" + split[0];
+            case 1: // 水核销
+                // 当前楼库存查询
+                FtHome ftHome = ftHomeMapper.selectByPrimaryKey(Long.parseLong(split[2]));
+                Integer LocalNumber = ftHome.getNumber();
+
+                if (usedNum > LocalNumber) {
+                    return "核销失败, 当前楼栋剩余水数量不足, 楼栋ID：" + split[2] +  ", 剩余数量：" + LocalNumber + ", 核销数量：" + usedNum;
+                }
+
+                // 插入核销表
+                FtSale ftSale = new FtSale(split[1], Integer.parseInt(split[0]), operatorId.toString());
+                ftSaleMapper.insertSelective(ftSale);
+
+                // 插入user_goods表
+                UserGoods userGoods = new UserGoods(Long.parseLong(split[1]), Long.parseLong(split[0]), Integer.parseInt(split[3]), false);
+                userGoodsMapper.insert(userGoods);
+
+                // 当前楼栋水库存更新
+                ftHome.setNumber(LocalNumber - Integer.parseInt(split[3]));
+                ftHomeMapper.updateByPrimaryKeySelective(ftHome);
+
+                // 订单状态更新
+                FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(Long.parseLong(split[0]));
+                ftOrder.setStatus(2);
+                ftOrderMapper.updateByPrimaryKey(ftOrder);
+
+                return "核销水成功, 用户ID：" + split[1] + ", 数量：" + split[3] + ", 订单ID：" + split[0];
+            case 2: // 空桶核销
+                // 插入核销表
+                FtSale ftSale1 = new FtSale(split[1], Integer.parseInt(split[0]), operatorId.toString());
+                ftSaleMapper.insertSelective(ftSale1);
+
+                // 插入user_goods表
+                UserGoods userGoods1 = new UserGoods(Long.parseLong(split[1]), Long.parseLong(split[0]), Integer.parseInt(split[3]), false);
+                userGoodsMapper.insert(userGoods1);
+
+                // 当前用户空桶数量更新
+                SysUser sysUser = userService.selectUserById(Long.parseLong(split[1]));
+                Integer waterNum = sysUser.getWaterNum();
+                sysUser.setWaterNum(waterNum + Integer.parseInt(split[3]));
+                userService.updateUser(sysUser);
+
+                // 订单状态更新
+                FtOrder ftOrder1 = ftOrderMapper.selectByPrimaryKey(Long.parseLong(split[0]));
+                ftOrder1.setStatus(2);
+                ftOrderMapper.updateByPrimaryKey(ftOrder1);
+
+                return "核销空桶成功, 用户ID：" + split[1] + ", 数量：" + split[3] + ", 订单ID：" + split[0];
+
+
+        }
+
+        return "暂无核销类型";
     }
 
     private void checkGoodsNumber(List<Shop> shops, Integer number) {

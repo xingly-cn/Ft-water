@@ -27,4 +27,6 @@ public class IndexController {
     public AjaxResult countEveryDay(@RequestBody IndexRequest request) {
         return AjaxResult.success(indexService.countEveryDay(request));
     }
+
+
 }

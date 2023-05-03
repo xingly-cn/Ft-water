@@ -33,9 +33,9 @@ public class FtSale extends BaseEntity implements Serializable {
     private String uid;
 
     /**
-     * 核销数量
+     * 核销订单ID
      */
-    @ApiModelProperty(value = "核销数量")
+    @ApiModelProperty(value = "核销订单ID")
     private Integer num;
 
     /**

@@ -3,6 +3,7 @@ package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.FtGoods;
 import com.ruoyi.system.request.GoodRequest;
+import com.ruoyi.system.response.FtCountResponse;
 import com.ruoyi.system.response.GoodsResponse;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -38,4 +39,6 @@ public interface FtGoodsMapper {
 
     List<Long> selectGoodsByIdsAndType(@Param("ids") Set<Long> ids,
                                        @Param("type") int type);
+
+    List<FtCountResponse> ftCount();
 }

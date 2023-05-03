@@ -2,6 +2,7 @@ package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.request.OrderRequest;
+import com.ruoyi.system.response.CQ;
 import com.ruoyi.system.response.OrderResponse;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -30,4 +31,6 @@ public interface FtOrderMapper {
     int updateByPrimaryKey(FtOrder order);
 
     List<OrderResponse> selectList(@Param("order") OrderRequest order);
+
+    CQ createOrderCQ(String orderId);
 }
