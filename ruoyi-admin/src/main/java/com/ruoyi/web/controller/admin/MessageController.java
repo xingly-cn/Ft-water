@@ -48,4 +48,10 @@ public class MessageController extends BaseController {
         return AjaxResult.success(messageService.confirmMessage(id));
     }
 
+    @PostMapping("/refuse")
+    @ApiOperation("拒绝消息")
+    public AjaxResult refuseMessage(@RequestParam(value = "id") Long id) {
+        return AjaxResult.success(messageService.refuseMessage(id));
+    }
+
 }

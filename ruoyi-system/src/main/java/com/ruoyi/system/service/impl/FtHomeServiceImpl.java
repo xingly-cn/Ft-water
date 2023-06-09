@@ -285,7 +285,7 @@ public class FtHomeServiceImpl implements FtHomeService {
                     .number(number)
                     .homeId(homeId)
                     .userId(user.getUserId())
-                    .confirm(false)
+                    .confirm(0)
                     .build();
             message.setCreateBy(userId.toString());
             message.setUpdateBy(userId.toString());

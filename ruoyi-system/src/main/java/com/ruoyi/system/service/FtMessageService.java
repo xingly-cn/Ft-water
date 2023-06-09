@@ -29,4 +29,6 @@ public interface FtMessageService {
     Boolean confirmMessage(Long id);
 
     List<MessageResponse> getMessageList(MessageRequest request);
+
+    Boolean refuseMessage(Long id);
 }

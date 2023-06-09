@@ -87,6 +87,12 @@ public class FtMessageServiceImpl implements FtMessageService {
         return ftMessageMapper.getMessageList(request);
     }
 
+    @Override
+    public Boolean refuseMessage(Long id) {
+        ftMessageMapper.refuseMessage(id);
+        return true;
+    }
+
     public void addMessages(List<FtMessage> messages) {
         if (CollectionUtils.isEmpty(messages)) {
             return;

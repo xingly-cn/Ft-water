@@ -35,4 +35,6 @@ public interface FtMessageMapper {
     void confirms(@Param("homeId") Long homeId, @Param("userId") Long userId);
 
     List<MessageResponse> getMessageList(@Param("message") MessageRequest request);
+
+    void refuseMessage(Long id);
 }

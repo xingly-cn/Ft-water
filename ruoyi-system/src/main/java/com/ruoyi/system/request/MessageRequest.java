@@ -14,5 +14,4 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class MessageRequest extends FtMessage {
-
 }

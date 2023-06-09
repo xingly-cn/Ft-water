@@ -40,7 +40,7 @@ public class FtMessage extends BaseEntity {
      * 是否确认
      */
     @ApiModelProperty(value = "是否确认")
-    private Boolean confirm;
+    private Integer confirm;
 
     private Integer number;
 
