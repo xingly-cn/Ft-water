@@ -34,7 +34,7 @@ public class FtMessage extends BaseEntity {
      * 用户id
      */
     @ApiModelProperty(value = "用户id")
-    private Long userId;
+    private String userId;
 
     /**
      * 是否确认
@@ -47,6 +47,5 @@ public class FtMessage extends BaseEntity {
     private Boolean operator;
 
     @Tolerate
-    public FtMessage() {
-    }
+    public FtMessage() {}
 }

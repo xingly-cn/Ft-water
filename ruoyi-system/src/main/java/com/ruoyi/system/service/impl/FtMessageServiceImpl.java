@@ -3,6 +3,7 @@ package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.FtMessage;
 import com.ruoyi.system.mapper.FtMessageMapper;
 import com.ruoyi.system.request.MessageRequest;
@@ -13,6 +14,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -35,6 +37,9 @@ public class FtMessageServiceImpl implements FtMessageService {
     @Autowired
     private SysUserServiceImpl userService;
 
+    @Autowired
+    private FtHomeServiceImpl homeServiceImpl;
+
     @Override
     public int deleteByPrimaryKey(Long id) {
         return ftMessageMapper.deleteByPrimaryKey(id);
@@ -52,7 +57,12 @@ public class FtMessageServiceImpl implements FtMessageService {
 
     @Override
     public MessageResponse selectByPrimaryKey(Long id) {
-        return ftMessageMapper.selectByPrimaryKey(id);
+        MessageResponse response = ftMessageMapper.selectByPrimaryKey(id);
+        if (response != null) {
+            List<FtHome> homes = homeServiceImpl.getHomes();
+            getMessageHomeName(homes, response);
+        }
+        return response;
     }
 
     @Override
@@ -78,19 +88,26 @@ public class FtMessageServiceImpl implements FtMessageService {
         SysUser user = userService.selectUserById(userId);
         Long homeId = user.getHomeId();
         //驳回 确认
-        confirms(homeId, userId);
+        confirms(id, userId);
         return homeService.addNumberByHomeId(homeId, message.getNumber());
     }
 
     @Override
     public List<MessageResponse> getMessageList(MessageRequest request) {
-        return ftMessageMapper.getMessageList(request);
+        List<MessageResponse> messageList = ftMessageMapper.getMessageList(request);
+        if (CollectionUtils.isNotEmpty(messageList)) {
+            List<FtHome> homes = homeServiceImpl.getHomes();
+            for (MessageResponse message : messageList) {
+                getMessageHomeName(homes, message);
+            }
+        }
+        return messageList;
     }
 
     @Override
+    @Transactional
     public Boolean refuseMessage(Long id) {
-        ftMessageMapper.refuseMessage(id);
-        return true;
+        return ftMessageMapper.refuseMessage(id)>0;
     }
 
     public void addMessages(List<FtMessage> messages) {
@@ -107,8 +124,16 @@ public class FtMessageServiceImpl implements FtMessageService {
         ftMessageMapper.updateBatch(messages);
     }
 
-    private void confirms(Long homeId, Long userId) {
+    private void confirms(Long id, Long userId) {
         //确认收获 一楼确认收获 无收获的
-        ftMessageMapper.confirms(homeId, userId);
+        ftMessageMapper.confirms(id, userId);
+    }
+
+    private void getMessageHomeName(List<FtHome> homes, MessageResponse message) {
+        FtHome home = homeServiceImpl.getTopHome(homes, message.getHomeId());
+        if (home != null) {
+            String homeName = homes.stream().filter(h -> h.getId().equals(message.getHomeId())).findFirst().orElse(new FtHome()).getName();
+            message.setHomeName(home.getName()+"/"+homeName);
+        }
     }
 }

@@ -279,19 +279,17 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         //消息
         List<FtMessage> messages = Lists.newArrayList();
-        for (UserHome user : userHomes) {
             FtMessage message = FtMessage.builder()
                     .operator(operator)
                     .number(number)
                     .homeId(homeId)
-                    .userId(user.getUserId())
+                    .userId(StringUtils.join(userHomes.stream().map(UserHome::getUserId).collect(Collectors.toList()), ","))
                     .confirm(0)
                     .build();
             message.setCreateBy(userId.toString());
             message.setUpdateBy(userId.toString());
             message.setCreateTime(new Date());
             messages.add(message);
-        }
 
         messageService.addMessages(messages);
         log.info("发送通知{}条", messages.size());

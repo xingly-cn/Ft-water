@@ -19,4 +19,9 @@ public class MessageResponse extends FtMessage {
     private String homeName;
 
     private String userName;
+
+    //暂时先放到这里
+    private String createUserName;
+
+    private String updateUserName;
 }

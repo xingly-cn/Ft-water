@@ -13,6 +13,7 @@ import java.util.List;
  * @create 2023/4/18 21:41
  */
 public interface FtHomeService {
+
     List<HomeResponse> homeTree();
 
     Boolean deleteByPrimaryKey(Long id);

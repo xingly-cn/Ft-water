@@ -32,9 +32,10 @@ public interface FtMessageMapper {
 
     void updateBatch(@Param("messages") List<FtMessage> messages);
 
-    void confirms(@Param("homeId") Long homeId, @Param("userId") Long userId);
+    void confirms(@Param("id") Long id,
+                  @Param("userId") Long userId);
 
     List<MessageResponse> getMessageList(@Param("message") MessageRequest request);
 
-    void refuseMessage(Long id);
+    int refuseMessage(Long id);
 }

@@ -8,14 +8,23 @@
         <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
         <result column="number" jdbcType="INTEGER" property="number"/>
         <result column="home_id" jdbcType="BIGINT" property="homeId"/>
-        <result column="user_id" jdbcType="BIGINT" property="userId"/>
-        <result column="confirm" jdbcType="BOOLEAN" property="confirm"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="confirm" jdbcType="INTEGER" property="confirm"/>
         <result column="operator" jdbcType="BOOLEAN" property="operator"/>
         <result column="create_by" jdbcType="BIGINT" property="createBy"/>
         <result column="update_by" jdbcType="BIGINT" property="updateBy"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
     </resultMap>
+
+    <resultMap id="MessageResponseMap" type="com.ruoyi.system.response.MessageResponse" extends="BaseResultMap">
+        <!--@mbg.generated-->
+<!--        <result column="homeName" jdbcType="VARCHAR" property="homeName"/>-->
+        <result column="userName" jdbcType="VARCHAR" property="userName"/>
+        <result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
+        <result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
@@ -34,24 +43,29 @@
     <sql id="Base_Column_List_With_Home_User">
         <!--@mbg.generated-->
         select m.id,
-        m.deleted,
-        m.number,
-        m.home_id,
-        m.user_id,
-        m.confirm,
-        m.operator,
-        m.create_by,
-        m.update_by,
-        m.create_time,
-        m.update_time,
-        h.name as homeName,
-        u.user_name as userName
+               m.deleted,
+               m.number,
+               m.home_id,
+               m.user_id,
+               m.confirm,
+               m.operator,
+               m.create_by,
+               su.user_name as createUserName,
+               m.update_by,
+               ut.user_name as updateUserName,
+               m.create_time,
+               m.update_time
+<!--               h.name       as homeName,-->
+<!--               u.user_name  as userName-->
         from ft_message m
-        inner join ft_home h on m.home_id = h.id
-        inner join sys_user u on m.user_id = u.user_id
+<!--                 inner join ft_home h on m.home_id = h.id-->
+<!--                 inner join sys_user u on m.user_id = u.user_id-->
+                 inner join sys_user su on m.create_by = su.user_id
+                 inner join sys_user ut on m.update_by = ut.user_id
     </sql>
 
-    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.ruoyi.system.response.MessageResponse">
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long"
+            resultMap="MessageResponseMap">
         <!--@mbg.generated-->
         <include refid="Base_Column_List_With_Home_User"/>
         where m.id = #{id,jdbcType=BIGINT}
@@ -71,8 +85,8 @@
                                 confirm, create_by, update_by,
                                 create_time, update_time)
         values (#{number,jdbcType=INTEGER}, #{deleted,jdbcType=BOOLEAN}, #{homeId,jdbcType=BIGINT},
-                #{userId,jdbcType=BIGINT}, #{operator,jdbcType=BOOLEAN},
-                #{confirm,jdbcType=BOOLEAN}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
+                #{userId}, #{operator,jdbcType=BOOLEAN},
+                #{confirm}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
                 #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
     </insert>
 
@@ -123,10 +137,10 @@
                 #{homeId,jdbcType=BIGINT},
             </if>
             <if test="userId != null">
-                #{userId,jdbcType=BIGINT},
+                #{userId},
             </if>
             <if test="confirm != null">
-                #{confirm,jdbcType=BOOLEAN},
+                #{confirm},
             </if>
             <if test="operator != null">
                 #{operator,jdbcType=BOOLEAN},
@@ -160,10 +174,10 @@
                 home_id = #{homeId,jdbcType=BIGINT},
             </if>
             <if test="userId != null">
-                user_id = #{userId,jdbcType=BIGINT},
+                user_id = #{userId},
             </if>
             <if test="confirm != null">
-                confirm = #{confirm,jdbcType=BOOLEAN},
+                confirm = #{confirm},
             </if>
             <if test="operator != null">
                 operator = #{operator,jdbcType=BOOLEAN},
@@ -189,8 +203,8 @@
         set deleted     = #{deleted,jdbcType=BOOLEAN},
             number      = #{number,jdbcType=INTEGER},
             home_id     = #{homeId,jdbcType=BIGINT},
-            user_id     = #{userId,jdbcType=BIGINT},
-            confirm     = #{confirm,jdbcType=BOOLEAN},
+            user_id     = #{userId},
+            confirm     = #{confirm},
             operator    = #{operator,jdbcType=BOOLEAN},
             create_by   = #{createBy,jdbcType=BIGINT},
             update_by   = #{updateBy,jdbcType=BIGINT},
@@ -201,13 +215,14 @@
 
     <insert id="insertBatch">
         <!--@mbg.generated-->
-        insert into ft_message (number,home_id, user_id,operator,
+        insert into ft_message (number, home_id, user_id, operator,
                                 confirm, create_by, update_by,
                                 create_time, update_time)
         values
         <foreach collection="messages" item="item" index="index" separator=",">
-            (#{item.number,jdbcType=INTEGER}, #{item.homeId,jdbcType=BIGINT}, #{item.userId,jdbcType=BIGINT},#{item.operator,jdbcType=BOOLEAN},
-             #{item.confirm,jdbcType=BOOLEAN}, #{item.createBy,jdbcType=BIGINT}, #{item.updateBy,jdbcType=BIGINT},
+            (#{item.number,jdbcType=INTEGER}, #{item.homeId,jdbcType=BIGINT}, #{item.userId},
+             #{item.operator,jdbcType=BOOLEAN},
+             #{item.confirm}, #{item.createBy,jdbcType=BIGINT}, #{item.updateBy,jdbcType=BIGINT},
              #{item.createTime,jdbcType=TIMESTAMP}, now())
         </foreach>
     </insert>
@@ -233,7 +248,7 @@
             </trim>
             <trim prefix="user_id = case" suffix="end,">
                 <foreach collection="messages" index="index" item="item">
-                    when id = #{item.id,jdbcType=BIGINT} then #{item.userId,jdbcType=BIGINT}
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.userId}
                 </foreach>
             </trim>
             <trim prefix="operator = case" suffix="end,">
@@ -243,7 +258,7 @@
             </trim>
             <trim prefix="confirm = case" suffix="end,">
                 <foreach collection="messages" index="index" item="item">
-                    when id = #{item.id,jdbcType=BIGINT} then #{item.confirm,jdbcType=BOOLEAN}
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.confirm}
                 </foreach>
             </trim>
             <trim prefix="create_by = case" suffix="end,">
@@ -276,12 +291,14 @@
     <update id="confirms">
         <!--@mbg.generated-->
         update ft_message
-        set confirm = 1,update_by = #{userId,jdbcType=BIGINT},update_time = now()
-        where home_id = #{homeId,jdbcType=BIGINT}
+        set confirm     = 1,
+            update_by   = #{userId},
+            update_time = now()
+        where id = #{id,jdbcType=BIGINT}
           and confirm = 0
     </update>
 
-    <select id="getMessageList" resultType="com.ruoyi.system.response.MessageResponse">
+    <select id="getMessageList" resultMap="MessageResponseMap">
         <include refid="Base_Column_List_With_Home_User"/>
         <where>
             m.deleted = 0
@@ -289,20 +306,21 @@
                 and m.home_id = #{message.homeId,jdbcType=BIGINT}
             </if>
             <if test="message.userId != null">
-                and m.user_id = #{message.userId,jdbcType=BIGINT}
+                and m.user_id = #{message.userId}
             </if>
             <if test="message.confirm != null">
-                and m.confirm = #{message.confirm,jdbcType=BOOLEAN}
+                and m.confirm = #{message.confirm}
             </if>
         </where>
         order by m.id desc
     </select>
 
-    <update id="refuseMessage" >
+    <update id="refuseMessage">
         <!--@mbg.generated-->
         update ft_message
-        set confirm = 2,update_by = #{userId,jdbcType=BIGINT},update_time = now()
-        where home_id = #{homeId,jdbcType=BIGINT}
-        and confirm = 0
+        set confirm     = 2,
+            update_by   = #{userId},
+            update_time = now()
+        where id= #{id,jdbcType=BIGINT}
     </update>
 </mapper>
