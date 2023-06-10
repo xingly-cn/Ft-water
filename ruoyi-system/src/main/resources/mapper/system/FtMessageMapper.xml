@@ -306,7 +306,7 @@
                 and m.home_id = #{message.homeId,jdbcType=BIGINT}
             </if>
             <if test="message.userId != null">
-                and m.user_id = #{message.userId}
+                and find_in_set(m.user_id, #{message.userId})
             </if>
             <if test="message.confirm != null">
                 and m.confirm = #{message.confirm}
