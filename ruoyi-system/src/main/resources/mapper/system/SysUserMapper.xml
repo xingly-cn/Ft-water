@@ -535,4 +535,14 @@
         set barrel_number = #{number}
         where user_id = #{id}
     </update>
+
+    <select id="selectUsersByIds" resultMap="BaseUserResult">
+        select user_id,
+               user_name
+        from sys_user
+        where user_id in
+        <foreach collection="ids" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </select>
 </mapper>

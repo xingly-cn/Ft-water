@@ -160,4 +160,6 @@ public interface SysUserMapper {
 
     Boolean updateBarrelNumberById(@Param("id") Long id,
                                    @Param("number") int number);
+
+    List<SysUser> selectUsersByIds(@Param("ids") List<String> userIds);
 }

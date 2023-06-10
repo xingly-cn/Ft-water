@@ -328,8 +328,10 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         if (type == 2) {
             //取上一条的库存 必须是水
-            FtNotices last = noticesService.selectLastByHomeIdAndOrderType(homeId,orderType);
+            FtNotices last = noticesService.selectLastByHomeIdAndOrderType(homeId, orderType);
+            notices.setResidue(last == null ? 0 : last.getResidue());
         }
+
         notices.setCreateBy(userId.toString());
         notices.setUpdateBy(userId.toString());
         notices.setCreateTime(new Date());
