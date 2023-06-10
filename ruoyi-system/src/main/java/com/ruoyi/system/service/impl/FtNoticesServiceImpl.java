@@ -63,4 +63,7 @@ public class FtNoticesServiceImpl implements FtNoticesService {
         return ftNoticesMapper.selectList(request);
     }
 
+    public FtNotices selectLastByHomeIdAndOrderType(Long homeId, Integer orderType) {
+        return ftNoticesMapper.selectLastByHomeIdAndOrderType(homeId, orderType);
+    }
 }

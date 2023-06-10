@@ -5,6 +5,7 @@
         <!--@mbg.generated-->
         <!--@Table ft_notices-->
         <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="order_type" jdbcType="TINYINT" property="orderType"/>
         <result column="type" jdbcType="TINYINT" property="type"/>
         <result column="school_id" jdbcType="BIGINT" property="schoolId"/>
         <result column="home_id" jdbcType="BIGINT" property="homeId"/>
@@ -22,6 +23,7 @@
         <!--@mbg.generated-->
         id,
         `type`,
+        order_type,
         school_id,
         home_id,
         user_id,
@@ -37,27 +39,29 @@
     <sql id="Base_Column_List_With_Home_User">
         <!--@mbg.generated-->
         select n.id,
-        n.type,
-        n.school_id,
-        n.home_id,
-        n.user_id,
-        n.number,
-        n.residue,
-        n.deleted,
-        n.create_by,
-        n.update_by,
-        n.create_time,
-        n.update_time,
-        s.name as schoolName,
-        h.name        as homeName,
-        u.user_name        as userName
+               n.type,
+        n.order_type,
+               n.school_id,
+               n.home_id,
+               n.user_id,
+               n.number,
+               n.residue,
+               n.deleted,
+               n.create_by,
+               n.update_by,
+               n.create_time,
+               n.update_time,
+               s.name      as schoolName,
+               h.name      as homeName,
+               u.user_name as userName
         from ft_notices n
-        inner join ft_home s on n.school_id = s.id
-        inner join ft_home h on n.home_id = h.id
-        inner join sys_user u on n.user_id = u.id
+                 inner join ft_home s on n.school_id = s.id
+                 inner join ft_home h on n.home_id = h.id
+                 inner join sys_user u on n.user_id = u.id
     </sql>
 
-    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultType="com.ruoyi.system.response.NoticesResponse">
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long"
+            resultType="com.ruoyi.system.response.NoticesResponse">
         <!--@mbg.generated-->
         <include refid="Base_Column_List_With_Home_User"/>
         where n.id = #{id,jdbcType=BIGINT}
@@ -71,11 +75,11 @@
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.domain.FtNotices"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
-        insert into ft_notices (`type`, school_id, home_id,
+        insert into ft_notices (`type`, order_type,school_id, home_id,
                                 user_id, `number`, residue,
                                 deleted, create_by, update_by,
                                 create_time, update_time)
-        values (#{type,jdbcType=TINYINT}, #{schoolId,jdbcType=BIGINT}, #{homeId,jdbcType=BIGINT},
+        values (#{type,jdbcType=TINYINT},#{orderType}, #{schoolId,jdbcType=BIGINT}, #{homeId,jdbcType=BIGINT},
                 #{userId,jdbcType=BIGINT}, #{number,jdbcType=INTEGER}, #{residue,jdbcType=INTEGER},
                 #{deleted,jdbcType=BOOLEAN}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
                 #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=VARCHAR})
@@ -87,6 +91,9 @@
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="type != null">
                 `type`,
+            </if>
+            <if test="orderType != null">
+                order_type,
             </if>
             <if test="schoolId != null">
                 school_id,
@@ -122,6 +129,9 @@
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="type != null">
                 #{type,jdbcType=TINYINT},
+            </if>
+            <if test="orderType != null">
+                #{orderType,jdbcType=TINYINT},
             </if>
             <if test="schoolId != null">
                 #{schoolId,jdbcType=BIGINT},
@@ -161,6 +171,9 @@
         <set>
             <if test="type != null">
                 `type` = #{type,jdbcType=TINYINT},
+            </if>
+            <if test="orderType != null">
+                order_type = #{orderType,jdbcType=TINYINT},
             </if>
             <if test="schoolId != null">
                 school_id = #{schoolId,jdbcType=BIGINT},
@@ -229,6 +242,13 @@
         <if test="notices.type != null">
             and n.type = #{notices.type}
         </if>
+        <if test="notices.orderType != null">
+            and n.order_type = #{notices.orderType}
+        </if>
         order by n.id desc
+    </select>
+
+    <select id="selectLastByHomeIdAndOrderType" resultMap="BaseResultMap">
+        SELECT * from ft_notices where home_id= #{homeId} and order_type= #{orderType} ORDER BY id desc limit 1;
     </select>
 </mapper>

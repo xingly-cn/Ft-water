@@ -5,6 +5,7 @@
         <!--@mbg.generated-->
         <!--@Table ft_message-->
         <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="order_type" jdbcType="TINYINT" property="orderType"/>
         <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
         <result column="number" jdbcType="INTEGER" property="number"/>
         <result column="home_id" jdbcType="BIGINT" property="homeId"/>
@@ -20,7 +21,7 @@
     <resultMap id="MessageResponseMap" type="com.ruoyi.system.response.MessageResponse" extends="BaseResultMap">
         <!--@mbg.generated-->
 <!--        <result column="homeName" jdbcType="VARCHAR" property="homeName"/>-->
-        <result column="userName" jdbcType="VARCHAR" property="userName"/>
+<!--        <result column="userName" jdbcType="VARCHAR" property="userName"/>-->
         <result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
         <result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
     </resultMap>
@@ -28,6 +29,7 @@
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
+        order_type,
         deleted,
         number,
         home_id,
@@ -43,6 +45,7 @@
     <sql id="Base_Column_List_With_Home_User">
         <!--@mbg.generated-->
         select m.id,
+               m.order_type,
                m.deleted,
                m.number,
                m.home_id,
@@ -55,13 +58,13 @@
                ut.user_name as updateUserName,
                m.create_time,
                m.update_time
-<!--               h.name       as homeName,-->
-<!--               u.user_name  as userName-->
+        <!--               h.name       as homeName,-->
+        <!--               u.user_name  as userName-->
         from ft_message m
-<!--                 inner join ft_home h on m.home_id = h.id-->
-<!--                 inner join sys_user u on m.user_id = u.user_id-->
-                 inner join sys_user su on m.create_by = su.user_id
-                 inner join sys_user ut on m.update_by = ut.user_id
+        <!--                 inner join ft_home h on m.home_id = h.id-->
+        <!--                 inner join sys_user u on m.user_id = u.user_id-->
+        inner join sys_user su on m.create_by = su.user_id
+        inner join sys_user ut on m.update_by = ut.user_id
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long"
@@ -81,10 +84,10 @@
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.ruoyi.system.domain.FtMessage"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
-        insert into ft_message (number, deleted, home_id, user_id, operator,
+        insert into ft_message (number, order_type,deleted, home_id, user_id, operator,
                                 confirm, create_by, update_by,
                                 create_time, update_time)
-        values (#{number,jdbcType=INTEGER}, #{deleted,jdbcType=BOOLEAN}, #{homeId,jdbcType=BIGINT},
+        values (#{number,jdbcType=INTEGER},#{orderType}, #{deleted,jdbcType=BOOLEAN}, #{homeId,jdbcType=BIGINT},
                 #{userId}, #{operator,jdbcType=BOOLEAN},
                 #{confirm}, #{createBy,jdbcType=BIGINT}, #{updateBy,jdbcType=BIGINT},
                 #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP})
@@ -100,6 +103,9 @@
             </if>
             <if test="deleted != null">
                 deleted,
+            </if>
+            <if test="orderType != null">
+                order_type,
             </if>
             <if test="homeId != null">
                 home_id,
@@ -132,6 +138,9 @@
             </if>
             <if test="deleted != null">
                 #{deleted,jdbcType=BOOLEAN},
+            </if>
+            <if test="orderType != null">
+                #{orderType},
             </if>
             <if test="homeId != null">
                 #{homeId,jdbcType=BIGINT},
@@ -169,6 +178,9 @@
             </if>
             <if test="deleted != null">
                 deleted = #{deleted,jdbcType=BOOLEAN},
+            </if>
+            <if test="orderType != null">
+                order_type = #{orderType},
             </if>
             <if test="homeId != null">
                 home_id = #{homeId,jdbcType=BIGINT},
@@ -215,12 +227,12 @@
 
     <insert id="insertBatch">
         <!--@mbg.generated-->
-        insert into ft_message (number, home_id, user_id, operator,
+        insert into ft_message (number,order_type, home_id, user_id, operator,
                                 confirm, create_by, update_by,
                                 create_time, update_time)
         values
         <foreach collection="messages" item="item" index="index" separator=",">
-            (#{item.number,jdbcType=INTEGER}, #{item.homeId,jdbcType=BIGINT}, #{item.userId},
+            (#{item.number,jdbcType=INTEGER},#{item.orderType}, #{item.homeId,jdbcType=BIGINT}, #{item.userId},
              #{item.operator,jdbcType=BOOLEAN},
              #{item.confirm}, #{item.createBy,jdbcType=BIGINT}, #{item.updateBy,jdbcType=BIGINT},
              #{item.createTime,jdbcType=TIMESTAMP}, now())
@@ -239,6 +251,11 @@
             <trim prefix="deleted = case" suffix="end,">
                 <foreach collection="messages" index="index" item="item">
                     when id = #{item.id,jdbcType=BIGINT} then #{item.deleted,jdbcType=BOOLEAN}
+                </foreach>
+            </trim>
+            <trim prefix="order_type = case" suffix="end,">
+                <foreach collection="messages" index="index" item="item">
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.orderType}
                 </foreach>
             </trim>
             <trim prefix="home_id = case" suffix="end,">
@@ -310,6 +327,12 @@
             </if>
             <if test="message.confirm != null">
                 and m.confirm = #{message.confirm}
+            </if>
+            <if test="message.operator != null">
+                and m.operator = #{message.operator}
+            </if>
+            <if test="message.orderType != null">
+                and m.order_type = #{message.orderType}
             </if>
         </where>
         order by m.id desc

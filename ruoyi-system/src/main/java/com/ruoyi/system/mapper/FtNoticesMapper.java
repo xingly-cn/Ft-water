@@ -29,4 +29,7 @@ public interface FtNoticesMapper {
     int updateByPrimaryKey(FtNotices record);
 
     List<NoticesResponse> selectList(@Param("notices") NoticesRequest request);
+
+    FtNotices selectLastByHomeIdAndOrderType(@Param("homeId") Long homeId,
+                                             @Param("orderType") Integer orderType);
 }

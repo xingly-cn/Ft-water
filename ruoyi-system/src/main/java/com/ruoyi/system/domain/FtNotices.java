@@ -27,8 +27,10 @@ public class FtNotices extends BaseEntity {
     /**
      * 0 取货 1是收货
      */
-    @ApiModelProperty(value = "0 送货 1是收货")
+    @ApiModelProperty(value = "0 送货 1是收货 2是驳回")
     private Integer type;
+
+    private Integer orderType;
 
     /**
      * 学校id

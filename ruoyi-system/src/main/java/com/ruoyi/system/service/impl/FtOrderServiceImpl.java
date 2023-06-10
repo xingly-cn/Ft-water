@@ -184,13 +184,13 @@ public class FtOrderServiceImpl implements FtOrderService {
                     //水
                     //发送消息 给对应宿管
                     log.info("水 - number:{}", number);
-                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false);
+                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false,1);
                     break;
                 case 2:
                     //桶
                     //发送消息 给对应宿管
                     log.info("桶 - number:{}", number);
-                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, 0, number, true);
+                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, 0, number, true,2);
                     break;
                 default:
                     break;

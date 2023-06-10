@@ -1,12 +1,12 @@
 package com.ruoyi.system.service.impl;
 
 
-import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.FtMessage;
 import com.ruoyi.system.mapper.FtMessageMapper;
 import com.ruoyi.system.request.MessageRequest;
+import com.ruoyi.system.response.HomeResponse;
 import com.ruoyi.system.response.MessageResponse;
 import com.ruoyi.system.service.FtHomeService;
 import com.ruoyi.system.service.FtMessageService;
@@ -33,9 +33,6 @@ public class FtMessageServiceImpl implements FtMessageService {
 
     @Autowired
     private FtHomeService homeService;
-
-    @Autowired
-    private SysUserServiceImpl userService;
 
     @Autowired
     private FtHomeServiceImpl homeServiceImpl;
@@ -85,11 +82,13 @@ public class FtMessageServiceImpl implements FtMessageService {
         }
         //找到对应的楼 一人确认收获 一楼确认收获
         Long userId = SecurityUtils.getUserId();
-        SysUser user = userService.selectUserById(userId);
-        Long homeId = user.getHomeId();
         //驳回 确认
         confirms(id, userId);
-        return homeService.addNumberByHomeId(homeId, message.getNumber());
+        HomeResponse homeResponse = homeService.selectByPrimaryKey(message.getHomeId());
+
+        homeServiceImpl.addNotices(message.getHomeId(), userId, message.getNumber(), true, homeResponse.getNumber(), false, 1, 1);
+
+        return homeService.addNumberByHomeId(message.getHomeId(), message.getNumber());
     }
 
     @Override
@@ -107,7 +106,14 @@ public class FtMessageServiceImpl implements FtMessageService {
     @Override
     @Transactional
     public Boolean refuseMessage(Long id) {
-        return ftMessageMapper.refuseMessage(id)>0;
+        FtMessage message = selectByPrimaryKey(id);
+        if (message == null) {
+            throw new SecurityException("该消息不存在");
+        }
+        Long userId = SecurityUtils.getUserId();
+        HomeResponse homeResponse = homeService.selectByPrimaryKey(message.getHomeId());
+        homeServiceImpl.addNotices(message.getHomeId(), userId, message.getNumber(), true, homeResponse.getNumber(), false, 2, 1);
+        return ftMessageMapper.refuseMessage(id) > 0;
     }
 
     public void addMessages(List<FtMessage> messages) {
@@ -133,7 +139,7 @@ public class FtMessageServiceImpl implements FtMessageService {
         FtHome home = homeServiceImpl.getTopHome(homes, message.getHomeId());
         if (home != null) {
             String homeName = homes.stream().filter(h -> h.getId().equals(message.getHomeId())).findFirst().orElse(new FtHome()).getName();
-            message.setHomeName(home.getName()+"/"+homeName);
+            message.setHomeName(home.getName() + "/" + homeName);
         }
     }
 }

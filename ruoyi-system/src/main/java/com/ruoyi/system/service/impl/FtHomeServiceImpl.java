@@ -104,7 +104,7 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         //添加消息 确认之后在入库
         Long userId = SecurityUtils.getUserId();
-        return sendMessageAndNotices(request.getId(), userId, true, home.getNumber(), request.getNumber(), false);
+        return sendMessageAndNotices(request.getId(), userId, true, home.getNumber(), request.getNumber(), false, 1);
     }
 
     @Override
@@ -263,13 +263,13 @@ public class FtHomeServiceImpl implements FtHomeService {
      *
      * @param homeId       宿舍楼id
      * @param userId       用户id
-     * @param operator     操作
+     * @param operator     操作 true 增加 false 减少
      * @param sourceNumber 源数量
      * @param number       数量
      * @param flag         是否是桶 桶不需要减库存
      * @return 是否成功
      */
-    public Boolean sendMessageAndNotices(Long homeId, Long userId, Boolean operator, Integer sourceNumber, Integer number, Boolean flag) {
+    public Boolean sendMessageAndNotices(Long homeId, Long userId, Boolean operator, Integer sourceNumber, Integer number, Boolean flag, Integer orderType) {
         //找该楼下面的管理员 发送消息
         List<UserHome> userHomes = userHomeMapper.selectByHomeId(homeId);
 
@@ -278,47 +278,61 @@ public class FtHomeServiceImpl implements FtHomeService {
         }
 
         //消息
-        List<FtMessage> messages = Lists.newArrayList();
-            FtMessage message = FtMessage.builder()
-                    .operator(operator)
-                    .number(number)
-                    .homeId(homeId)
-                    .userId(StringUtils.join(userHomes.stream().map(UserHome::getUserId).collect(Collectors.toList()), ","))
-                    .confirm(0)
-                    .build();
-            message.setCreateBy(userId.toString());
-            message.setUpdateBy(userId.toString());
-            message.setCreateTime(new Date());
-            messages.add(message);
+        FtMessage message = FtMessage.builder()
+                .orderType(orderType)
+                .operator(operator)
+                .number(number)
+                .homeId(homeId)
+                .userId(StringUtils.join(userHomes.stream().map(UserHome::getUserId).collect(Collectors.toList()), ","))
+                .confirm(0)
+                .build();
+        message.setCreateBy(userId.toString());
+        message.setUpdateBy(userId.toString());
+        message.setCreateTime(new Date());
 
-        messageService.addMessages(messages);
-        log.info("发送通知{}条", messages.size());
-        //日志 记录
-        //xxx学校xxx宿舍楼xxx用户xxx手机几点提货多少 - 剩余多少
-        //xxx学校xxx宿舍楼几点收货多少 - 剩余多少
+        messageService.insertSelective(message);
+//        log.info("发送通知{}条", messages.size());
+        return addNotices(homeId, userId, number, operator, sourceNumber, flag, 0, orderType);
+    }
+
+    public Boolean addNotices(Long homeId,
+                              Long userId,
+                              Integer number,
+                              Boolean operator,
+                              Integer sourceNumber,
+                              Boolean flag,
+                              Integer type,
+                              Integer orderType) {
         List<FtHome> homes = getHomes();
         Long topId = getTopId(homes, homeId);
         int total = 0;
-        //如果是桶不需要减库存
-        if (!flag) {
+        //如果是桶不需要减库存 2是驳回
+        if (!flag && type != 2) {
             if (operator) {
                 total = sourceNumber + number;
             } else {
                 total = sourceNumber - number;
             }
         }
+
         FtNotices notices = FtNotices.builder()
-                .type(0)
+                .type(type)
+                .orderType(orderType)
                 .homeId(homeId)
                 //todo 需要逆向推算学校
                 .schoolId(topId)
+                .residue(total)
                 .userId(userId)
                 .number(number)
-                .residue(total)
                 .build();
+
+        if (type == 2) {
+            //取上一条的库存 必须是水
+            FtNotices last = noticesService.selectLastByHomeIdAndOrderType(homeId,orderType);
+        }
         notices.setCreateBy(userId.toString());
         notices.setUpdateBy(userId.toString());
         notices.setCreateTime(new Date());
-        return noticesService.insert(notices) > 0;
+        return noticesService.insertSelective(notices) > 0;
     }
 }

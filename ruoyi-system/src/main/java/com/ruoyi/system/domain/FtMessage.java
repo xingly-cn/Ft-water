@@ -30,6 +30,8 @@ public class FtMessage extends BaseEntity {
     @ApiModelProperty(value = "楼栋id")
     private Long homeId;
 
+    private Integer orderType;
+
     /**
      * 用户id
      */
