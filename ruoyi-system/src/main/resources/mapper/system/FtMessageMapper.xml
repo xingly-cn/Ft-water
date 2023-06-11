@@ -61,7 +61,7 @@
         <!--               h.name       as homeName,-->
         <!--               u.user_name  as userName-->
         from ft_message m
-        <!--                 inner join ft_home h on m.home_id = h.id-->
+            inner join ft_home h on m.home_id = h.id
         <!--                 inner join sys_user u on m.user_id = u.user_id-->
         inner join sys_user su on m.create_by = su.user_id
         inner join sys_user ut on m.update_by = ut.user_id
@@ -315,9 +315,10 @@
         <include refid="Base_Column_List_With_Home_User"/>
         <where>
             m.deleted = 0
-            <if test="message.homeId != null">
-                and m.home_id = #{message.homeId,jdbcType=BIGINT}
+            <if test="message.homeName != null and message.homeName != ''">
+                and h.name like concat('%', #{message.homeName}, '%')
             </if>
+
             <if test="message.userId != null">
                 and find_in_set(m.user_id, #{message.userId})
             </if>
@@ -329,6 +330,9 @@
             </if>
             <if test="message.orderType != null">
                 and m.order_type = #{message.orderType}
+            </if>
+            <if test="message.startTime != null and message.startTime != '' and message.endTime != null and message.endTime != ''">
+                and m.update_time between #{message.startTime} and #{message.endTime}
             </if>
         </where>
         order by m.id desc

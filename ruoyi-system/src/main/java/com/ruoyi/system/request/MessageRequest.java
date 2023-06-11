@@ -14,4 +14,10 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode(callSuper = true)
 public class MessageRequest extends FtMessage {
+
+    private String homeName;
+
+    private String startTime;
+
+    private String endTime;
 }
