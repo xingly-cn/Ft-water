@@ -538,7 +538,8 @@
 
     <select id="selectUsersByIds" resultMap="BaseUserResult">
         select user_id,
-               user_name
+               user_name,
+               open_id
         from sys_user
         where user_id in
         <foreach collection="ids" item="userId" open="(" separator="," close=")">

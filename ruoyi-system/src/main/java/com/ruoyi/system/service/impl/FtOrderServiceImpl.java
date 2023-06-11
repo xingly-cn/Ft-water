@@ -13,6 +13,8 @@ import com.ruoyi.system.response.GoodsResponse;
 import com.ruoyi.system.response.HomeResponse;
 import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;
+import com.ruoyi.system.utils.DateUtils;
+import com.ruoyi.system.utils.WechatUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
@@ -23,9 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -185,6 +185,28 @@ public class FtOrderServiceImpl implements FtOrderService {
                     //发送消息 给对应宿管
                     log.info("水 - number:{}", number);
                     homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false,1);
+                    //消息订阅
+                    Map<String, Object> data = new HashMap<>();
+                    //订单编号
+                    data.put("character_string2", new HashMap<String, String>() {{
+                        put("value", String.valueOf(ftOrder.getId())); // 替换为具体值
+                    }});
+                    data.put("thing11", new HashMap<String, String>() {{
+                        put("value", "水"); // 替换为具体值
+                    }});
+                    //支付金额
+                    data.put("amount1", new HashMap<String, String>() {{
+                        put("value", "100"); // 替换为具体值
+                    }});
+                    //支付时间
+                    data.put("date3", new HashMap<String, String>() {{
+                        put("value", DateUtils.getCurrentDate()); // 替换为具体值
+                    }});
+                    //提货码
+                    data.put("character_string9", new HashMap<String, String>() {{
+                        put("value", ""); // 替换为具体值
+                    }});
+                    WechatUtil.sendSubscriptionMessage(user.getOpenId(),"3",data);
                     break;
                 case 2:
                     //桶
@@ -203,6 +225,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         //支付之后
         //todo 收货的时候需要根据type=3的商品来增加用户的空桶数量
 //        userMapper.updateWaterNumberById(user.getUserId(), number);
+
         return updateOrder(orderRequest);
     }
 
@@ -234,7 +257,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             return "订单未支付";
         }
 
-        if (ftOrder.getUserId() != userId) {
+        if (!Objects.equals(ftOrder.getUserId(), userId)) {
             return "订单不属于当前用户, 非法操作已记录 ";
         }
 
@@ -265,6 +288,8 @@ public class FtOrderServiceImpl implements FtOrderService {
         Integer typer = ftGoods.getTyper();
 
         //--------------------水商品 和 空桶商品 核销--------------------
+        SysUser user = userService.selectUserById(Long.parseLong(split[1]));
+
         switch (typer) {
             case 0:
                 return "该订单为水票券, 不需要核销, 订单ID：" + split[0];
@@ -294,6 +319,32 @@ public class FtOrderServiceImpl implements FtOrderService {
                 ftOrder.setStatus(2);
                 ftOrderMapper.updateByPrimaryKey(ftOrder);
 
+                //消息订阅
+                Map<String, Object> data = new HashMap<>();
+                data.put("thing3", new HashMap<String, String>() {{
+                    put("value", "水"); // 替换为具体值
+                }});
+                data.put("thing7", new HashMap<String, String>() {{
+                    put("value", "订单核销"); // 替换为具体值
+                }});
+
+                //提货地址
+//                String name = homes.stream().filter(h -> h.getId().equals(homeId)).findFirst().orElse(new FtHome()).getName();
+//                String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
+                data.put("thing9", new HashMap<String, String>() {{
+                    put("value", "核销穿进来的地址"); // 替换为具体值
+                }});
+
+                //说明
+                data.put("thing1", new HashMap<String, String>() {{
+                    put("value", "宿管进行订单核销"); // 替换为具体值
+                }});
+
+                data.put("phone_number6", new HashMap<String, String>() {{
+                    put("value", "13697333214"); // 替换为具体值
+                }});
+                WechatUtil.sendSubscriptionMessage(user.getOpenId(),"4",data);
+
                 return "核销水成功, 用户ID：" + split[1] + ", 数量：" + split[3] + ", 订单ID：" + split[0];
             case 2: // 空桶核销
                 // 插入核销表
@@ -305,7 +356,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                 userGoodsMapper.insert(userGoods1);
 
                 // 当前用户空桶数量更新
-                SysUser sysUser = userService.selectUserById(Long.parseLong(split[1]));
+                SysUser sysUser = user;
                 Integer waterNum = sysUser.getWaterNum();
                 sysUser.setWaterNum(waterNum + Integer.parseInt(split[3]));
                 userService.updateUser(sysUser);
@@ -316,8 +367,6 @@ public class FtOrderServiceImpl implements FtOrderService {
                 ftOrderMapper.updateByPrimaryKey(ftOrder1);
 
                 return "核销空桶成功, 用户ID：" + split[1] + ", 数量：" + split[3] + ", 订单ID：" + split[0];
-
-
         }
 
         return "暂无核销类型";
