@@ -52,6 +52,9 @@ public class FtOrder extends BaseEntity implements Serializable {
     @ApiModelProperty(value = "支付方式")
     private String payMethod;
 
+    @ApiModelProperty(value = "配送方式")
+    private String deliveryType;
+
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<OrderElements> orderElements;
 }

@@ -37,9 +37,11 @@ public class ShopServiceImpl implements ShopService {
         if (shopResponse != null) {
             log.info("已经存在该商品，累加数量");
             request.setNumber(shopResponse.getNumber() + request.getNumber());
+            request.setId(shopResponse.getId());
             return shopMapper.updateByPrimaryKeySelective(request) > 0;
         }
         log.info("不存在该商品，新增");
+
         return shopMapper.insertSelective(request) > 0;
     }
 

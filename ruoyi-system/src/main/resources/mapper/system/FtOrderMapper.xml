@@ -8,6 +8,7 @@
         <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
         <result column="address_id" jdbcType="BIGINT" property="addressId"/>
         <result column="pay_method" jdbcType="VARCHAR" property="payMethod"/>
+        <result column="delivery_type" jdbcType="VARCHAR" property="deliveryType"/>
         <result column="home_id" jdbcType="BIGINT" property="homeId"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
@@ -25,6 +26,7 @@
         <result column="goods_id" jdbcType="INTEGER" property="goodsId"/>
         <result column="goods_name" jdbcType="TIMESTAMP" property="goodName"/>
         <result column="pay_method" jdbcType="VARCHAR" property="payMethod"/>
+        <result column="delivery_type" jdbcType="VARCHAR" property="deliveryType"/>
         <result column="number" jdbcType="TIMESTAMP" property="number"/>
         <result column="price" jdbcType="DECIMAL" property="price"/>
     </resultMap>
@@ -38,6 +40,7 @@
         home_id,
         address_id,
         pay_method,
+        delivery_type,
         deleted,
         create_time
     </sql>
@@ -50,6 +53,7 @@
                fo.home_id,
                fo.status,
                fo.paymethod,
+               fo.delivery_type,
                fo.user_id,
                fu.user_name   as user_name,
                fu.phonenumber as user_phone,
@@ -84,10 +88,10 @@
     <insert id="insert" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         insert into ft_order (address_id, status,user_id,home_id,
-                              create_time, payed, pay_method)
+                              create_time, payed, pay_method, delivery_type)
         values (#{addressId,jdbcType=BIGINT},
                 #{status,jdbcType=INTEGER},#{userId,jdbcType=BIGINT},#{homeId,jdbcType=BIGINT},
-                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR})
+                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR}, #{deliveryType,jdbcType=VARCHAR})
     </insert>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
@@ -114,6 +118,9 @@
             <if test="payMethod != null">
                 pay_method,
             </if>
+            <if test="deliveryType != null">
+                delivery_type
+            </if>
             create_time,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -135,6 +142,9 @@
             0,
             <if test="payMethod != null">
                 #{payMethod,jdbcType=VARCHAR},
+            </if>
+            <if test="deliveryType != null">
+                #{deliveryType,jdbcType=VARCHAR},
             </if>
             now(),
         </trim>
@@ -159,6 +169,9 @@
             <if test="payMethod != null">
                 pay_method = #{payMethod,jdbcType=VARCHAR},
             </if>
+            <if test="deliveryType != null">
+                delivery_type = #{deliveryType,jdbcType=VARCHAR},
+            </if>
         </set>
         where id = #{id}
     </update>
@@ -171,6 +184,7 @@
             payed     = #{payed,jdbcType=BOOLEAN},
             status    = #{status,jdbcType=INTEGER},
             pay_method = #{payMethod,jdbcType=VARCHAR}
+            delivery_type = #{deliveryType,jdbcType=VARCHAR}
         where id = #{id}
     </update>
 

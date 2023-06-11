@@ -34,6 +34,8 @@ public class OrderResponse extends FtOrder {
 
     private String payMethod;
 
+    private String deliveryType;
+
     private Long schoolId;
 
     private List<OrderElementsResponse> orderElementsResponses;
