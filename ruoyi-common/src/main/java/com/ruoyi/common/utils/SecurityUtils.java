@@ -29,6 +29,18 @@ public class SecurityUtils
         }
     }
 
+    public static String getOpenId()
+    {
+        try
+        {
+            return getLoginUser().getUser().getOpenId();
+        }
+        catch (Exception e)
+        {
+            throw new ServiceException("获取用户ID异常", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
     /**
      * 获取部门ID
      **/
