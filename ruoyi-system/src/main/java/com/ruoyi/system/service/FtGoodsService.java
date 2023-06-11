@@ -27,6 +27,5 @@ public interface FtGoodsService{
 
     Boolean setOpener(Long id, int flag);
 
-
     List<FtCountResponse> ftCount();
 }

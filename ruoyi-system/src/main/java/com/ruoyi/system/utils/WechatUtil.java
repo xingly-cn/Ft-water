@@ -17,6 +17,9 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by IntelliJ IDEA.
  *
@@ -35,7 +38,9 @@ public class WechatUtil {
 
     public static String[] getOpenId(String code) {
         String appId = configService.selectConfigByKey("wechat_appid");
+//        String appId = null;
         String secret = configService.selectConfigByKey("wechat_secret");
+//        String secret = null;
         logger.info("【小程序获取openId】: code={}, appId={}, secret={}", code, appId, secret);
         String url = String.format("https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
                 appId, secret, code);
@@ -97,7 +102,9 @@ public class WechatUtil {
 
     private static String getAccessTokenAndRefresh() {
         String appId = configService.selectConfigByKey("wechat_appid");
+//        String appId = "wx0c0ff097756fc774";
         String secret = configService.selectConfigByKey("wechat_secret");
+//        String secret = "46d99d7ddb575cfc0cae392bc47f81ec";
         String url = String.format("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
                 appId, secret);
         logger.info("【小程序】获取accessToken url:{}", url);
@@ -106,4 +113,60 @@ public class WechatUtil {
         JSONObject json = JSON.parseObject(r);
         return json.getString("access_token");
     }
+
+    // 定义消息发送接口
+//    @Async
+    public static String sendSubscriptionMessage(String openId, String type,Map<String, Object> data) {
+        if (StringUtils.isEmpty(openId)) {
+            logger.info("【小程序】发送订阅消息失败，openId不能为空");
+        }
+
+        // 构造消息体
+        Map<String, Object> message = new HashMap<>();
+        message.put("touser", openId);
+        message.put("page", "pages/index/index"); // 订阅消息点击跳转页面路径
+
+        switch (type) {
+            case "1":
+                //补货
+                message.put("template_id", configService.selectConfigByKey("add_water"));
+                break;
+            case "2":
+                message.put("template_id", configService.selectConfigByKey("refuse_water"));
+                //驳回
+                break;
+            case "3":
+                //订单-下单
+                message.put("template_id", configService.selectConfigByKey("order_pay"));
+                break;
+            case "4":
+                //核销
+                message.put("template_id", configService.selectConfigByKey("order_confirm"));
+                break;
+            default:
+                break;
+        }
+
+        message.put("data", data);
+
+        // 发送消息请求
+        String url = String.format("https://api.weixin.qq.com/cgi-bin/message/subscribe/send?access_token=%s",
+                getAccessTokenAndRefresh());
+
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setEntity(new StringEntity(JSON.toJSONString(message), "UTF-8"));
+
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
+            HttpEntity entity = response.getEntity();
+            String r = EntityUtils.toString(entity);
+            logger.info("【小程序发送消息】结果:{}", r);
+            JSONObject mResult = JSON.parseObject(r);
+            return mResult.toJSONString();
+        } catch (Exception e) {
+            logger.error("【小程序发送消息】出错", e);
+            throw new ServiceException("【小程序发送消息】出错");
+        }
+    }
+
 }

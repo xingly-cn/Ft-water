@@ -12,6 +12,8 @@ import com.ruoyi.system.mapper.UserHomeMapper;
 import com.ruoyi.system.request.HomeRequest;
 import com.ruoyi.system.response.HomeResponse;
 import com.ruoyi.system.service.FtHomeService;
+import com.ruoyi.system.utils.DateUtils;
+import com.ruoyi.system.utils.WechatUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
@@ -22,10 +24,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -315,6 +314,48 @@ public class FtHomeServiceImpl implements FtHomeService {
             }
         }
 
+        if (type == 1 || type == 2) {
+            List<UserHome> userHomes = userHomeMapper.selectByHomeId(homeId);
+            if (CollectionUtils.isNotEmpty(userHomes)) {
+                List<String> userIds = userHomes.stream().map(UserHome::getUserId).map(String::valueOf).collect(Collectors.toList());
+                List<SysUser> users = userMapper.selectUsersByIds(userIds);
+                users = users.stream().filter(u -> StringUtils.isNotEmpty(u.getOpenId())).collect(Collectors.toList());
+                if (CollectionUtils.isNotEmpty(users)) {
+                    log.info("send message homeId:{},userIds:{}", homeId, userIds);
+                    Map<String, Object> data = new HashMap<>();
+                    data.put(type == 1 ? "thing4" : "thing6", new HashMap<String, String>() {{
+                        put("value", "水"); // 替换为具体值
+                    }});
+
+                    if (type == 1) {
+                        data.put("thing5", new HashMap<String, String>() {{
+                            put("value", String.valueOf(number)); // 替换为具体值
+                        }});
+                    }
+
+                    String name = homes.stream().filter(h -> h.getId().equals(homeId)).findFirst().orElse(new FtHome()).getName();
+                    String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
+                    data.put(type == 1 ? "thing6" : "thing22", new HashMap<String, String>() {{
+                        put("value", topName + "/" + name); // 替换为具体值
+                    }});
+                    data.put(type == 1 ? "time3" : "date2", new HashMap<String, String>() {{
+                        put("value", DateUtils.getCurrentDate()); // 替换为具体值
+                    }});
+                    data.put(type == 1 ? "thing2" : "thing1", new HashMap<String, String>() {{
+                        put("value", type == 1 ? "确认" : "驳回"); // 替换为具体值
+                    }});
+
+                    if (type == 2) {
+                        data.put("phrase8", new HashMap<String, String>() {{
+                            put("value", "驳回"); // 替换为具体值
+                        }});
+                    }
+
+                    users.forEach(user -> WechatUtil.sendSubscriptionMessage(user.getOpenId(), String.valueOf(type), data));
+                }
+            }
+        }
+
         FtNotices notices = FtNotices.builder()
                 .type(type)
                 .orderType(orderType)
@@ -334,7 +375,9 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         notices.setCreateBy(userId.toString());
         notices.setUpdateBy(userId.toString());
-        notices.setCreateTime(new Date());
+        notices.setCreateTime(new
+
+                Date());
         return noticesService.insertSelective(notices) > 0;
     }
 }
