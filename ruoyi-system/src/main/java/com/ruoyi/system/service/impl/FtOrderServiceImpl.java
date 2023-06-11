@@ -65,7 +65,6 @@ public class FtOrderServiceImpl implements FtOrderService {
     @Resource
     private FtHomeMapper ftHomeMapper;
 
-
     @Resource
     private FtGoodsMapper ftGoodsMapper;
 
@@ -157,6 +156,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                     .number(element.getNumber())
                     .build());
         });
+
         if (homeId == null) {
             throw new ServiceException("宿舍不存在");
         }

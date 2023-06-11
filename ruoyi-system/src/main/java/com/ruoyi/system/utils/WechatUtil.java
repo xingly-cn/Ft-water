@@ -116,7 +116,7 @@ public class WechatUtil {
 
     // 定义消息发送接口
 //    @Async
-    public static String sendSubscriptionMessage(String openId, String type,Map<String, Object> data) {
+    public static void sendSubscriptionMessage(String openId, String type,Map<String, Object> data) {
         if (StringUtils.isEmpty(openId)) {
             logger.info("【小程序】发送订阅消息失败，openId不能为空");
         }
@@ -160,9 +160,8 @@ public class WechatUtil {
         try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
             HttpEntity entity = response.getEntity();
             String r = EntityUtils.toString(entity);
-            logger.info("【小程序发送消息】结果:{}", r);
             JSONObject mResult = JSON.parseObject(r);
-            return mResult.toJSONString();
+            logger.info("【小程序发送消息】结果:{}", mResult);
         } catch (Exception e) {
             logger.error("【小程序发送消息】出错", e);
             throw new ServiceException("【小程序发送消息】出错");

@@ -87,7 +87,7 @@
                               create_time, payed, pay_method)
         values (#{addressId,jdbcType=BIGINT},
                 #{status,jdbcType=INTEGER},#{userId,jdbcType=BIGINT},#{homeId,jdbcType=BIGINT},
-                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR}
+                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR})
     </insert>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
@@ -157,7 +157,7 @@
                 status = #{status,jdbcType=INTEGER},
             </if>
             <if test="payMethod != null">
-                status = #{payMethod,jdbcType=VARCHAR},
+                pay_method = #{payMethod,jdbcType=VARCHAR},
             </if>
         </set>
         where id = #{id}
@@ -169,7 +169,7 @@
         set address_id = #{addressId,jdbcType=BIGINT},
             home_id    = #{homeId,jdbcType=BIGINT},
             payed     = #{payed,jdbcType=BOOLEAN},
-            status    = #{status,jdbcType=INTEGER}
+            status    = #{status,jdbcType=INTEGER},
             pay_method = #{payMethod,jdbcType=VARCHAR}
         where id = #{id}
     </update>
