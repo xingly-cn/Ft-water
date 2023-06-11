@@ -172,7 +172,7 @@
         where id = #{id}
     </update>
 
-    <update id="setOpen" parameterType="java.lang.String">
+    <update id="setOpen">
         update ft_goods
         set opener = #{flag}
         where id = #{id}

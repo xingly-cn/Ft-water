@@ -7,6 +7,7 @@
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
         <result column="address_id" jdbcType="BIGINT" property="addressId"/>
+        <result column="pay_method" jdbcType="VARCHAR" property="payMethod"/>
         <result column="home_id" jdbcType="BIGINT" property="homeId"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
@@ -23,6 +24,7 @@
         <result column="order_id" jdbcType="BOOLEAN" property="orderId"/>
         <result column="goods_id" jdbcType="INTEGER" property="goodsId"/>
         <result column="goods_name" jdbcType="TIMESTAMP" property="goodName"/>
+        <result column="pay_method" jdbcType="VARCHAR" property="payMethod"/>
         <result column="number" jdbcType="TIMESTAMP" property="number"/>
         <result column="price" jdbcType="DECIMAL" property="price"/>
     </resultMap>
@@ -35,6 +37,7 @@
         user_id,
         home_id,
         address_id,
+        pay_method,
         deleted,
         create_time
     </sql>
@@ -46,6 +49,7 @@
                fo.address_id,
                fo.home_id,
                fo.status,
+               fo.paymethod,
                fo.user_id,
                fu.user_name   as user_name,
                fu.phonenumber as user_phone,
@@ -80,10 +84,10 @@
     <insert id="insert" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         insert into ft_order (address_id, status,user_id,home_id,
-                              create_time, payed)
+                              create_time, payed, pay_method)
         values (#{addressId,jdbcType=BIGINT},
                 #{status,jdbcType=INTEGER},#{userId,jdbcType=BIGINT},#{homeId,jdbcType=BIGINT},
-                now(), #{payed,jdbcType=BOOLEAN})
+                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR}
     </insert>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
@@ -106,8 +110,9 @@
             <if test="payed != null">
                 payed,
             </if>
-            <if test="status != null">
-                status,
+            status,
+            <if test="payMethod != null">
+                pay_method,
             </if>
             create_time,
         </trim>
@@ -127,8 +132,9 @@
             <if test="payed != null">
                 #{payed,jdbcType=BOOLEAN},
             </if>
-            <if test="status != null">
-                #{status,jdbcType=INTEGER},
+            0,
+            <if test="payMethod != null">
+                #{payMethod,jdbcType=VARCHAR},
             </if>
             now(),
         </trim>
@@ -150,6 +156,9 @@
             <if test="status != null">
                 status = #{status,jdbcType=INTEGER},
             </if>
+            <if test="payMethod != null">
+                status = #{payMethod,jdbcType=VARCHAR},
+            </if>
         </set>
         where id = #{id}
     </update>
@@ -161,6 +170,7 @@
             home_id    = #{homeId,jdbcType=BIGINT},
             payed     = #{payed,jdbcType=BOOLEAN},
             status    = #{status,jdbcType=INTEGER}
+            pay_method = #{payMethod,jdbcType=VARCHAR}
         where id = #{id}
     </update>
 
@@ -172,7 +182,6 @@
         <if test="order.keyword != null and order.keyword != ''">
             and (
                     fg.title like concat('%', #{order.keyword}, '%')
-<!--                    or fh.name like concat('%', #{order.keyword}, '%')-->
                     or fu.user_name like concat('%', #{order.keyword}, '%')
                     or fu.phonenumber = #{order.keyword}
                 )

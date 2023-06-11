@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -32,6 +31,8 @@ public class OrderResponse extends FtOrder {
     private String homeName;
 
     private String schoolName;
+
+    private String payMethod;
 
     private Long schoolId;
 

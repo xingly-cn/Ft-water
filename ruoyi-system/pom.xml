@@ -46,6 +46,12 @@
             <version>9.0.63</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.wechatpay-apiv3</groupId>
+            <artifactId>wechatpay-apache-httpclient</artifactId>
+            <version>0.4.8</version>
+        </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>com.baomidou</groupId>-->
 <!--            <artifactId>mybatis-plus-core</artifactId>-->

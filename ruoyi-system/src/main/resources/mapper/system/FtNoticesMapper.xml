@@ -57,7 +57,7 @@
         from ft_notices n
                  inner join ft_home s on n.school_id = s.id
                  inner join ft_home h on n.home_id = h.id
-                 inner join sys_user u on n.user_id = u.id
+                 inner join sys_user u on n.user_id = u.user_id
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long"
