@@ -54,7 +54,7 @@ public class JsApiPayController {
         CertificatesManager instance = CertificatesManager.getInstance();
 
         String merchantId = "1644099333";
-        String serialNumber = "";
+        String serialNumber = "63BA432C5DB7DE7633D3EFE9D3BAA0B5AFFB4975";
         String apiV3Key = "NorthWeixinPayZhiDuoXing12345678";
         String wechatAppId = "wx0c0ff097756fc774";
 
