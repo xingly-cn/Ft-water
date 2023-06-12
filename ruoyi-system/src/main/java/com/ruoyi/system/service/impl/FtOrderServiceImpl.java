@@ -213,6 +213,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                     break;
                 case 1:
                     //水
+
                     //发送消息 给对应宿管
                     log.info("水 - number:{}", number);
                     homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false, 1);
@@ -458,6 +459,11 @@ public class FtOrderServiceImpl implements FtOrderService {
 //            }
         });
         return responses;
+    }
+
+    @Override
+    public CalcOrderPriceResponse getOrderPrice(Long orderId) {
+        return ftOrderMapper.getOrderPrice(orderId);
     }
 
     private void checkGoodsNumber(List<Shop> shops, Integer number) {
