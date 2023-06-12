@@ -27,4 +27,6 @@ public class OrderRequest extends FtOrder {
     private Boolean flag;
 
     private List<Shop> shops;
+
+    private String payType;
 }

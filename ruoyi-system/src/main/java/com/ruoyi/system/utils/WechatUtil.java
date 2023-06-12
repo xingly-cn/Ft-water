@@ -37,10 +37,8 @@ public class WechatUtil {
     }
 
     public static String[] getOpenId(String code) {
-        String appId = configService.selectConfigByKey("wechat_appid");
-//        String appId = null;
-        String secret = configService.selectConfigByKey("wechat_secret");
-//        String secret = null;
+        String appId = configService.getCacheValue("wechat_appid");
+        String secret = configService.getCacheValue("wechat_secret");
         logger.info("【小程序获取openId】: code={}, appId={}, secret={}", code, appId, secret);
         String url = String.format("https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
                 appId, secret, code);
@@ -101,22 +99,21 @@ public class WechatUtil {
     }
 
     private static String getAccessTokenAndRefresh() {
-        String appId = configService.selectConfigByKey("wechat_appid");
-//        String appId = "wx0c0ff097756fc774";
-        String secret = configService.selectConfigByKey("wechat_secret");
-//        String secret = "46d99d7ddb575cfc0cae392bc47f81ec";
+        String appId = configService.getCacheValue("wechat_appid");
+        String secret = configService.getCacheValue("wechat_secret");
         String url = String.format("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
                 appId, secret);
         logger.info("【小程序】获取accessToken url:{}", url);
         String r = HttpClientUtil.doGet(url);
         logger.info("【小程序】获取accessToken结果:{}", r);
         JSONObject json = JSON.parseObject(r);
+        assert json != null;
         return json.getString("access_token");
     }
 
     // 定义消息发送接口
 //    @Async
-    public static void sendSubscriptionMessage(String openId, String type,Map<String, Object> data) {
+    public static void sendSubscriptionMessage(String openId, String type, Map<String, Object> data) {
         if (StringUtils.isEmpty(openId)) {
             logger.info("【小程序】发送订阅消息失败，openId不能为空");
         }
@@ -129,19 +126,19 @@ public class WechatUtil {
         switch (type) {
             case "1":
                 //补货
-                message.put("template_id", configService.selectConfigByKey("add_water"));
+                message.put("template_id", configService.getCacheValue("add_water"));
                 break;
             case "2":
-                message.put("template_id", configService.selectConfigByKey("refuse_water"));
+                message.put("template_id", configService.getCacheValue("refuse_water"));
                 //驳回
                 break;
             case "3":
                 //订单-下单
-                message.put("template_id", configService.selectConfigByKey("order_pay"));
+                message.put("template_id", configService.getCacheValue("order_pay"));
                 break;
             case "4":
                 //核销
-                message.put("template_id", configService.selectConfigByKey("order_confirm"));
+                message.put("template_id", configService.getCacheValue("order_confirm"));
                 break;
             default:
                 break;

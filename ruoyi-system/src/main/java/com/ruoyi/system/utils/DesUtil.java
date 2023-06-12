@@ -25,7 +25,7 @@ public class DesUtil {
 
     static {
         SysConfigServiceImpl configService = ApplicationContextProvider.getBean(SysConfigServiceImpl.class);
-        key = configService.selectConfigByKey("DES_KEY");
+        key = configService.getCacheValue("DES_KEY");
     }
 
 
