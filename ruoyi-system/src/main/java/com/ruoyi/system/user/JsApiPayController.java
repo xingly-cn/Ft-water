@@ -116,7 +116,7 @@ public class JsApiPayController {
 
         HashMap<Object, Object> payMap = new HashMap<>();
         payMap.put("paySign", paySign);
-        payMap.put("timeStamp", "" + time);
+        payMap.put("timeStamp", String.valueOf(time));
         payMap.put("nonceStr", nonstr);
         payMap.put("package", pack);
         payMap.put("signType", "RSA");

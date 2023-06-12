@@ -229,4 +229,9 @@ public class SysConfigServiceImpl implements ISysConfigService
     {
         return CacheConstants.SYS_CONFIG_KEY + configKey;
     }
+
+    public String getCacheValue(String configKey)
+    {
+        return Convert.toStr(redisCache.getCacheObject(getCacheKey(configKey)));
+    }
 }

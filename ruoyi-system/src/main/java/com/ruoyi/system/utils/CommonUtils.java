@@ -33,13 +33,13 @@ public class CommonUtils {
 
     static {
         SysConfigServiceImpl configService = ApplicationContextProvider.getBean(SysConfigServiceImpl.class);
-        ENDPOINT = configService.selectConfigByKey("ENDPOINT");
-        RESULT_URL = configService.selectConfigByKey("RESULT_URL");
-        ACCESS_KEY_ID = configService.selectConfigByKey("ACCESS_KEY_ID");
-        ACCESS_KEY_SECRET = configService.selectConfigByKey("ACCESS_KEY_SECRET");
-        MSG_APPID = configService.selectConfigByKey("MSG_APPID");
-        MSG_APPSID = configService.selectConfigByKey("MSG_APPSID");
-        MSG_TOKEN = configService.selectConfigByKey("MSG_TOKEN");
+        ENDPOINT = configService.getCacheValue("ENDPOINT");
+        RESULT_URL = configService.getCacheValue("RESULT_URL");
+        ACCESS_KEY_ID = configService.getCacheValue("ACCESS_KEY_ID");
+        ACCESS_KEY_SECRET = configService.getCacheValue("ACCESS_KEY_SECRET");
+        MSG_APPID = configService.getCacheValue("MSG_APPID");
+        MSG_APPSID = configService.getCacheValue("MSG_APPSID");
+        MSG_TOKEN = configService.getCacheValue("MSG_TOKEN");
     }
 
     /**

@@ -4,6 +4,7 @@ import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.*;
@@ -68,6 +69,9 @@ public class FtOrderServiceImpl implements FtOrderService {
     @Resource
     private FtGoodsMapper ftGoodsMapper;
 
+    @Autowired
+    private SysConfigServiceImpl configService;
+
     @Override
     @Transactional(rollbackFor = ServiceException.class)
     public Boolean deleteByPrimaryKey(Long id) {
@@ -115,7 +119,8 @@ public class FtOrderServiceImpl implements FtOrderService {
         });
         //下单之后删除购物车里面的东西
         List<Long> shopIds = request.getShops().stream().map(Shop::getId).collect(Collectors.toList());
-        if (CollectionUtils.isNotEmpty(shopIds)) {
+        if (CollectionUtils.isNotEmpty(shopIds) && StringUtils.isNotEmpty(request.getPayType()) && !request.getPayType().equals("goods")) {
+            log.info("delete shop :{}", request.getShops());
             shopService.deleteShopsByIds(shopIds);
         }
         orderElementsMapper.insertBatch(orderElements);
@@ -196,7 +201,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                     }});
                     //支付金额
                     data.put("amount1", new HashMap<String, String>() {{
-                        put("value", "100"); // 替换为具体值
+                        put("value", "支付金额"); // 替换为具体值
                     }});
                     //支付时间
                     data.put("date3", new HashMap<String, String>() {{
@@ -341,7 +346,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                 }});
 
                 data.put("phone_number6", new HashMap<String, String>() {{
-                    put("value", "13697333214"); // 替换为具体值
+                    put("value", configService.getCacheValue("manage_phone")); // 替换为具体值
                 }});
                 WechatUtil.sendSubscriptionMessage(user.getOpenId(),"4",data);
 
@@ -356,10 +361,9 @@ public class FtOrderServiceImpl implements FtOrderService {
                 userGoodsMapper.insert(userGoods1);
 
                 // 当前用户空桶数量更新
-                SysUser sysUser = user;
-                Integer waterNum = sysUser.getWaterNum();
-                sysUser.setWaterNum(waterNum + Integer.parseInt(split[3]));
-                userService.updateUser(sysUser);
+                Integer waterNum = user.getWaterNum();
+                user.setWaterNum(waterNum + Integer.parseInt(split[3]));
+                userService.updateUser(user);
 
                 // 订单状态更新
                 FtOrder ftOrder1 = ftOrderMapper.selectByPrimaryKey(Long.parseLong(split[0]));

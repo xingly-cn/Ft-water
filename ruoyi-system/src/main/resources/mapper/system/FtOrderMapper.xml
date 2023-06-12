@@ -13,7 +13,7 @@
         <result column="address" jdbcType="VARCHAR" property="address"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="delivery_time" jdbcType="TIMESTAMP" property="deliveryTime"/>
         <result column="payed" jdbcType="BOOLEAN" property="payed"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="user_name" jdbcType="BIGINT" property="userName"/>
@@ -42,21 +42,21 @@
         address_id,
         pay_method,
         delivery_type,
+        delivery_time,
         deleted,
-        create_time,
-        update_time
+        create_time
     </sql>
 
     <sql id="Base_Column_Goods_HOME_User_List">
         select fo.id,
                fo.create_time,
-               fo.update_time,
                fo.payed,
                fo.address_id,
                fo.home_id,
                fo.status,
-               fo.paymethod,
+               fo.pay_method,
                fo.delivery_type,
+               fo.delivery_time,
                fo.user_id,
                fu.user_name   as user_name,
                fu.phonenumber as user_phone,
@@ -91,10 +91,10 @@
     <insert id="insert" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         insert into ft_order (address_id, status,user_id,home_id,
-                              create_time, payed, pay_method, delivery_type, update_time)
+                              create_time, payed, pay_method, delivery_type,delivery_time)
         values (#{addressId,jdbcType=BIGINT},
                 #{status,jdbcType=INTEGER},#{userId,jdbcType=BIGINT},#{homeId,jdbcType=BIGINT},
-                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR}, #{deliveryType,jdbcType=VARCHAR}, now())
+                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR}, #{deliveryType,jdbcType=VARCHAR},#{deliveryTime,jdbcType=TIMESTAMP})
     </insert>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
@@ -111,6 +111,12 @@
             <if test="homeId != null">
                 home_id,
             </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="deliveryTime != null">
+                delivery_time,
+            </if>
             <if test="payed != null">
                 payed,
             </if>
@@ -121,7 +127,7 @@
             <if test="deliveryType != null">
                 delivery_type,
             </if>
-            update_time
+            update_time,
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="userId != null">
@@ -133,6 +139,12 @@
             <if test="homeId != null">
                 #{homeId,jdbcType=BIGINT},
             </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="deliveryTime != null">
+                #{deliveryTime,jdbcType=TIMESTAMP},
+            </if>
             <if test="payed != null">
                 #{payed,jdbcType=BOOLEAN},
             </if>
@@ -143,7 +155,7 @@
             <if test="deliveryType != null">
                 #{deliveryType,jdbcType=VARCHAR},
             </if>
-            now()
+            now(),
         </trim>
     </insert>
 
@@ -169,8 +181,8 @@
             <if test="deliveryType != null">
                 delivery_type = #{deliveryType,jdbcType=VARCHAR},
             </if>
-            <if test="updateTime != null">
-                update_time = #{updateTime,jdbcType=TIMESTAMP}
+            <if test="deliveryTime != null">
+                delivery_time = #{deliveryTime,jdbcType=TIMESTAMP},
             </if>
         </set>
         where id = #{id}
