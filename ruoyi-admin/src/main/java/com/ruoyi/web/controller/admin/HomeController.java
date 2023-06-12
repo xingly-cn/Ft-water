@@ -71,4 +71,12 @@ public class HomeController {
     public AjaxResult addUser(@RequestBody HomeRequest request) {
         return AjaxResult.success(homeService.addUser(request));
     }
+
+    @GetMapping("/count/{homeId}/{userId}")
+    @ApiOperation("统计")
+    public AjaxResult count(@PathVariable(value = "homeId") Long homeId,
+                            @PathVariable(value = "userId") Long userId)
+    {
+        return AjaxResult.success(homeService.count(homeId,userId));
+    }
 }

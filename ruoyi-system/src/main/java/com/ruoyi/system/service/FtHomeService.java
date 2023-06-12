@@ -6,6 +6,7 @@ import com.ruoyi.system.request.HomeRequest;
 import com.ruoyi.system.response.HomeResponse;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,4 +32,6 @@ public interface FtHomeService {
     Boolean addNumberByHomeId(Long homeId, Integer number);
 
     List<HomeResponse> homeList(HomeRequest request);
+
+    Map<String,Integer> count(Long homeId,Long userId);
 }

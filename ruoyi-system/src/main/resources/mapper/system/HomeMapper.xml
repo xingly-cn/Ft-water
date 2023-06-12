@@ -198,4 +198,22 @@
             fo.create_time,
             '%Y-%M-%d')
     </select>
+
+    <select id="waterCount" resultType="int">
+        select number from ft_home where deleted=0 and id=#{homeId}
+    </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_home
+        where deleted = false
+        <if test="ids != null and ids.size() != 0">
+            and id in
+            <foreach collection="ids" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>

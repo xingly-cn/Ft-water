@@ -9,10 +9,7 @@ import com.ruoyi.system.domain.*;
 import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.request.OrderRequest;
-import com.ruoyi.system.response.CQ;
-import com.ruoyi.system.response.GoodsResponse;
-import com.ruoyi.system.response.HomeResponse;
-import com.ruoyi.system.response.OrderResponse;
+import com.ruoyi.system.response.*;
 import com.ruoyi.system.service.FtOrderService;
 import com.ruoyi.system.utils.DateUtils;
 import com.ruoyi.system.utils.WechatUtil;
@@ -72,6 +69,9 @@ public class FtOrderServiceImpl implements FtOrderService {
     @Autowired
     private SysConfigServiceImpl configService;
 
+    @Autowired
+    private UserHomeMapper userHomeMapper;
+
     @Override
     @Transactional(rollbackFor = ServiceException.class)
     public Boolean deleteByPrimaryKey(Long id) {
@@ -108,6 +108,32 @@ public class FtOrderServiceImpl implements FtOrderService {
         checkGoodsNumber(request.getShops(), homeResponse.getNumber());
         //生成订单
         request.setUserId(userId);
+
+        if (request.getDeliveryType().equals("selfGet")) {
+            //自提
+            if (request.getHomeId() == null) {
+                throw new ServiceException("自提地址不能为空");
+            }
+            List<UserHome> userHomes = userHomeMapper.selectByHomeId(request.getHomeId());
+            if (CollectionUtils.isEmpty(userHomes)) {
+                throw new ServiceException("自提地址不存在管理员");
+            }
+            request.setManageUserId(StringUtils.join(userHomes.stream().map(UserHome::getUserId).collect(Collectors.toList()), ","));
+        }
+
+//        else if (request.getDeliveryType().equals("goDoor")) {
+//            //配送
+//            if (request.getAddressId() == null) {
+//                throw new ServiceException("配送地址不能为空");
+//            }
+//            //todo address
+//            List<UserHome> userHomes = userHomeMapper.selectByHomeId(request.getAddressId());
+//            if (CollectionUtils.isEmpty(userHomes)) {
+//                throw new ServiceException("配送地址不存在管理员");
+//            }
+//            request.setManageUserId(StringUtils.join(userHomes.stream().map(UserHome::getUserId).collect(Collectors.toList()), ","));
+//        }
+
         ftOrderMapper.insertSelective(request);
         List<OrderElements> orderElements = Lists.newArrayList();
         request.getShops().forEach(shop -> {
@@ -189,7 +215,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                     //水
                     //发送消息 给对应宿管
                     log.info("水 - number:{}", number);
-                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false,1);
+                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false, 1);
                     //消息订阅
                     Map<String, Object> data = new HashMap<>();
                     //订单编号
@@ -211,13 +237,13 @@ public class FtOrderServiceImpl implements FtOrderService {
                     data.put("character_string9", new HashMap<String, String>() {{
                         put("value", ""); // 替换为具体值
                     }});
-                    WechatUtil.sendSubscriptionMessage(user.getOpenId(),"3",data);
+                    WechatUtil.sendSubscriptionMessage(user.getOpenId(), "3", data);
                     break;
                 case 2:
                     //桶
                     //发送消息 给对应宿管
                     log.info("桶 - number:{}", number);
-                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, 0, number, true,2);
+                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, 0, number, true, 2);
                     break;
                 default:
                     break;
@@ -268,7 +294,7 @@ public class FtOrderServiceImpl implements FtOrderService {
 
         CQ orderCQ = ftOrderMapper.createOrderCQ(orderId);
         // 生成二维码
-        String body = orderCQ.getId() + "_" + orderCQ.getUserId() + "_" + orderCQ.getHomeId() + "_" + orderCQ.getNumber() + "_" + orderCQ.getGoodId()  + "_" + LocalDateTimeUtil.now();
+        String body = orderCQ.getId() + "_" + orderCQ.getUserId() + "_" + orderCQ.getHomeId() + "_" + orderCQ.getNumber() + "_" + orderCQ.getGoodId() + "_" + LocalDateTimeUtil.now();
         String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
         return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encBody;
     }
@@ -304,7 +330,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                 Integer LocalNumber = ftHome.getNumber();
 
                 if (usedNum > LocalNumber) {
-                    return "核销失败, 当前楼栋剩余水数量不足, 楼栋ID：" + split[2] +  ", 剩余数量：" + LocalNumber + ", 核销数量：" + usedNum;
+                    return "核销失败, 当前楼栋剩余水数量不足, 楼栋ID：" + split[2] + ", 剩余数量：" + LocalNumber + ", 核销数量：" + usedNum;
                 }
 
                 // 插入核销表
@@ -348,7 +374,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                 data.put("phone_number6", new HashMap<String, String>() {{
                     put("value", configService.getCacheValue("manage_phone")); // 替换为具体值
                 }});
-                WechatUtil.sendSubscriptionMessage(user.getOpenId(),"4",data);
+                WechatUtil.sendSubscriptionMessage(user.getOpenId(), "4", data);
 
                 return "核销水成功, 用户ID：" + split[1] + ", 数量：" + split[3] + ", 订单ID：" + split[0];
             case 2: // 空桶核销
@@ -374,6 +400,64 @@ public class FtOrderServiceImpl implements FtOrderService {
         }
 
         return "暂无核销类型";
+    }
+
+    @Override
+    public List<OrderHomeCountResponse> homeCount(Long userId) {
+        //找到素有的楼栋
+
+        List<FtOrder> orders = ftOrderMapper.homeCount(userId);
+        if (CollectionUtils.isEmpty(orders)) {
+            return Collections.emptyList();
+        }
+        List<OrderHomeCountResponse> responses = new ArrayList<>();
+
+        List<FtHome> homes = homeService.getHomes();
+
+        Map<String, List<FtOrder>> orderMap = orders.stream().collect(Collectors.groupingBy(FtOrder::getDeliveryType));
+        orderMap.forEach((k, v) -> {
+            Map<Integer, List<FtOrder>> orderStatusMap = v.stream().collect(Collectors.groupingBy(FtOrder::getStatus));
+            orderStatusMap.forEach((ok, ov) -> {
+
+            });
+            if (k.equals("selfGet")) {
+                //自提
+                Map<Long, List<FtOrder>> orderHomeMap = v.stream().collect(Collectors.groupingBy(FtOrder::getHomeId));
+                orderHomeMap.forEach((ok, ov) -> {
+                    ov.forEach(oov -> {
+                        String name = homes.stream().filter(h -> h.getId().equals(ok)).findFirst().orElse(new FtHome()).getName();
+                        Long topId = homeService.getTopId(homes, ok);
+                        String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
+                        responses.add(OrderHomeCountResponse.builder()
+                                .homeId(ok)
+                                .homeName(topName+"/"+name)
+                                .status(oov.getStatus())
+                                .count(ov.size())
+                                .build());
+                    });
+                });
+
+            }
+
+//            else if (k.equals("goDoor")) {
+//                //配送
+//                Map<Long, List<FtOrder>> orderAddressMap = v.stream().collect(Collectors.groupingBy(FtOrder::getAddressId));
+//                orderAddressMap.forEach((ok, ov) -> {
+//                    ov.forEach(oov -> {
+//                        String name = homes.stream().filter(h -> h.getId().equals(ok)).findFirst().orElse(new FtHome()).getName();
+//                        Long topId = homeService.getTopId(homes, ok);
+//                        String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
+//                        responses.add(OrderHomeCountResponse.builder()
+//                                .homeId(ok)
+//                                .homeName(topName+"/"+name)
+//                                .status(oov.getStatus())
+//                                .count(ov.size())
+//                                .build());
+//                    });
+//                });
+//            }
+        });
+        return responses;
     }
 
     private void checkGoodsNumber(List<Shop> shops, Integer number) {

@@ -71,4 +71,10 @@ public class OrderController extends BaseController {
     public AjaxResult getOrderDetail(Long id) {
         return AjaxResult.success(orderService.selectByPrimaryKey(id));
     }
+
+    @GetMapping("/home/count/{userId}")
+    @ApiOperation("楼栋管理员-待取货/已经取货")
+    public AjaxResult homeCount(@PathVariable(value = "userId") Long userId) {
+        return AjaxResult.success(orderService.homeCount(userId));
+    }
 }

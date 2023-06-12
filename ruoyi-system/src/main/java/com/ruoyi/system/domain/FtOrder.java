@@ -64,4 +64,6 @@ public class FtOrder extends BaseEntity implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date deliveryTime;
+
+    private String manageUserId;
 }

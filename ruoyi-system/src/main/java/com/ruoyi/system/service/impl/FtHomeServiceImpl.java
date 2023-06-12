@@ -6,6 +6,7 @@ import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.FtMessage;
 import com.ruoyi.system.domain.FtNotices;
 import com.ruoyi.system.domain.UserHome;
+import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.FtHomeMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.mapper.UserHomeMapper;
@@ -177,6 +178,29 @@ public class FtHomeServiceImpl implements FtHomeService {
             responses.add(response);
         }
         return responses;
+    }
+
+    @Override
+    public Map<String, Integer> count(Long homeId, Long userId) {
+        List<UserHome> userHomes = userHomeMapper.selectByHomeId(homeId);
+
+        if (CollectionUtils.isEmpty(userHomes)) {
+            throw new ServiceException("该宿舍楼下面没有管理员");
+        }
+
+        userHomes.stream().filter(u -> u.getUserId().equals(userId)).findAny()
+                .orElseThrow(() -> new ServiceException("该用户不是该宿舍楼的管理员"));
+
+
+        //待入库的水的数量 栋楼的水的数量
+        int waterCount = homeMapper.waterCount(homeId);
+        int waterWaiteCount = messageService.waterWaiteCount(homeId, userId);
+        return new HashMap<String, Integer>() {
+            {
+                put("waterCount", waterCount);
+                put("waterWaiteCount", waterWaiteCount);
+            }
+        };
     }
 
     public String getSchoolByRemark(String name) {

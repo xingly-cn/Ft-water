@@ -11,6 +11,7 @@
         <result column="delivery_type" jdbcType="VARCHAR" property="deliveryType"/>
         <result column="home_id" jdbcType="BIGINT" property="homeId"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="manage_user_id" jdbcType="VARCHAR" property="manageUserId"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
         <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
         <result column="delivery_time" jdbcType="TIMESTAMP" property="deliveryTime"/>
@@ -40,6 +41,7 @@
         user_id,
         home_id,
         address_id,
+        manage_user_id,
         pay_method,
         delivery_type,
         delivery_time,
@@ -53,6 +55,7 @@
                fo.payed,
                fo.address_id,
                fo.home_id,
+               fo.manage_user_id,
                fo.status,
                fo.pay_method,
                fo.delivery_type,
@@ -91,10 +94,11 @@
     <insert id="insert" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         insert into ft_order (address_id, status,user_id,home_id,
-                              create_time, payed, pay_method, delivery_type,delivery_time)
+                              create_time, payed, pay_method, delivery_type,delivery_time,manage_user_id)
         values (#{addressId,jdbcType=BIGINT},
                 #{status,jdbcType=INTEGER},#{userId,jdbcType=BIGINT},#{homeId,jdbcType=BIGINT},
-                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR}, #{deliveryType,jdbcType=VARCHAR},#{deliveryTime,jdbcType=TIMESTAMP})
+                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR}, #{deliveryType,jdbcType=VARCHAR},
+        #{deliveryTime,jdbcType=TIMESTAMP},#{manageUserId,jdbcType=VARCHAR})
     </insert>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
@@ -111,9 +115,10 @@
             <if test="homeId != null">
                 home_id,
             </if>
-            <if test="createTime != null">
-                create_time,
+            <if test="manageUserId != null">
+                manage_user_id,
             </if>
+                create_time,
             <if test="deliveryTime != null">
                 delivery_time,
             </if>
@@ -139,9 +144,10 @@
             <if test="homeId != null">
                 #{homeId,jdbcType=BIGINT},
             </if>
-            <if test="createTime != null">
-                #{createTime,jdbcType=TIMESTAMP},
+            <if test="manageUserId != null">
+                #{manageUserId},
             </if>
+            now(),
             <if test="deliveryTime != null">
                 #{deliveryTime,jdbcType=TIMESTAMP},
             </if>
@@ -224,11 +230,27 @@
         <if test="order.status != null">
             and fo.status = #{order.status}
         </if>
+        <if test="order.manageUserId != null">
+            and find_in_set(#{order.manageUserId}, fo.manage_user_id)
+        </if>
         order by fo.id desc
     </select>
 
     <select id="createOrderCQ" resultType="com.ruoyi.system.response.CQ">
-        SELECT f.id, f.user_id userId,f.home_id homeId,o.number, o.goods_id goodId from ft_order f join order_elements o on f.id = o.order_id
+        SELECT f.id, f.user_id userId, f.home_id homeId, o.number, o.goods_id goodId
+        from ft_order f
+                 join order_elements o on f.id = o.order_id
         where f.id = #{orderId}
+    </select>
+
+    <select id="homeCount" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_order
+        where status in (1, 2)
+          and find_in_set(#{userId}, manage_user_id)
+          and deleted = 0
+        GROUP BY `status`
     </select>
 </mapper>

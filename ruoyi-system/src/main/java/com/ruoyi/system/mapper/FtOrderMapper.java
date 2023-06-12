@@ -33,4 +33,6 @@ public interface FtOrderMapper {
     List<OrderResponse> selectList(@Param("order") OrderRequest order);
 
     CQ createOrderCQ(String orderId);
+
+    List<FtOrder> homeCount(Long userId);
 }
