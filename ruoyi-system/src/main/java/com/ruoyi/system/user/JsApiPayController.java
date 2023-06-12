@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.system.response.CalcOrderPriceResponse;
+import com.ruoyi.system.service.FtOrderService;
 import com.ruoyi.system.utils.WxUtils;
 import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
 import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
@@ -28,8 +30,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Base64;
@@ -46,9 +50,13 @@ import java.util.UUID;
 @Api(tags = "支付模块")
 @Slf4j
 public class JsApiPayController {
+
+    @Resource
+    private FtOrderService ftOrderService;
+
     @GetMapping("/createNo")
     @ApiOperation("JSAPI下单")
-    public AjaxResult createPay() throws NotFoundException, IOException, GeneralSecurityException, HttpCodeException {
+    public AjaxResult createPay(Long orderId) throws NotFoundException, IOException, GeneralSecurityException, HttpCodeException {
 
         String openId = SecurityUtils.getOpenId();
 
@@ -70,8 +78,45 @@ public class JsApiPayController {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectMapper objectMapper = new ObjectMapper();
 
-        int price = 1;      // 商品价格
+        // 计算价格
+        CalcOrderPriceResponse orderPrice = ftOrderService.getOrderPrice(orderId);
+        log.info("订单数据 ->" + orderPrice.toString());
 
+        int price = 0;
+
+        String payMethod = orderPrice.getPayMethod();
+        BigDecimal waterPrice = orderPrice.getPrice();
+        BigDecimal runPrice = orderPrice.getRunPrice();
+        Integer buyNum = orderPrice.getBuyNum();
+        Integer waterNum = orderPrice.getWaterNum();
+        String deliveryType = orderPrice.getDeliveryType();
+
+        // 三种支付方式
+        switch (payMethod){
+            case "wechat":
+                price = (int) (waterPrice.doubleValue() * 100) * buyNum;
+                break;
+            case "coupon":
+                JSONObject resData = new JSONObject();
+                resData.put("price", 0);
+                resData.put("success", "ok");
+                resData.put("payMethod", payMethod);
+                return AjaxResult.success(resData); // 调用老罗的 order/pay 完成支付后的相关操作，如优惠券扣除，发送通知，订单状态变更等
+            case "mixed":
+                int newNum = buyNum - waterNum; // 优惠券抵扣后, 还需支付的水票数量
+                price += (int) (waterPrice.doubleValue() * 100) * newNum;
+                break;
+        }
+
+        // 如果为上门配送, 则计算配送费
+        if ("goDoor".equals(deliveryType)){
+            price += (int) (runPrice.doubleValue() * 100 * buyNum);
+        }
+
+        log.info("订单价格 ->" + price);
+
+
+        // 构建微信支付请求体
         ObjectNode rootNode = objectMapper.createObjectNode();
         String wx_no = UUID.randomUUID().toString().replaceAll("-", "");
         rootNode.put("mchid", merchantId)
@@ -89,8 +134,14 @@ public class JsApiPayController {
         CloseableHttpResponse response = httpClient.execute(httpPost);
         String res = EntityUtils.toString(response.getEntity());
         JSONObject jsonObject = new JSONObject(res);
-        log.info(jsonObject.toString());
-        return AjaxResult.success(jsonObject.get("prepay_id"));
+        log.info("微信支付回调信息 ->" + jsonObject);
+
+        JSONObject resData = new JSONObject();
+        resData.put("prepay_id", jsonObject.get("prepay_id"));
+        resData.put("price", price * 1.0 / 100);
+        resData.put("success", "ok");
+        resData.put("payMethod", payMethod);
+        return AjaxResult.success(resData);
     }
 
 
