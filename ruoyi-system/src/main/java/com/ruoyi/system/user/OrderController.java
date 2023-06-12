@@ -61,7 +61,7 @@ public class OrderController extends BaseController {
     }
 
     @PostMapping("/pay")
-    @ApiOperation("支付订单")
+    @ApiOperation("支付后订单操作")
     public AjaxResult payOrder(Long id) {
         return AjaxResult.success(orderService.payOrder(id));
     }

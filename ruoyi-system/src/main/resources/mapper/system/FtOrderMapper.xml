@@ -32,6 +32,15 @@
         <result column="price" jdbcType="DECIMAL" property="price"/>
     </resultMap>
 
+    <resultMap id="orderPrice" type="com.ruoyi.system.response.CalcOrderPriceResponse">
+        <result column="delivery_type" jdbcType="BOOLEAN" property="deliveryType"/>
+        <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="buy_num" jdbcType="INTEGER" property="buyNum"/>
+        <result column="run_price" jdbcType="DECIMAL" property="runPrice"/>
+        <result column="water_num" jdbcType="DECIMAL" property="waterNum"/>
+        <result column="pay_method" jdbcType="VARCHAR" property="payMethod"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
@@ -230,5 +239,14 @@
     <select id="createOrderCQ" resultType="com.ruoyi.system.response.CQ">
         SELECT f.id, f.user_id userId,f.home_id homeId,o.number, o.goods_id goodId from ft_order f join order_elements o on f.id = o.order_id
         where f.id = #{orderId}
+    </select>
+
+    <select id="getOrderPrice" resultMap="orderPrice">
+        SELECT fo.delivery_type, fo.user_id, oe.number buy_num, fg.price, fg.run_price, su.water_num, fo.pay_method
+        FROM `ft_order` fo
+        left JOIN order_elements oe ON fo.id = oe.order_id
+        LEFT JOIN ft_goods fg ON fg.id = oe.goods_id
+        LEFT JOIN sys_user su ON fo.user_id = su.user_id
+        WHERE fo.id = #{orderId}
     </select>
 </mapper>
