@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -319,7 +321,7 @@ public class FtOrderServiceImpl implements FtOrderService {
     }
 
     @Override
-    public String createOrderCQ(String orderId) {
+    public String createOrderCQ(String orderId) throws UnsupportedEncodingException {
         Long userId = SecurityUtils.getUserId();
 
         FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(Long.valueOf(orderId));
@@ -335,107 +337,138 @@ public class FtOrderServiceImpl implements FtOrderService {
         // 生成二维码
         String body = orderCQ.getId() + "_" + orderCQ.getUserId() + "_" + orderCQ.getHomeId() + "_" + orderCQ.getNumber() + "_" + orderCQ.getGoodId() + "_" + LocalDateTimeUtil.now();
         String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
-        return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encBody;
+        log.info("encBody:{}", encBody);
+        return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(encBody, "UTF-8");
     }
 
     @Override
-    public String checkOrderCQ(String encBody) {
-        // 解密数据
-        String s = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).decryptStr(encBody);
-        String[] split = s.split("_");
+    public String checkOrderCQ(String encBody, String type) {
+        // 判断核销类型 二维码/提货码
+        Integer typer = null;
+        Long operatorId =  SecurityUtils.getUserId();    // 操作员ID
+        Integer usedNum = null;
+        String userId = null;   //ok
+        String orderId = null;  //ok
+        String homeId = null;     // ok
 
-        Long operatorId = SecurityUtils.getUserId();    // 操作员ID
-        long usedNum = Long.parseLong(split[3]);    // 核销数量
+        if ("code".equals(type)) {
+            String[] split = encBody.split("-");
+            orderId = String.valueOf(Integer.parseInt(split[1], 16));
+            Integer goodId = Integer.parseInt(split[2], 16);
+            FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(Long.valueOf(orderId));
+            userId = ftOrder.getUserId().toString();
+            homeId = ftOrder.getHomeId().toString();
+            usedNum = Integer.parseInt(split[3], 16) ;
 
-        // 核销校验-是否已核销
-        FtSale f = ftSaleMapper.checkExist(split[0]);
-        if (f != null) {
-            return "该订单已核销, 非法操作已记录, 用户ID：" + split[0];
+
+
+            // 核销校验-是否已核销
+            FtSale f = ftSaleMapper.checkExist(orderId);
+            if (f != null) {
+                return "该订单已核销, 非法操作已记录, 用户ID：" + userId;
+            }
+
+            // 获取核销类型
+            FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey(goodId.longValue());
+            typer = ftGoods.getTyper();
+
+        }else if ("scan".equals(type)) {
+            String s = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).decryptStr(encBody);
+            String[] split = s.split("_");
+            userId = split[1];
+            orderId = split[0];
+            homeId = split[2];
+            usedNum = Integer.parseInt(split[3]);
+
+            // 核销校验-是否已核销
+            FtSale f = ftSaleMapper.checkExist(orderId);
+            if (f != null) {
+                return "该订单已核销, 非法操作已记录, 用户ID：" + userId;
+            }
+
+            // 获取核销类型
+            FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey(Long.parseLong(split[4]));
+            typer = ftGoods.getTyper();
         }
 
-        // 获取核销类型
-        FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey(Long.parseLong(split[4]));
-        Integer typer = ftGoods.getTyper();
 
         //--------------------水商品 和 空桶商品 核销--------------------
-        SysUser user = userService.selectUserById(Long.parseLong(split[1]));
+        SysUser user = userService.selectUserById(Long.parseLong(userId));
 
         switch (typer) {
             case 0:
-                return "该订单为水票券, 不需要核销, 订单ID：" + split[0];
+                return "该订单为水票券, 不需要核销, 订单ID：" + orderId;
             case 1: // 水核销
                 // 当前楼库存查询
-                FtHome ftHome = ftHomeMapper.selectByPrimaryKey(Long.parseLong(split[2]));
+                FtHome ftHome = ftHomeMapper.selectByPrimaryKey(Long.parseLong(homeId));
                 Integer LocalNumber = ftHome.getNumber();
 
                 if (usedNum > LocalNumber) {
-                    return "核销失败, 当前楼栋剩余水数量不足, 楼栋ID：" + split[2] + ", 剩余数量：" + LocalNumber + ", 核销数量：" + usedNum;
+                    return "核销失败, 当前楼栋剩余水数量不足, 楼栋ID：" + homeId + ", 剩余数量：" + LocalNumber + ", 核销数量：" + usedNum;
                 }
 
                 // 插入核销表
-                FtSale ftSale = new FtSale(split[1], Integer.parseInt(split[0]), operatorId.toString());
+                FtSale ftSale = new FtSale(userId, Integer.parseInt(orderId), operatorId.toString());
                 ftSaleMapper.insertSelective(ftSale);
 
                 // 插入user_goods表
-                UserGoods userGoods = new UserGoods(Long.parseLong(split[1]), Long.parseLong(split[0]), Integer.parseInt(split[3]), false);
+                UserGoods userGoods = new UserGoods(Long.parseLong(userId), Long.parseLong(orderId), usedNum, false);
                 userGoodsMapper.insert(userGoods);
 
                 // 当前楼栋水库存更新
-                ftHome.setNumber(LocalNumber - Integer.parseInt(split[3]));
+                ftHome.setNumber(LocalNumber - usedNum);
                 ftHomeMapper.updateByPrimaryKeySelective(ftHome);
 
                 // 订单状态更新
-                FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(Long.parseLong(split[0]));
+                FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(Long.parseLong(orderId));
                 ftOrder.setStatus(2);
                 ftOrderMapper.updateByPrimaryKey(ftOrder);
 
                 //消息订阅
                 Map<String, Object> data = new HashMap<>();
                 data.put("thing3", new HashMap<String, String>() {{
-                    put("value", "水"); // 替换为具体值
+                    put("value", "水");
                 }});
                 data.put("thing7", new HashMap<String, String>() {{
-                    put("value", "订单核销"); // 替换为具体值
+                    put("value", "核销完成");
                 }});
 
-                //提货地址
-//                String name = homes.stream().filter(h -> h.getId().equals(homeId)).findFirst().orElse(new FtHome()).getName();
-//                String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
                 data.put("thing9", new HashMap<String, String>() {{
-                    put("value", "核销穿进来的地址"); // 替换为具体值
+                    put("value", "您的订单已送达");
                 }});
 
                 //说明
+                Integer finalUsedNum = usedNum;
                 data.put("thing1", new HashMap<String, String>() {{
-                    put("value", "宿管进行订单核销"); // 替换为具体值
+                    put("value", operatorId + " 为 "+ user.getUserId() + " 核销" + finalUsedNum + " 桶水");
                 }});
 
                 data.put("phone_number6", new HashMap<String, String>() {{
-                    put("value", configService.getCacheValue("manage_phone")); // 替换为具体值
+                    put("value", configService.getCacheValue("manage_phone")); // 管理员电话
                 }});
                 WechatUtil.sendSubscriptionMessage(user.getOpenId(), "4", data);
 
-                return "核销水成功, 用户ID：" + split[1] + ", 数量：" + split[3] + ", 订单ID：" + split[0];
+                return "核销水成功, 用户ID：" + usedNum + ", 数量：" + usedNum + ", 订单ID：" + orderId + "&" + usedNum;
             case 2: // 空桶核销
                 // 插入核销表
-                FtSale ftSale1 = new FtSale(split[1], Integer.parseInt(split[0]), operatorId.toString());
+                FtSale ftSale1 = new FtSale(userId, Integer.parseInt(orderId), operatorId.toString());
                 ftSaleMapper.insertSelective(ftSale1);
 
                 // 插入user_goods表
-                UserGoods userGoods1 = new UserGoods(Long.parseLong(split[1]), Long.parseLong(split[0]), Integer.parseInt(split[3]), false);
+                UserGoods userGoods1 = new UserGoods(Long.parseLong(userId), Long.parseLong(orderId), Integer.parseInt(homeId), false);
                 userGoodsMapper.insert(userGoods1);
 
                 // 当前用户空桶数量更新
                 Integer waterNum = user.getWaterNum();
-                user.setWaterNum(waterNum + Integer.parseInt(split[3]));
+                user.setWaterNum(waterNum + Integer.parseInt(homeId));
                 userService.updateUser(user);
 
                 // 订单状态更新
-                FtOrder ftOrder1 = ftOrderMapper.selectByPrimaryKey(Long.parseLong(split[0]));
+                FtOrder ftOrder1 = ftOrderMapper.selectByPrimaryKey(Long.parseLong(orderId));
                 ftOrder1.setStatus(2);
                 ftOrderMapper.updateByPrimaryKey(ftOrder1);
 
-                return "核销空桶成功, 用户ID：" + split[1] + ", 数量：" + split[3] + ", 订单ID：" + split[0];
+                return "核销空桶成功, 用户ID：" + userId+ ", 数量：" + usedNum + ", 订单ID：" + orderId +  "&" + usedNum;
         }
 
         return "暂无核销类型";
@@ -526,6 +559,16 @@ public class FtOrderServiceImpl implements FtOrderService {
     @Override
     public CalcOrderPriceResponse getOrderPrice(Long orderId) {
         return ftOrderMapper.getOrderPrice(orderId);
+    }
+
+    @Override
+    public String getGoodId(String orderId) {
+        return ftOrderMapper.getGoodId(orderId);
+    }
+
+    @Override
+    public String getUseNum(String orderId) {
+        return ftOrderMapper.getUseNum(orderId);
     }
 
     private void checkGoodsNumber(List<Shop> shops, Integer number) {

@@ -283,4 +283,12 @@
           and deleted = 0
 
     </select>
+
+    <select id="getGoodId" resultType="java.lang.String">
+        SELECT oe.goods_id FROM `ft_order` fo left join order_elements oe on fo.id = oe.order_id where fo.id = #{orderId}
+    </select>
+
+    <select id="getUseNum" resultType="java.lang.String">
+        SELECT oe.number FROM `ft_order` fo left join order_elements oe on fo.id = oe.order_id where fo.id = #{orderId}
+    </select>
 </mapper>

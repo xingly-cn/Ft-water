@@ -7,6 +7,7 @@ import com.ruoyi.system.response.CalcOrderPriceResponse;
 import com.ruoyi.system.response.OrderHomeCountResponse;
 import com.ruoyi.system.response.OrderResponse;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -33,11 +34,15 @@ public interface FtOrderService {
 
     List<OrderResponse> getCouponNum(String str);
 
-    String createOrderCQ(String orderId);
+    String createOrderCQ(String orderId) throws UnsupportedEncodingException;
 
-    String checkOrderCQ(String encBody);
+    String checkOrderCQ(String encBody, String type);
 
     List<OrderHomeCountResponse> homeCount(Long userId);
 
     CalcOrderPriceResponse getOrderPrice(Long orderId);
+
+    String getGoodId(String orderId);
+
+    String getUseNum(String orderId);
 }

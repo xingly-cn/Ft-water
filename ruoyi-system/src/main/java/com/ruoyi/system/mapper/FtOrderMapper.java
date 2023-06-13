@@ -38,4 +38,8 @@ public interface FtOrderMapper {
     CalcOrderPriceResponse getOrderPrice(Long orderId);
 
     List<FtOrder> homeCount(Long userId);
+
+    String getGoodId(String orderId);
+
+    String getUseNum(String orderId);
 }
