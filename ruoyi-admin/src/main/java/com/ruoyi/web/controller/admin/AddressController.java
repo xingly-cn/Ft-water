@@ -66,7 +66,7 @@ public class AddressController extends BaseController {
 
     @PostMapping("/default")
     @ApiOperation("设置为默认地址")
-    public AjaxResult updateDefaultAddress(@RequestBody AddressRequest request)
+    public AjaxResult   updateDefaultAddress(@RequestBody AddressRequest request)
     {
         return AjaxResult.success(addressService.updateDefaultAddress(request.getId()));
     }

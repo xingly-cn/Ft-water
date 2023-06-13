@@ -36,4 +36,6 @@ public interface FtOrderMapper {
     CQ createOrderCQ(String orderId);
 
     CalcOrderPriceResponse getOrderPrice(Long orderId);
+
+    List<FtOrder> homeCount(Long userId);
 }

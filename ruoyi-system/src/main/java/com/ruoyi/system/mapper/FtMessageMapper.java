@@ -38,4 +38,6 @@ public interface FtMessageMapper {
     List<MessageResponse> getMessageList(@Param("message") MessageRequest request);
 
     int refuseMessage(Long id);
+
+    List<FtMessage> waterWaiteCount(@Param("userId") Long userId);
 }

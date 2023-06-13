@@ -6,6 +6,7 @@ import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.FtMessage;
 import com.ruoyi.system.domain.FtNotices;
 import com.ruoyi.system.domain.UserHome;
+import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.FtHomeMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.mapper.UserHomeMapper;

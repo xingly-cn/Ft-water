@@ -4,6 +4,7 @@ import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.request.OrderPayRequest;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.CalcOrderPriceResponse;
+import com.ruoyi.system.response.OrderHomeCountResponse;
 import com.ruoyi.system.response.OrderResponse;
 
 import java.util.List;
@@ -35,6 +36,8 @@ public interface FtOrderService {
     String createOrderCQ(String orderId);
 
     String checkOrderCQ(String encBody);
+
+    List<OrderHomeCountResponse> homeCount(Long userId);
 
     CalcOrderPriceResponse getOrderPrice(Long orderId);
 }

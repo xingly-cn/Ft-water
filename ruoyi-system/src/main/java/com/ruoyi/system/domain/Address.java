@@ -22,6 +22,8 @@ public class Address extends BaseEntity {
     @ApiModelProperty(value = "用户唯一标识")
     private Long userId;
 
+    private Long homeId;
+
     @ApiModelProperty(value = "手机号")
     private String phone;
 

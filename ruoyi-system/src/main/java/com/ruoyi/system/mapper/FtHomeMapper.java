@@ -7,6 +7,7 @@ import com.ruoyi.system.response.IndexCountResponse;
 import org.springframework.stereotype.Repository;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,4 +34,8 @@ public interface FtHomeMapper {
 
     List<IndexCountResponse> countIndex(@Param("time") String time,
                                         @Param("schoolIds") List<Long> schoolIds);
+
+    List<FtHome> waterCount(@Param("ids") Set<Long> ids);
+
+    List<FtHome> selectByIds(@Param("ids") Set<Long> homeIds);
 }

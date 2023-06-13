@@ -174,4 +174,8 @@ public class FtMessageServiceImpl implements FtMessageService {
             message.setUserName(userName.substring(0,userName.length()-1));
         }
     }
+
+    public List<FtMessage> waterWaiteCount(Long userId) {
+        return ftMessageMapper.waterWaiteCount(userId);
+    }
 }
