@@ -6,11 +6,13 @@ import cn.hutool.json.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.response.CalcOrderPriceResponse;
 import com.ruoyi.system.service.FtOrderService;
+import com.ruoyi.system.service.ISysUserService;
 import com.ruoyi.system.utils.WxUtils;
 import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
 import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
@@ -58,6 +60,9 @@ public class JsApiPayController {
 
     @Resource
     private FtOrderMapper ftOrderMapper;
+
+    @Resource
+    private ISysUserService sysUserService;
 
     @GetMapping("/createNo")
     @ApiOperation("JSAPI下单")
@@ -164,6 +169,9 @@ public class JsApiPayController {
     @GetMapping("/refund")
     @ApiOperation("退款")
     public AjaxResult refund(String wxNo) throws NotFoundException, IOException, GeneralSecurityException, HttpCodeException {
+
+        Long userId = SecurityUtils.getUserId();
+
         // 自动获取微信证书, 第一次获取证书绕过鉴权
         CertificatesManager instance = CertificatesManager.getInstance();
         String merchantId = "1644099333";
@@ -176,28 +184,42 @@ public class JsApiPayController {
         CloseableHttpClient httpClient = builder.build();
 
         // 构建订单数据
-        HttpPost httpPost = new HttpPost("https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi");
+        HttpPost httpPost = new HttpPost("https://api.mch.weixin.qq.com/v3/refund/domestic/refunds");
         httpPost.addHeader("Accept", "application/json");
         httpPost.addHeader("Content-type", "application/json; charset=utf-8");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectMapper objectMapper = new ObjectMapper();
+
         // 构建微信支付请求体
         ObjectNode rootNode = objectMapper.createObjectNode();
         String refundId = UUID.randomUUID().toString().replaceAll("-", "");
         rootNode.put("out_trade_no", wxNo);
         rootNode.put("out_refund_no",  refundId);
         log.info(wxNo + "发起退款，退款单号：" + refundId);
-        rootNode.put("退款原因",  "空桶退款");
+        rootNode.put("reason",  "空桶退款");
         rootNode.putObject("amount")
                 .put("refund", 1)
                 .put("total", 1)
                 .put("currency", "CNY");
         objectMapper.writeValue(bos, rootNode);
         httpPost.setEntity(new StringEntity(bos.toString("UTF-8"), "UTF-8"));
+
+        log.info("退款请求体 ->" + bos.toString("UTF-8"));
+
         CloseableHttpResponse response = httpClient.execute(httpPost);
         String res = EntityUtils.toString(response.getEntity());
+        log.info("退款回调信息 ->" + res);
         JSONObject jsonObject = new JSONObject(res);
-        log.info("微信支付回调信息 ->" + jsonObject);
+        Object status = jsonObject.get("status");
+        if ("SUCCESS".equals(status)){
+            log.info("退款成功, 将空桶数量-1");
+            SysUser sysUser = sysUserService.selectUserById(userId);
+            sysUser.setBarrelNumber(sysUser.getBarrelNumber() - 1);
+            int i = sysUserService.updateUser(sysUser);
+            if (i == 0){
+                log.error("空桶数量-1失败，管理员请查看");
+            }
+        }
         return AjaxResult.success(jsonObject);
     }
 

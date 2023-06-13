@@ -276,7 +276,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                     }});
                     //提货码
                     data.put("character_string9", new HashMap<String, String>() {{
-                        put("value", "Y-108"); // 提货码
+                        put("value", "小程序查看提货码"); // 提货码
                     }});
                     WechatUtil.sendSubscriptionMessage(user.getOpenId(),"3",data);
                     break;
