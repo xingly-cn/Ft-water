@@ -129,7 +129,7 @@
             <if test="manageUserId != null">
                 manage_user_id,
             </if>
-                create_time,
+            create_time,
             <if test="deliveryTime != null">
                 delivery_time,
             </if>
@@ -236,7 +236,7 @@
             and (
                     fg.title like concat('%', #{order.keyword}, '%')
                     or fu.user_name like concat('%', #{order.keyword}, '%')
-                    or fu.phonenumber = #{order.keyword}
+                    or fu.phonenumber like concat('%', #{order.keyword}, '%')
                 )
         </if>
 
@@ -244,21 +244,23 @@
             and a.id = #{order.addressId}
         </if>
 
-        <if test="order.userId != null">
-            and fo.user_id = #{order.userId}
+        <if test="order.userId != null and order.manageUserId != null and order.deliveryType==null ">
+            and (fo.user_id = #{order.userId} or find_in_set(#{order.manageUserId}, fo.manage_user_id))
+        </if>
+
+        <if test="order.deliveryType != null">
+            and fo.delivery_type = #{order.deliveryType}
         </if>
 
         <if test="order.status != null">
             and fo.status = #{order.status}
         </if>
-        <if test="order.manageUserId != null">
-            and find_in_set(#{order.manageUserId}, fo.manage_user_id)
-        </if>
+
         order by fo.id desc
     </select>
 
-    <select id="createOrderCQ" resultType="com.ruoyi.system.response.CQ">
-        SELECT f.id, f.user_id userId, f.home_id homeId, o.number, o.goods_id goodId
+    <select id="createOrderCQ" resultType="com.ruoyi.system.response.OrderResponse">
+        SELECT f.id, f.user_id userId, f.home_id homeId,f.address_id addressId, o.number, o.goods_id goodId
         from ft_order f
                  join order_elements o on f.id = o.order_id
         where f.id = #{orderId}
@@ -281,7 +283,6 @@
         where status in (1, 2)
           and find_in_set(#{userId}, manage_user_id)
           and deleted = 0
-
     </select>
 
     <select id="getGoodId" resultType="java.lang.String">

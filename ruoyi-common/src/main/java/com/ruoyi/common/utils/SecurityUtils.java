@@ -29,6 +29,18 @@ public class SecurityUtils
         }
     }
 
+    public static String getUserIdStr()
+    {
+        try
+        {
+            return String.valueOf(getLoginUser().getUserId());
+        }
+        catch (Exception e)
+        {
+            throw new ServiceException("获取用户ID异常", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
     public static String getOpenId()
     {
         try

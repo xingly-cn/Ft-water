@@ -172,6 +172,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         if (order.getFlag().equals(true)) {
             //小程序端
             order.setUserId(SecurityUtils.getUserId());
+            order.setManageUserId(SecurityUtils.getUserIdStr());
         }
         return ftOrderMapper.selectList(order);
     }
@@ -238,7 +239,7 @@ public class FtOrderServiceImpl implements FtOrderService {
 
                     // 增加用户水票
                     user.setWaterNum(user.getWaterNum() + number);
-                   userService.updateUser(user);
+                    userService.updateUser(user);
                     break;
                 case 1:
                     //商品 = 水
@@ -247,14 +248,14 @@ public class FtOrderServiceImpl implements FtOrderService {
                     if ("coupon".equals(ftOrder.getPayMethod())) {
                         log.info("用户水票为：" + user.getWaterNum() + " 购买水数：" + number);
                         user.setWaterNum(user.getWaterNum() - number);
-                    }else if ("mixed".equals(ftOrder.getPayMethod())) {
+                    } else if ("mixed".equals(ftOrder.getPayMethod())) {
                         user.setWaterNum(0);
                     }
                     userService.updateUser(user);
 
                     //发送消息 给对应宿管
                     log.info("水 - number:{}", number);
-                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false,1);
+                    homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false, 1);
                     //消息订阅
                     Map<String, Object> data = new HashMap<>();
 
@@ -278,12 +279,15 @@ public class FtOrderServiceImpl implements FtOrderService {
                     data.put("character_string9", new HashMap<String, String>() {{
                         put("value", "小程序查看提货码"); // 提货码
                     }});
-                    WechatUtil.sendSubscriptionMessage(user.getOpenId(),"3",data);
+                    WechatUtil.sendSubscriptionMessage(user.getOpenId(), "3", data);
                     break;
                 case 2:
                     // 空桶
                     //发送消息 给对应宿管
                     log.info("桶 - number:{}", number);
+                    // 增加用户空桶
+                    user.setWaterNum(user.getBarrelNumber() + number);
+                    userService.updateUser(user);
                     homeService.sendMessageAndNotices(homeId, user.getUserId(), false, 0, number, true, 2);
                     break;
                 default:
@@ -296,8 +300,6 @@ public class FtOrderServiceImpl implements FtOrderService {
         OrderRequest orderRequest = new OrderRequest();
         BeanUtils.copyProperties(ftOrder, orderRequest);
         //支付之后
-        //todo 收货的时候需要根据type=3的商品来增加用户的空桶数量
-//        userMapper.updateWaterNumberById(user.getUserId(), number);
 
         return updateOrder(orderRequest);
     }
@@ -334,9 +336,18 @@ public class FtOrderServiceImpl implements FtOrderService {
             return "订单不属于当前用户, 非法操作已记录 ";
         }
 
-        CQ orderCQ = ftOrderMapper.createOrderCQ(orderId);
+        OrderResponse response = ftOrderMapper.createOrderCQ(orderId);
+        //orderCQ.getHomeId() 俩种
+        Long homeId = response.getHomeId();
+        if (response.getDeliveryType().equals("goDoor")) {
+            //配送
+            //todo address
+            Address address = addressMapper.selectByPrimaryKey(response.getAddressId());
+            homeId = address.getHomeId();
+        }
+
         // 生成二维码
-        String body = orderCQ.getId() + "_" + orderCQ.getUserId() + "_" + orderCQ.getHomeId() + "_" + orderCQ.getNumber() + "_" + orderCQ.getGoodId() + "_" + LocalDateTimeUtil.now();
+        String body = response.getId() + "_" + response.getUserId() + "_" + homeId + "_" + response.getNumber() + "_" + response.getGoodId() + "_" + LocalDateTimeUtil.now();
         String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
         log.info("encBody:{}", encBody);
         return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(encBody, "UTF-8");
@@ -346,7 +357,7 @@ public class FtOrderServiceImpl implements FtOrderService {
     public String checkOrderCQ(String encBody, String type) {
         // 判断核销类型 二维码/提货码
         Integer typer = null;
-        Long operatorId =  SecurityUtils.getUserId();    // 操作员ID
+        Long operatorId = SecurityUtils.getUserId();    // 操作员ID
         Integer usedNum = null;
         String userId = null;   //ok
         String orderId = null;  //ok
@@ -355,13 +366,11 @@ public class FtOrderServiceImpl implements FtOrderService {
         if ("code".equals(type)) {
             String[] split = encBody.split("-");
             orderId = String.valueOf(Integer.parseInt(split[1], 16));
-            Integer goodId = Integer.parseInt(split[2], 16);
+            int goodId = Integer.parseInt(split[2], 16);
             FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(Long.valueOf(orderId));
             userId = ftOrder.getUserId().toString();
             homeId = ftOrder.getHomeId().toString();
-            usedNum = Integer.parseInt(split[3], 16) ;
-
-
+            usedNum = Integer.parseInt(split[3], 16);
 
             // 核销校验-是否已核销
             FtSale f = ftSaleMapper.checkExist(orderId);
@@ -370,10 +379,10 @@ public class FtOrderServiceImpl implements FtOrderService {
             }
 
             // 获取核销类型
-            FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey(goodId.longValue());
+            FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey((long) goodId);
             typer = ftGoods.getTyper();
 
-        }else if ("scan".equals(type)) {
+        } else if ("scan".equals(type)) {
             String s = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).decryptStr(encBody);
             String[] split = s.split("_");
             userId = split[1];
@@ -391,7 +400,6 @@ public class FtOrderServiceImpl implements FtOrderService {
             FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey(Long.parseLong(split[4]));
             typer = ftGoods.getTyper();
         }
-
 
         //--------------------水商品 和 空桶商品 核销--------------------
         SysUser user = userService.selectUserById(Long.parseLong(userId));
@@ -425,6 +433,9 @@ public class FtOrderServiceImpl implements FtOrderService {
                 ftOrder.setStatus(2);
                 ftOrderMapper.updateByPrimaryKey(ftOrder);
 
+                List<FtHome> homes = homeService.getHomes();
+                String topName = homeService.getTopHome(homes, Long.valueOf(homeId)).getName();
+
                 //消息订阅
                 Map<String, Object> data = new HashMap<>();
                 data.put("thing3", new HashMap<String, String>() {{
@@ -435,13 +446,13 @@ public class FtOrderServiceImpl implements FtOrderService {
                 }});
 
                 data.put("thing9", new HashMap<String, String>() {{
-                    put("value", "您的订单已送达");
+                    put("value", topName + "/" + ftHome.getName());
                 }});
 
                 //说明
                 Integer finalUsedNum = usedNum;
                 data.put("thing1", new HashMap<String, String>() {{
-                    put("value", operatorId + " 为 "+ user.getUserId() + " 核销" + finalUsedNum + " 桶水");
+                    put("value", operatorId + " 为 " + user.getUserId() + " 核销" + finalUsedNum + " 桶水");
                 }});
 
                 data.put("phone_number6", new HashMap<String, String>() {{
@@ -469,7 +480,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                 ftOrder1.setStatus(2);
                 ftOrderMapper.updateByPrimaryKey(ftOrder1);
 
-                return "核销空桶成功, 用户ID：" + userId+ ", 数量：" + usedNum + ", 订单ID：" + orderId +  "&" + usedNum;
+                return "核销空桶成功, 用户ID：" + userId + ", 数量：" + usedNum + ", 订单ID：" + orderId + "&" + usedNum;
         }
 
         return "暂无核销类型";
@@ -518,7 +529,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                     }
                     Long homeId = addresses.stream().filter(h -> h.getId().equals(ok)).findFirst().orElse(new Address()).getHomeId();
 
-                    assembleHomeCountResponse(responses, homes, ov, homeId,waterCountMap,waterWaiteCountMap);
+                    assembleHomeCountResponse(responses, homes, ov, homeId, waterCountMap, waterWaiteCountMap);
                 });
             }
         });
@@ -530,8 +541,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                                            List<FtOrder> ov,
                                            Long homeId,
                                            Map<Long, Integer> waterCountMap,
-                                           Map<Long, Integer> waterWaiteCountMap)
-    {
+                                           Map<Long, Integer> waterWaiteCountMap) {
         if (CollectionUtils.isNotEmpty(responses)) {
             if (responses.stream().anyMatch(r -> r.getHomeId().equals(homeId))) {
                 responses.stream()

@@ -2,7 +2,6 @@ package com.ruoyi.system.mapper;
 
 import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.request.OrderRequest;
-import com.ruoyi.system.response.CQ;
 import com.ruoyi.system.response.CalcOrderPriceResponse;
 import com.ruoyi.system.response.OrderResponse;
 import org.apache.ibatis.annotations.Param;
@@ -33,7 +32,7 @@ public interface FtOrderMapper {
 
     List<OrderResponse> selectList(@Param("order") OrderRequest order);
 
-    CQ createOrderCQ(String orderId);
+    OrderResponse createOrderCQ(String orderId);
 
     CalcOrderPriceResponse getOrderPrice(Long orderId);
 

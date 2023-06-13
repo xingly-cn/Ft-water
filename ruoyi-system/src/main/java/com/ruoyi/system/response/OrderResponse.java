@@ -1,6 +1,7 @@
 package com.ruoyi.system.response;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ruoyi.system.domain.FtOrder;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -39,4 +40,10 @@ public class OrderResponse extends FtOrder {
     private Long schoolId;
 
     private List<OrderElementsResponse> orderElementsResponses;
+
+    @JsonInclude
+    private Integer number;
+
+    @JsonInclude
+    private Integer goodId;
 }
