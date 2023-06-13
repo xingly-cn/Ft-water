@@ -478,9 +478,12 @@ public class FtOrderServiceImpl implements FtOrderService {
             String topName = homeService.getTopHome(homes, Long.valueOf(homeId)).getName();
             //消息订阅
             Map<String, Object> data = new HashMap<>();
+
+            Integer finalTyper = typer;
             data.put("thing3", new HashMap<String, String>() {{
-                put("value", "水");
+                put("value", finalTyper == 1 ? "水" : "空桶");
             }});
+
             data.put("thing7", new HashMap<String, String>() {{
                 put("value", "您的订单已送达");
             }});
