@@ -29,4 +29,10 @@ public class OrderRequest extends FtOrder {
     private List<Shop> shops;
 
     private String payType;
+
+    private String startTime;
+
+    private String endTime;
+
+    private Integer typer;
 }

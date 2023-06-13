@@ -27,6 +27,7 @@ import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -196,7 +197,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         // 查询用户
         Long userId = SecurityUtils.getUserId();
         SysUser user = userService.selectUserById(userId);
-        log.info("user ->" + user);
+//        log.info("user ->" + user);
 
 
         // 查出订单信息
@@ -243,13 +244,20 @@ public class FtOrderServiceImpl implements FtOrderService {
             switch (type) {
                 case 0:
                     // 套餐 = 水票
-                    log.info("水漂 - number:{}", number);
+                    log.info("套餐 - number:{}", number);
                     ftOrder.setStatus(2);
                     //async 水漂 其他 是 核销之后 入这个表
                     addUserGoods(shopList, user.getUserId());
-
+                    AtomicInteger waterNum = new AtomicInteger();
+                    goodsResponses.forEach(goodsResponse -> {
+                        //校验
+                        if (number > goodsResponse.getMinNum() && number < goodsResponse.getMaxNum()) {
+                            log.info("套餐赠送水票 - number:{}", goodsResponse.getWaterNum());
+                            waterNum.set(goodsResponse.getWaterNum());
+                        }
+                    });
                     // 增加用户水票
-                    user.setWaterNum(user.getWaterNum() + number);
+                    user.setWaterNum(user.getWaterNum() + waterNum.get());
                     userService.updateUser(user);
                     break;
                 case 1:
@@ -297,7 +305,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                     //发送消息 给对应宿管
                     log.info("桶 - number:{}", number);
                     // 增加用户空桶
-                    user.setWaterNum(user.getBarrelNumber() + number);
+                    user.setBarrelNumber(user.getBarrelNumber() + number);
                     userService.updateUser(user);
                     homeService.sendMessageAndNotices(homeId, user.getUserId(), false, 0, number, true, 2);
                     break;

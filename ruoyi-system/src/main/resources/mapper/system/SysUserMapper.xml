@@ -301,6 +301,9 @@
         <if test="waterNum != null">
             water_num,
         </if>
+        <if test="barrelNumber != null">
+            barrel_number,
+        </if>
         <if test="dormType != null">
             dorm_type,
         </if>
@@ -351,6 +354,9 @@
         </if>
         <if test="waterNum != null">
             #{waterNum},
+        </if>
+        <if test="barrelNumber != null">
+            #{barrelNumber},
         </if>
         <if test="dormType != null">
             #{dormType},
@@ -408,6 +414,9 @@
             </if>
             <if test="waterNum != null">
                 water_num = #{waterNum},
+            </if>
+            <if test="barrelNumber != null">
+                barrel_number = #{barrelNumber},
             </if>
             <if test="dormType != null">
                 dorm_type = #{dormType},

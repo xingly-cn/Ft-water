@@ -76,6 +76,7 @@
                fu.user_name   as user_name,
                fu.phonenumber as user_phone,
                fg.title       as goods_name,
+               fg.typer,
                fg.price,
                a.address,
                oe.goods_id,
@@ -208,7 +209,10 @@
                 delivery_time = #{deliveryTime,jdbcType=TIMESTAMP},
             </if>
             <if test="total != null">
-                total = #{total,jdbcType=DECIMAL}
+                total = #{total,jdbcType=DECIMAL},
+            </if>
+            <if test="wxno != null and wxno != ''">
+                wxno = #{wxno,jdbcType=VARCHAR},
             </if>
         </set>
         where id = #{id}
@@ -245,7 +249,7 @@
             and a.id = #{order.addressId}
         </if>
 
-        <if test="order.userId != null and order.manageUserId != null and order.deliveryType==null ">
+        <if test="order.userId != null and order.manageUserId != null and order.deliveryType!='goDoor' ">
             and (fo.user_id = #{order.userId} or find_in_set(#{order.manageUserId}, fo.manage_user_id))
         </if>
 
@@ -255,6 +259,14 @@
 
         <if test="order.status != null">
             and fo.status = #{order.status}
+        </if>
+
+        <if test="order.startTime != null and order.endTime != null">
+            and fo.create_time between #{order.startTime} and #{order.endTime}
+        </if>
+
+        <if test="order.typer != null">
+            and fg.typer = #{order.typer}
         </if>
 
         order by fo.id desc

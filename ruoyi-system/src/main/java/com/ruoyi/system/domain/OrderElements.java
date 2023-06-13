@@ -23,6 +23,7 @@ public class OrderElements {
     private Integer number;
 
     private String payMethod;
+
     private String deliveryType;
 
     @Tolerate
