@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.system.domain.FtOrder;
+import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.response.CalcOrderPriceResponse;
 import com.ruoyi.system.service.FtOrderService;
 import com.ruoyi.system.utils.WxUtils;
@@ -54,6 +56,9 @@ public class JsApiPayController {
     @Resource
     private FtOrderService ftOrderService;
 
+    @Resource
+    private FtOrderMapper ftOrderMapper;
+
     @GetMapping("/createNo")
     @ApiOperation("JSAPI下单")
     public AjaxResult createPay(Long orderId) throws NotFoundException, IOException, GeneralSecurityException, HttpCodeException {
@@ -79,8 +84,11 @@ public class JsApiPayController {
         ObjectMapper objectMapper = new ObjectMapper();
 
         // 计算价格
+        log.info("订单数据 -> 开始");
+
         CalcOrderPriceResponse orderPrice = ftOrderService.getOrderPrice(orderId);
         log.info("订单数据 ->" + orderPrice.toString());
+
 
         int price = 0;
 
@@ -97,11 +105,8 @@ public class JsApiPayController {
                 price = (int) (waterPrice.doubleValue() * 100) * buyNum;
                 break;
             case "coupon":
-                JSONObject resData = new JSONObject();
-                resData.put("price", 0);
-                resData.put("success", "ok");
-                resData.put("payMethod", payMethod);
-                return AjaxResult.success(resData); // 调用老罗的 order/pay 完成支付后的相关操作，如优惠券扣除，发送通知，订单状态变更等
+                log.info(orderId + " -> 执行优惠券支付, 仍需计算配送费");
+                break;
             case "mixed":
                 int newNum = buyNum - waterNum; // 优惠券抵扣后, 还需支付的水票数量
                 price += (int) (waterPrice.doubleValue() * 100) * newNum;
@@ -115,6 +120,19 @@ public class JsApiPayController {
 
         log.info("订单价格 ->" + price);
 
+        // 回写金额到数据库
+        FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(orderId);
+        if (price == 0) {
+            ftOrder.setTotal(BigDecimal.ZERO);
+        }else {
+            ftOrder.setTotal(BigDecimal.valueOf(price*1.0/100));
+        }
+        int i = ftOrderMapper.updateByPrimaryKeySelective(ftOrder);
+
+        if (price == 0 && "selfGet".equals(deliveryType)){
+            log.info("订单金额为0, 直接返回成功");
+            return AjaxResult.success();
+        }
 
         // 构建微信支付请求体
         ObjectNode rootNode = objectMapper.createObjectNode();
@@ -138,9 +156,8 @@ public class JsApiPayController {
 
         JSONObject resData = new JSONObject();
         resData.put("prepay_id", jsonObject.get("prepay_id"));
-        resData.put("price", price * 1.0 / 100);
-        resData.put("success", "ok");
         resData.put("payMethod", payMethod);
+        resData.put("wx_no", wx_no);
         return AjaxResult.success(resData);
     }
 
@@ -172,6 +189,6 @@ public class JsApiPayController {
         payMap.put("package", pack);
         payMap.put("signType", "RSA");
 
-        return AjaxResult.success(payMap);
+        return AjaxResult.success(payMap);   // 调用老罗的 order/pay 完成支付后的相关操作，如优惠券扣除，发送通知，订单状态变更等
     }
 }
