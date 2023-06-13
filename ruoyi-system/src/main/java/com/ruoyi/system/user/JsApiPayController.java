@@ -161,6 +161,46 @@ public class JsApiPayController {
         return AjaxResult.success(resData);
     }
 
+    @GetMapping("/refund")
+    @ApiOperation("退款")
+    public AjaxResult refund(String wxNo) throws NotFoundException, IOException, GeneralSecurityException, HttpCodeException {
+        // 自动获取微信证书, 第一次获取证书绕过鉴权
+        CertificatesManager instance = CertificatesManager.getInstance();
+        String merchantId = "1644099333";
+        String serialNumber = "43D14D8650152DE650A0F83F87017298C3D1372B";
+        String apiV3Key = "NorthWeixinPayZhiDuoXing12345678";
+        String wechatAppId = "wx0c0ff097756fc774";
+        instance.putMerchant(merchantId, new WechatPay2Credentials(merchantId, new PrivateKeySigner(serialNumber, WxUtils.getPrivateKey())), apiV3Key.getBytes(StandardCharsets.UTF_8));
+        Verifier verifier = instance.getVerifier(merchantId);
+        WechatPayHttpClientBuilder builder = WechatPayHttpClientBuilder.create().withMerchant(merchantId, serialNumber, WxUtils.getPrivateKey()).withValidator(new WechatPay2Validator(verifier));
+        CloseableHttpClient httpClient = builder.build();
+
+        // 构建订单数据
+        HttpPost httpPost = new HttpPost("https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi");
+        httpPost.addHeader("Accept", "application/json");
+        httpPost.addHeader("Content-type", "application/json; charset=utf-8");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectMapper objectMapper = new ObjectMapper();
+        // 构建微信支付请求体
+        ObjectNode rootNode = objectMapper.createObjectNode();
+        String refundId = UUID.randomUUID().toString().replaceAll("-", "");
+        rootNode.put("out_trade_no", wxNo);
+        rootNode.put("out_refund_no",  refundId);
+        log.info(wxNo + "发起退款，退款单号：" + refundId);
+        rootNode.put("退款原因",  "空桶退款");
+        rootNode.putObject("amount")
+                .put("refund", 1)
+                .put("total", 1)
+                .put("currency", "CNY");
+        objectMapper.writeValue(bos, rootNode);
+        httpPost.setEntity(new StringEntity(bos.toString("UTF-8"), "UTF-8"));
+        CloseableHttpResponse response = httpClient.execute(httpPost);
+        String res = EntityUtils.toString(response.getEntity());
+        JSONObject jsonObject = new JSONObject(res);
+        log.info("微信支付回调信息 ->" + jsonObject);
+        return AjaxResult.success(jsonObject);
+    }
+
 
     @ApiOperation("paySign")
     @GetMapping("wakePay")

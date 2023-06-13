@@ -292,6 +292,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         });
 
         ftOrder.setPayed(true);
+        ftOrder.setWxno(request.getWxNo());
         OrderRequest orderRequest = new OrderRequest();
         BeanUtils.copyProperties(ftOrder, orderRequest);
         //支付之后
