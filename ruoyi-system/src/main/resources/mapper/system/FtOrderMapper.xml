@@ -233,11 +233,12 @@
           and fg.deleted = 0
           and fu.del_flag = 0
         <if test="order.keyword != null and order.keyword != ''">
-            and (
+        and (
                     fg.title like concat('%', #{order.keyword}, '%')
-                    or fu.user_name like concat('%', #{order.keyword}, '%')
-                    or fu.phonenumber like concat('%', #{order.keyword}, '%')
-                )
+                or fu.user_name like concat('%', #{order.keyword}, '%')
+                or fu.phonenumber like concat('%', #{order.keyword}, '%')
+                or a.address like concat('%', #{order.keyword}, '%')
+            )
         </if>
 
         <if test="order.addressId != null">
@@ -260,7 +261,13 @@
     </select>
 
     <select id="createOrderCQ" resultType="com.ruoyi.system.response.OrderResponse">
-        SELECT f.id, f.user_id userId, f.home_id homeId,f.address_id addressId, o.number, o.goods_id goodId
+        SELECT f.id,
+               f.user_id       userId,
+               f.home_id       homeId,
+               f.address_id    addressId,
+               f.delivery_type deliveryType,
+               o.number,
+               o.goods_id      goodId
         from ft_order f
                  join order_elements o on f.id = o.order_id
         where f.id = #{orderId}

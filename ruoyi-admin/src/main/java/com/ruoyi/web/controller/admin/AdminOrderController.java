@@ -46,7 +46,7 @@ public class AdminOrderController extends BaseController {
         Integer goodId = Integer.valueOf(orderService.getGoodId(orderId));
         Integer useNum = Integer.valueOf(orderService.getUseNum(orderId));
         res.put("encBody", orderService.createOrderCQ(orderId));
-        String prefex = String.valueOf('f' + goodId + 't' + useNum);
+//        String prefex = String.valueOf('f' + goodId + 't' + useNum);
         res.put("getCode", dict[index - 1] + "-" + Integer.toHexString(Integer.parseInt(orderId))  + "-" + Integer.toHexString(goodId) + "-" + Integer.toHexString(useNum));
         return AjaxResult.success(res);
     }

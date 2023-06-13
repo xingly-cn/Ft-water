@@ -174,7 +174,18 @@ public class FtOrderServiceImpl implements FtOrderService {
             order.setUserId(SecurityUtils.getUserId());
             order.setManageUserId(SecurityUtils.getUserIdStr());
         }
-        return ftOrderMapper.selectList(order);
+        List<OrderResponse> responses = ftOrderMapper.selectList(order);
+        if (CollectionUtils.isNotEmpty(responses)) {
+            List<FtHome> homes = homeService.getHomes();
+            responses.forEach(response -> {
+                if (response.getDeliveryType().equals("selfGet")) {
+                    //自提
+                    String name = homes.stream().filter(f -> f.getId().equals(response.getHomeId())).findFirst().orElse(new FtHome()).getName();
+                    response.setHomeName(homeService.getTopHome(homes, response.getHomeId()).getName() + "/" + name);
+                }
+            });
+        }
+        return responses;
     }
 
     @Override
@@ -363,6 +374,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         String orderId = null;  //ok
         String homeId = null;     // ok
 
+
         if ("code".equals(type)) {
             String[] split = encBody.split("-");
             orderId = String.valueOf(Integer.parseInt(split[1], 16));
@@ -401,15 +413,17 @@ public class FtOrderServiceImpl implements FtOrderService {
             typer = ftGoods.getTyper();
         }
 
+        String result = null;
+
         //--------------------水商品 和 空桶商品 核销--------------------
         SysUser user = userService.selectUserById(Long.parseLong(userId));
+        FtHome ftHome = ftHomeMapper.selectByPrimaryKey(Long.parseLong(homeId));
 
         switch (typer) {
             case 0:
                 return "该订单为水票券, 不需要核销, 订单ID：" + orderId;
             case 1: // 水核销
                 // 当前楼库存查询
-                FtHome ftHome = ftHomeMapper.selectByPrimaryKey(Long.parseLong(homeId));
                 Integer LocalNumber = ftHome.getNumber();
 
                 if (usedNum > LocalNumber) {
@@ -433,35 +447,10 @@ public class FtOrderServiceImpl implements FtOrderService {
                 ftOrder.setStatus(2);
                 ftOrderMapper.updateByPrimaryKey(ftOrder);
 
-                List<FtHome> homes = homeService.getHomes();
-                String topName = homeService.getTopHome(homes, Long.valueOf(homeId)).getName();
-
-                //消息订阅
-                Map<String, Object> data = new HashMap<>();
-                data.put("thing3", new HashMap<String, String>() {{
-                    put("value", "水");
-                }});
-                data.put("thing7", new HashMap<String, String>() {{
-                    put("value", "核销完成");
-                }});
-
-                data.put("thing9", new HashMap<String, String>() {{
-                    put("value", topName + "/" + ftHome.getName());
-                }});
-
-                //说明
-                Integer finalUsedNum = usedNum;
-                data.put("thing1", new HashMap<String, String>() {{
-                    put("value", operatorId + " 为 " + user.getUserId() + " 核销" + finalUsedNum + " 桶水");
-                }});
-
-                data.put("phone_number6", new HashMap<String, String>() {{
-                    put("value", configService.getCacheValue("manage_phone")); // 管理员电话
-                }});
-                WechatUtil.sendSubscriptionMessage(user.getOpenId(), "4", data);
-
-                return "核销水成功, 用户ID：" + usedNum + ", 数量：" + usedNum + ", 订单ID：" + orderId + "&" + usedNum;
-            case 2: // 空桶核销
+                result = "核销水成功, 用户ID：" + usedNum + ", 数量：" + usedNum + ", 订单ID：" + orderId + "&" + usedNum;
+                break;
+            case 2:
+                // 空桶核销
                 // 插入核销表
                 FtSale ftSale1 = new FtSale(userId, Integer.parseInt(orderId), operatorId.toString());
                 ftSaleMapper.insertSelective(ftSale1);
@@ -480,10 +469,38 @@ public class FtOrderServiceImpl implements FtOrderService {
                 ftOrder1.setStatus(2);
                 ftOrderMapper.updateByPrimaryKey(ftOrder1);
 
-                return "核销空桶成功, 用户ID：" + userId + ", 数量：" + usedNum + ", 订单ID：" + orderId + "&" + usedNum;
+                result = "核销空桶成功, 用户ID：" + userId + ", 数量：" + usedNum + ", 订单ID：" + orderId + "&" + usedNum;
+                break;
         }
 
-        return "暂无核销类型";
+        if (typer == 1 || typer == 2) {
+            List<FtHome> homes = homeService.getHomes();
+            String topName = homeService.getTopHome(homes, Long.valueOf(homeId)).getName();
+            //消息订阅
+            Map<String, Object> data = new HashMap<>();
+            data.put("thing3", new HashMap<String, String>() {{
+                put("value", "水");
+            }});
+            data.put("thing7", new HashMap<String, String>() {{
+                put("value", "您的订单已送达");
+            }});
+
+            data.put("thing9", new HashMap<String, String>() {{
+                put("value", topName + "/" + ftHome.getName());
+            }});
+
+            //说明
+            data.put("thing1", new HashMap<String, String>() {{
+                put("value", "交易成功");
+            }});
+
+            data.put("phone_number6", new HashMap<String, String>() {{
+                put("value", configService.getCacheValue("manage_phone")); // 管理员电话
+            }});
+            WechatUtil.sendSubscriptionMessage(user.getOpenId(), "4", data);
+        }
+
+        return result;
     }
 
     @Override
