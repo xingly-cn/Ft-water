@@ -9,6 +9,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +43,12 @@ public class FtOrder extends BaseEntity implements Serializable {
     private Long userId;
 
     private Long homeId;
+
+    @ApiModelProperty(value = "总金额")
+    private BigDecimal total;
+
+    @ApiModelProperty(value = "微信支付订单号")
+    private String wxno;
 
     @ApiModelProperty(value = "0待付款 1代取货 2已取货")
     private Integer status;

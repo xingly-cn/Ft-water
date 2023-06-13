@@ -3,6 +3,7 @@ package com.ruoyi.system.user;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
+import com.ruoyi.system.request.OrderPayRequest;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;
@@ -54,16 +55,16 @@ public class OrderController extends BaseController {
         return AjaxResult.success(orderService.selectOrderList(order));
     }
 
-//    @DeleteMapping("/remove")
-//    @ApiOperation("删除订单")
+    @DeleteMapping("/remove")
+    @ApiOperation("删除订单")
     public AjaxResult delete(Long id) {
         return AjaxResult.success(orderService.deleteByPrimaryKey(id));
     }
 
     @PostMapping("/pay")
     @ApiOperation("支付后订单操作")
-    public AjaxResult payOrder(Long id) {
-        return AjaxResult.success(orderService.payOrder(id));
+    public AjaxResult payOrder(OrderPayRequest request) {
+        return AjaxResult.success(orderService.payOrder(request));
     }
 
     @GetMapping("/detail")

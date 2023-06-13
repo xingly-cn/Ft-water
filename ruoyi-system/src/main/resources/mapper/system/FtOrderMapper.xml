@@ -18,6 +18,7 @@
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="user_name" jdbcType="BIGINT" property="userName"/>
         <result column="user_phone" jdbcType="BIGINT" property="userPhone"/>
+        <result column="total" jdbcType="DECIMAL" property="total"/>
         <collection property="orderElementsResponses"
                     javaType="java.util.List" resultMap="elements"/>
     </resultMap>
@@ -52,6 +53,7 @@
         pay_method,
         delivery_type,
         delivery_time,
+        total,
         deleted,
         create_time
     </sql>
@@ -65,6 +67,7 @@
                fo.status,
                fo.pay_method,
                fo.delivery_type,
+               fo.total,
                fo.delivery_time,
                fo.user_id,
                fu.user_name   as user_name,
@@ -100,10 +103,10 @@
     <insert id="insert" parameterType="com.ruoyi.system.domain.FtOrder">
         <!--@mbg.generated-->
         insert into ft_order (address_id, status,user_id,home_id,
-                              create_time, payed, pay_method, delivery_type,delivery_time)
+                              create_time, payed, pay_method, delivery_type,delivery_time, total)
         values (#{addressId,jdbcType=BIGINT},
                 #{status,jdbcType=INTEGER},#{userId,jdbcType=BIGINT},#{homeId,jdbcType=BIGINT},
-                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR}, #{deliveryType,jdbcType=VARCHAR},#{deliveryTime,jdbcType=TIMESTAMP})
+                now(), #{payed,jdbcType=BOOLEAN}, #{payMethod,jdbcType=VARCHAR}, #{deliveryType,jdbcType=VARCHAR},#{deliveryTime,jdbcType=TIMESTAMP}, #{total,jdbcType=DECIMAL})
     </insert>
 
     <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
@@ -137,6 +140,9 @@
                 delivery_type,
             </if>
             update_time,
+            <if test="total != null">
+                total
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="userId != null">
@@ -165,6 +171,9 @@
                 #{deliveryType,jdbcType=VARCHAR},
             </if>
             now(),
+            <if test="total != null">
+                #{total,jdbcType=DECIMAL}
+            </if>
         </trim>
     </insert>
 
@@ -193,6 +202,9 @@
             <if test="deliveryTime != null">
                 delivery_time = #{deliveryTime,jdbcType=TIMESTAMP},
             </if>
+            <if test="total != null">
+                total = #{total,jdbcType=DECIMAL}
+            </if>
         </set>
         where id = #{id}
     </update>
@@ -205,7 +217,8 @@
             payed     = #{payed,jdbcType=BOOLEAN},
             status    = #{status,jdbcType=INTEGER},
             pay_method = #{payMethod,jdbcType=VARCHAR},
-            delivery_type = #{deliveryType,jdbcType=VARCHAR}
+            delivery_type = #{deliveryType,jdbcType=VARCHAR},
+            total = #{total,jdbcType=DECIMAL}
         where id = #{id}
     </update>
 

@@ -1,6 +1,7 @@
 package com.ruoyi.system.service;
 
 import com.ruoyi.system.domain.FtOrder;
+import com.ruoyi.system.request.OrderPayRequest;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.CalcOrderPriceResponse;
 import com.ruoyi.system.response.OrderResponse;
@@ -25,7 +26,7 @@ public interface FtOrderService {
 
     List<OrderResponse> selectOrderList(OrderRequest order);
 
-    Boolean payOrder(Long id);
+    Boolean payOrder(OrderPayRequest request);
 
     List<OrderResponse> searchByPhone(String phone);
 

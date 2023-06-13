@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.ruoyi.common.core.domain.entity.SysUser;
@@ -8,10 +9,10 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.*;
 import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.*;
+import com.ruoyi.system.request.OrderPayRequest;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.*;
 import com.ruoyi.system.service.FtOrderService;
-import com.ruoyi.system.utils.DateUtils;
 import com.ruoyi.system.utils.WechatUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -135,20 +136,30 @@ public class FtOrderServiceImpl implements FtOrderService {
 
     @Override
     @Transactional(rollbackFor = ServiceException.class)
-    public Boolean payOrder(Long id) {
-        log.info("really pay order");
-        //todo 水漂 单独走 水和空
-        FtOrder ftOrder = selectByPrimaryKey(id);
+    public Boolean payOrder(OrderPayRequest request) {
+        log.info("really pay order:" + request);
+
+        // 查询用户
+        Long userId = SecurityUtils.getUserId();
+        SysUser user = userService.selectUserById(userId);
+        log.info("user ->" + user);
+
+
+        // 查出订单信息
+        FtOrder ftOrder = selectByPrimaryKey(request.getOrderId());
         if (ftOrder == null) {
             throw new ServiceException("订单不存在");
         }
+
+        // 设置订单状态为已支付
         ftOrder.setStatus(1);
+
         //需要校验库存
-        List<OrderElements> elements = orderElementsMapper.selectElementsByOrderId(id);
+        List<OrderElements> elements = orderElementsMapper.selectElementsByOrderId(request.getOrderId());
         if (CollectionUtils.isEmpty(elements)) {
             throw new ServiceException("订单不存在");
         }
-        SysUser user = SecurityUtils.getLoginUser().getUser();
+
         //订单的homeId
         Long homeId = ftOrder.getHomeId();
         List<Shop> shops = Lists.newArrayList();
@@ -164,6 +175,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         }
         HomeResponse homeResponse = homeService.selectByPrimaryKey(homeId);
         checkGoodsNumber(shops, homeResponse.getNumber());
+
         //找到对应的商品 - typer->1
         Set<Long> shopGoodsIds = shops.stream().map(Shop::getGoodsId).collect(Collectors.toSet());
         List<GoodsResponse> goods = goodsService.selectGoodsByIds(shopGoodsIds);
@@ -176,43 +188,64 @@ public class FtOrderServiceImpl implements FtOrderService {
             int number = shopList.stream().mapToInt(Shop::getNumber).sum();
             switch (type) {
                 case 0:
-                    //水漂
+                    // 套餐 = 水票
                     log.info("水漂 - number:{}", number);
                     ftOrder.setStatus(2);
                     //async 水漂 其他 是 核销之后 入这个表
                     addUserGoods(shopList, user.getUserId());
+
+                    // 增加用户水票
+                    user.setWaterNum(user.getWaterNum() + number);
+                   userService.updateUser(user);
                     break;
                 case 1:
-                    //水
+                    //商品 = 水
+
+                    // 如果为混合支付扣除用户水票
+                    if ("coupon".equals(ftOrder.getPayMethod())) {
+                        log.info("用户水票为：" + user.getWaterNum() + " 购买水数：" + number);
+                        user.setWaterNum(user.getWaterNum() - number);
+                    }else if ("mixed".equals(ftOrder.getPayMethod())) {
+                        user.setWaterNum(0);
+                    }
+                    userService.updateUser(user);
 
                     //发送消息 给对应宿管
                     log.info("水 - number:{}", number);
                     homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false,1);
+
                     //消息订阅
                     Map<String, Object> data = new HashMap<>();
+
                     //订单编号
                     data.put("character_string2", new HashMap<String, String>() {{
-                        put("value", String.valueOf(ftOrder.getId())); // 替换为具体值
+                        put("value", String.valueOf(ftOrder.getId())); // 订单id
                     }});
                     data.put("thing11", new HashMap<String, String>() {{
-                        put("value", "水"); // 替换为具体值
+                        put("value", "水"); // 商品名称
                     }});
                     //支付金额
                     data.put("amount1", new HashMap<String, String>() {{
-                        put("value", "支付金额"); // 替换为具体值
+                        put("value", String.valueOf(ftOrder.getTotal())); // 支付金额
                     }});
                     //支付时间
+                    String formatTime = DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss");
                     data.put("date3", new HashMap<String, String>() {{
-                        put("value", DateUtils.getCurrentDate()); // 替换为具体值
+                        put("value", formatTime); // 替换为具体值
                     }});
                     //提货码
                     data.put("character_string9", new HashMap<String, String>() {{
-                        put("value", ""); // 替换为具体值
+                        put("value", "Y-108"); // 提货码
                     }});
+                    log.info("user:" + user);
                     WechatUtil.sendSubscriptionMessage(user.getOpenId(),"3",data);
+
+                    // 回写微信支付订单号到数据库
+                    ftOrder.setWxno(request.getWxNo());
+                    ftOrderMapper.updateByPrimaryKeySelective(ftOrder);
                     break;
                 case 2:
-                    //桶
+                    // 空桶
                     //发送消息 给对应宿管
                     log.info("桶 - number:{}", number);
                     homeService.sendMessageAndNotices(homeId, user.getUserId(), false, 0, number, true,2);
