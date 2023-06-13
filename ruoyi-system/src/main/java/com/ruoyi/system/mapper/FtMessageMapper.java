@@ -39,5 +39,5 @@ public interface FtMessageMapper {
 
     int refuseMessage(Long id);
 
-    int waterWaiteCount(@Param("homeId") Long homeId, @Param("userId") Long userId);
+    List<FtMessage> waterWaiteCount(@Param("userId") Long userId);
 }

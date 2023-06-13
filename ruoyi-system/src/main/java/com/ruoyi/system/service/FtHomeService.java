@@ -32,6 +32,4 @@ public interface FtHomeService {
     Boolean addNumberByHomeId(Long homeId, Integer number);
 
     List<HomeResponse> homeList(HomeRequest request);
-
-    Map<String,Integer> count(Long homeId,Long userId);
 }

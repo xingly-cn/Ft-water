@@ -35,7 +35,7 @@ public interface FtHomeMapper {
     List<IndexCountResponse> countIndex(@Param("time") String time,
                                         @Param("schoolIds") List<Long> schoolIds);
 
-    int waterCount(Long homeId);
+    List<FtHome> waterCount(@Param("ids") Set<Long> ids);
 
     List<FtHome> selectByIds(@Param("ids") Set<Long> homeIds);
 }

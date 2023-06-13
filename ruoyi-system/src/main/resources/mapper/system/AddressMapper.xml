@@ -5,6 +5,7 @@
         <!--@Table address-->
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
+        <result column="home_id" jdbcType="BIGINT" property="homeId"/>
         <result column="phone" jdbcType="VARCHAR" property="phone"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="address" jdbcType="VARCHAR" property="address"/>
@@ -15,6 +16,7 @@
     <sql id="Base_Column_List">
         id,
         user_id,
+        home_id,
         phone,
         name,
         address,
@@ -30,10 +32,10 @@
     </select>
 
     <insert id="insert" parameterType="com.ruoyi.system.domain.Address">
-        insert into address (user_id,
+        insert into address (user_id,home_id,
                              phone, name, address,
                              create_time)
-        values (#{userId},
+        values (#{userId},#{homeId},
                 #{phone,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR},
                 now())
     </insert>
@@ -46,6 +48,9 @@
             </if>
             <if test="userId != null">
                 user_id,
+            </if>
+            <if test="homeId != null">
+                home_id,
             </if>
             <if test="phone != null and phone != ''">
                 phone,
@@ -70,6 +75,9 @@
             <if test="userId != null">
                 #{userId},
             </if>
+            <if test="homeId != null">
+                #{homeId},
+            </if>
             <if test="phone != null and phone != ''">
                 #{phone,jdbcType=VARCHAR},
             </if>
@@ -93,6 +101,9 @@
         <set>
             <if test="userId != null">
                 user_id = #{userId},
+            </if>
+            <if test="homeId != null">
+                home_id = #{homeId},
             </if>
             <if test="phone != null and phone != ''">
                 phone = #{phone,jdbcType=VARCHAR},
@@ -164,6 +175,17 @@
         where is_del = 0
           and user_id in
         <foreach collection="userIds" item="key" index="index" open="(" close=")" separator=",">
+            #{key}
+        </foreach>
+    </select>
+
+    <select id="selectByIds" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from address
+        where is_del = 0
+          and id in
+        <foreach collection="ids" item="key" index="index" open="(" close=")" separator=",">
             #{key}
         </foreach>
     </select>

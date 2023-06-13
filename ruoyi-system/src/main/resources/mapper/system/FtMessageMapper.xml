@@ -20,8 +20,6 @@
 
     <resultMap id="MessageResponseMap" type="com.ruoyi.system.response.MessageResponse" extends="BaseResultMap">
         <!--@mbg.generated-->
-        <!--        <result column="homeName" jdbcType="VARCHAR" property="homeName"/>-->
-        <!--        <result column="userName" jdbcType="VARCHAR" property="userName"/>-->
         <result column="createUserName" jdbcType="VARCHAR" property="createUserName"/>
         <result column="updateUserName" jdbcType="VARCHAR" property="updateUserName"/>
     </resultMap>
@@ -347,14 +345,13 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="waterWaiteCount" resultType="int">
+    <select id="waterWaiteCount" resultMap="BaseResultMap">
         <!--@mbg.generated-->
-        select sum(number)
+        select sum(number) number, home_id
         from ft_message
         where deleted = 0
           and confirm = 0
           and order_type = 1
-          and home_id = #{homeId}
-          and find_in_set(#{userId}, user_id)
+          and find_in_set(#{userId}, user_id) GROUP BY home_id
     </select>
 </mapper>

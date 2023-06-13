@@ -269,6 +269,6 @@
         where status in (1, 2)
           and find_in_set(#{userId}, manage_user_id)
           and deleted = 0
-        GROUP BY `status`
+
     </select>
 </mapper>

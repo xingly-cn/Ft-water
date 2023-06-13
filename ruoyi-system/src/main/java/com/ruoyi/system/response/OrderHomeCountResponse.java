@@ -20,9 +20,13 @@ public class OrderHomeCountResponse {
 
     private String homeName;
 
-    private Integer status;
-
     private Integer count;
+
+    private Integer waitCount;
+
+    private Integer waterCount;
+
+    private Integer waterWaiteCount;
 
     @Tolerate
     public OrderHomeCountResponse() {}

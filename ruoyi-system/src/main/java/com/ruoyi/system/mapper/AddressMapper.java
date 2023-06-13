@@ -5,6 +5,7 @@ import com.ruoyi.system.request.AddressRequest;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Set;
 
 /**
 * Created by IntelliJ IDEA.
@@ -34,4 +35,6 @@ public interface AddressMapper{
     int updateNoDefaultAddressByIds(@Param("ids")List<Long> ids);
 
     List<Address> getAddressesByUserIds(@Param("userIds") List<String> userIds);
+
+    List<Address> selectByIds(@Param("ids") Set<Long> addressIds);
 }

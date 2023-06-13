@@ -49,6 +49,9 @@ public class FtOrderServiceImpl implements FtOrderService {
     private FtHomeServiceImpl homeService;
 
     @Autowired
+    private FtHomeMapper homeMapper;
+
+    @Autowired
     private UserGoodsMapper userGoodsMapper;
 
     @Autowired
@@ -71,6 +74,12 @@ public class FtOrderServiceImpl implements FtOrderService {
 
     @Autowired
     private UserHomeMapper userHomeMapper;
+
+    @Autowired
+    private AddressMapper addressMapper;
+
+    @Autowired
+    private FtMessageServiceImpl messageService;
 
     @Override
     @Transactional(rollbackFor = ServiceException.class)
@@ -119,20 +128,22 @@ public class FtOrderServiceImpl implements FtOrderService {
                 throw new ServiceException("自提地址不存在管理员");
             }
             request.setManageUserId(StringUtils.join(userHomes.stream().map(UserHome::getUserId).collect(Collectors.toList()), ","));
+        } else if (request.getDeliveryType().equals("goDoor")) {
+            //配送
+            if (request.getAddressId() == null) {
+                throw new ServiceException("配送地址不能为空");
+            }
+            //todo address
+            Address address = addressMapper.selectByPrimaryKey(request.getAddressId());
+            if (address == null) {
+                throw new ServiceException("配送地址不存在");
+            }
+            List<UserHome> userHomes = userHomeMapper.selectByHomeId(address.getHomeId());
+            if (CollectionUtils.isEmpty(userHomes)) {
+                throw new ServiceException("配送地址不存在管理员");
+            }
+            request.setManageUserId(StringUtils.join(userHomes.stream().map(UserHome::getUserId).collect(Collectors.toList()), ","));
         }
-
-//        else if (request.getDeliveryType().equals("goDoor")) {
-//            //配送
-//            if (request.getAddressId() == null) {
-//                throw new ServiceException("配送地址不能为空");
-//            }
-//            //todo address
-//            List<UserHome> userHomes = userHomeMapper.selectByHomeId(request.getAddressId());
-//            if (CollectionUtils.isEmpty(userHomes)) {
-//                throw new ServiceException("配送地址不存在管理员");
-//            }
-//            request.setManageUserId(StringUtils.join(userHomes.stream().map(UserHome::getUserId).collect(Collectors.toList()), ","));
-//        }
 
         ftOrderMapper.insertSelective(request);
         List<OrderElements> orderElements = Lists.newArrayList();
@@ -406,7 +417,6 @@ public class FtOrderServiceImpl implements FtOrderService {
     @Override
     public List<OrderHomeCountResponse> homeCount(Long userId) {
         //找到素有的楼栋
-
         List<FtOrder> orders = ftOrderMapper.homeCount(userId);
         if (CollectionUtils.isEmpty(orders)) {
             return Collections.emptyList();
@@ -414,51 +424,76 @@ public class FtOrderServiceImpl implements FtOrderService {
         List<OrderHomeCountResponse> responses = new ArrayList<>();
 
         List<FtHome> homes = homeService.getHomes();
+        Set<Long> addressIds = orders.stream()
+                .filter(o -> o.getDeliveryType().equals("goDoor"))
+                .map(FtOrder::getAddressId).collect(Collectors.toSet());
+        List<Address> addresses = CollectionUtils.isEmpty(addressIds) ? Collections.emptyList() : addressMapper.selectByIds(addressIds);
+
+        Set<Long> homeIds = orders.stream()
+                .filter(o -> o.getDeliveryType().equals("selfGet"))
+                .map(FtOrder::getHomeId).collect(Collectors.toSet());
+        homeIds.addAll(addresses.stream().map(Address::getHomeId).collect(Collectors.toSet()));
+        //待入库的水的数量 栋楼的水的数量
+        List<FtHome> waterCountList = homeMapper.waterCount(homeIds);
+        Map<Long, Integer> waterCountMap = waterCountList.stream().collect(Collectors.toMap(FtHome::getId, FtHome::getNumber));
+        List<FtMessage> waterWaiteCountList = messageService.waterWaiteCount(userId);
+        Map<Long, Integer> waterWaiteCountMap = waterWaiteCountList.stream().collect(Collectors.toMap(FtMessage::getHomeId, FtMessage::getNumber));
 
         Map<String, List<FtOrder>> orderMap = orders.stream().collect(Collectors.groupingBy(FtOrder::getDeliveryType));
         orderMap.forEach((k, v) -> {
-            Map<Integer, List<FtOrder>> orderStatusMap = v.stream().collect(Collectors.groupingBy(FtOrder::getStatus));
-            orderStatusMap.forEach((ok, ov) -> {
-
-            });
             if (k.equals("selfGet")) {
                 //自提
                 Map<Long, List<FtOrder>> orderHomeMap = v.stream().collect(Collectors.groupingBy(FtOrder::getHomeId));
                 orderHomeMap.forEach((ok, ov) -> {
-                    ov.forEach(oov -> {
-                        String name = homes.stream().filter(h -> h.getId().equals(ok)).findFirst().orElse(new FtHome()).getName();
-                        Long topId = homeService.getTopId(homes, ok);
-                        String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
-                        responses.add(OrderHomeCountResponse.builder()
-                                .homeId(ok)
-                                .homeName(topName+"/"+name)
-                                .status(oov.getStatus())
-                                .count(ov.size())
-                                .build());
-                    });
+                    assembleHomeCountResponse(responses, homes, ov, ok, waterCountMap, waterWaiteCountMap);
                 });
 
-            }
+            } else if (k.equals("goDoor")) {
+                //配送
+                Map<Long, List<FtOrder>> orderAddressMap = v.stream().collect(Collectors.groupingBy(FtOrder::getAddressId));
+                orderAddressMap.forEach((ok, ov) -> {
+                    if (CollectionUtils.isEmpty(addresses)) {
+                        return;
+                    }
+                    Long homeId = addresses.stream().filter(h -> h.getId().equals(ok)).findFirst().orElse(new Address()).getHomeId();
 
-//            else if (k.equals("goDoor")) {
-//                //配送
-//                Map<Long, List<FtOrder>> orderAddressMap = v.stream().collect(Collectors.groupingBy(FtOrder::getAddressId));
-//                orderAddressMap.forEach((ok, ov) -> {
-//                    ov.forEach(oov -> {
-//                        String name = homes.stream().filter(h -> h.getId().equals(ok)).findFirst().orElse(new FtHome()).getName();
-//                        Long topId = homeService.getTopId(homes, ok);
-//                        String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
-//                        responses.add(OrderHomeCountResponse.builder()
-//                                .homeId(ok)
-//                                .homeName(topName+"/"+name)
-//                                .status(oov.getStatus())
-//                                .count(ov.size())
-//                                .build());
-//                    });
-//                });
-//            }
+                    assembleHomeCountResponse(responses, homes, ov, homeId,waterCountMap,waterWaiteCountMap);
+                });
+            }
         });
         return responses;
+    }
+
+    private void assembleHomeCountResponse(List<OrderHomeCountResponse> responses,
+                                           List<FtHome> homes,
+                                           List<FtOrder> ov,
+                                           Long homeId,
+                                           Map<Long, Integer> waterCountMap,
+                                           Map<Long, Integer> waterWaiteCountMap)
+    {
+        if (CollectionUtils.isNotEmpty(responses)) {
+            if (responses.stream().anyMatch(r -> r.getHomeId().equals(homeId))) {
+                responses.stream()
+                        .filter(r -> r.getHomeId().equals(homeId))
+                        .findFirst().ifPresent(r -> {
+                            r.setCount(r.getCount() + (int) ov.stream().filter(o -> o.getStatus().equals(2)).count());
+                            r.setWaitCount(r.getWaitCount() + (int) ov.stream().filter(o -> o.getStatus().equals(1)).count());
+                        });
+                return;
+            }
+        }
+
+        String name = homes.stream().filter(h -> h.getId().equals(homeId)).findFirst().orElse(new FtHome()).getName();
+        Long topId = homeService.getTopId(homes, homeId);
+        String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
+        responses.add(OrderHomeCountResponse.builder()
+                .homeId(homeId)
+                .homeName(topName + "/" + name)
+                .waitCount((int) ov.stream().filter(o -> o.getStatus().equals(1)).count())
+                .count((int) ov.stream().filter(o -> o.getStatus().equals(2)).count())
+                .waterCount(waterCountMap.get(homeId) != null ? waterCountMap.get(homeId) : 0)
+                .waterWaiteCount(waterWaiteCountMap.get(homeId) != null ? waterWaiteCountMap.get(homeId) : 0)
+                .build());
     }
 
     @Override

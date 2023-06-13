@@ -199,8 +199,15 @@
             '%Y-%M-%d')
     </select>
 
-    <select id="waterCount" resultType="int">
-        select number from ft_home where deleted=0 and id=#{homeId}
+    <select id="waterCount" resultMap="BaseResultMap">
+        select id, number
+        from ft_home where deleted = 0
+        <if test="ids != null and ids.size() != 0">
+            and id in
+            <foreach collection="ids" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
     </select>
 
     <select id="selectByIds" resultMap="BaseResultMap">
