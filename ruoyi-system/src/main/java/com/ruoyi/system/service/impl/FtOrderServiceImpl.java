@@ -366,8 +366,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         }
 
         // 生成二维码
-        String body = response.getWxNo() + "_" + LocalDateTimeUtil.now();
-        String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
+        String body = response.getId() + "_" + response.getUserId() + "_" + homeId + "_" + response.getNumber() + "_" + response.getGoodId() + "_" + LocalDateTimeUtil.now();        String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
         log.info("encBody:{}", encBody);
         return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(encBody, "UTF-8");
     }
@@ -379,7 +378,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             return "未找到订单";
         }
         // 生成二维码
-        String body = orderResponse.getId() + "_" + orderResponse.getUserId() + "_" + orderResponse.getHomeId() + "_" + orderResponse.getNumber() + "_" + orderResponse.getGoodId() + "_" + LocalDateTimeUtil.now();
+        String body = orderResponse.getWxNo() + "_" + LocalDateTimeUtil.now();
         String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
         log.info("encBody:{}", encBody);
         return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(encBody, "UTF-8");
