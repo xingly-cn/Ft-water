@@ -315,7 +315,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         });
 
         ftOrder.setPayed(true);
-        ftOrder.setWxno(request.getWxNo());
+        ftOrder.setWxNo(request.getWxNo());
         OrderRequest orderRequest = new OrderRequest();
         BeanUtils.copyProperties(ftOrder, orderRequest);
         //支付之后
@@ -366,7 +366,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         }
 
         // 生成二维码
-        String body = response.getWxno() + "_" + LocalDateTimeUtil.now();
+        String body = response.getWxNo() + "_" + LocalDateTimeUtil.now();
         String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
         log.info("encBody:{}", encBody);
         return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(encBody, "UTF-8");

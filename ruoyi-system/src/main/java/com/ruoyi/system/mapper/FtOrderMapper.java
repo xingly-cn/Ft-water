@@ -43,4 +43,7 @@ public interface FtOrderMapper {
     String getUseNum(String orderId);
 
     OrderResponse selectOrderByWxNo(String wxNo);
+
+    void updateStatusByWxNo(@Param("wxNo") String wxNo,
+                            @Param("status") int status);
 }

@@ -19,6 +19,7 @@
         <result column="user_id" jdbcType="BIGINT" property="userId"/>
         <result column="user_name" jdbcType="BIGINT" property="userName"/>
         <result column="user_phone" jdbcType="BIGINT" property="userPhone"/>
+        <result column="wxno" jdbcType="VARCHAR" property="wxNo"/>
         <result column="total" jdbcType="DECIMAL" property="total"/>
         <collection property="orderElementsResponses"
                     javaType="java.util.List" resultMap="elements"/>
@@ -73,6 +74,7 @@
                fo.delivery_type,
                fo.total,
                fo.delivery_time,
+               fo.wxno,
                fo.user_id,
                fu.user_name   as user_name,
                fu.phonenumber as user_phone,
@@ -212,8 +214,8 @@
             <if test="total != null">
                 total = #{total,jdbcType=DECIMAL},
             </if>
-            <if test="wxno != null and wxno != ''">
-                wxno = #{wxno,jdbcType=VARCHAR},
+            <if test="wxNo != null and wxNo != ''">
+                wxno = #{wxNo,jdbcType=VARCHAR},
             </if>
         </set>
         where id = #{id}
@@ -318,7 +320,13 @@
         select
         <include refid="Base_Column_List"/>
         from ft_order
-        where wxno = #{wxno}
+        where wxno = #{wxNo}
           and deleted = 0
     </select>
+
+    <update id="updateStatusByWxNo">
+        update ft_order
+        set status = #{status}
+        where wxno = #{wxNo}
+    </update>
 </mapper>

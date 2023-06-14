@@ -129,7 +129,7 @@ public class JsApiPayServiceImpl implements JsApiPayService {
         } else {
             ftOrder.setTotal(BigDecimal.valueOf(price * 1.0 / 100));
         }
-        int i = orderMapper.updateByPrimaryKeySelective(ftOrder);
+        orderMapper.updateByPrimaryKeySelective(ftOrder);
 
         if (price == 0 && "selfGet".equals(deliveryType)) {
             logger.info("订单金额为0, 直接返回成功");
@@ -205,6 +205,8 @@ public class JsApiPayServiceImpl implements JsApiPayService {
             logger.info("退款成功, 将空桶数量-1");
             SysUser sysUser = userService.selectUserById(userId);
             sysUser.setBarrelNumber(sysUser.getBarrelNumber() - 1);
+            //3已退款
+            orderMapper.updateStatusByWxNo(wxNo, 3);
             int i = userService.updateUser(sysUser);
             if (i == 0) {
                 logger.error("空桶数量-1失败，管理员请查看");

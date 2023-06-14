@@ -48,9 +48,9 @@ public class FtOrder extends BaseEntity implements Serializable {
     private BigDecimal total;
 
     @ApiModelProperty(value = "微信支付订单号")
-    private String wxno;
+    private String wxNo;
 
-    @ApiModelProperty(value = "0待付款 1代取货 2已取货")
+    @ApiModelProperty(value = "0待付款 1代取货 2已取货 3已退款")
     private Integer status;
 
     /**
