@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.response.CalcOrderPriceResponse;
@@ -38,10 +39,9 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.Signature;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -79,7 +79,6 @@ public class JsApiPayServiceImpl implements JsApiPayService {
         String wechatAppId = configService.getCacheValue("wechat_appid");
         String merchantId = configService.getCacheValue("merchantId");
 
-
         // 构建订单数据
         HttpPost httpPost = new HttpPost("https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi");
         httpPost.addHeader("Accept", "application/json");
@@ -90,49 +89,58 @@ public class JsApiPayServiceImpl implements JsApiPayService {
         // 计算价格
         logger.info("订单数据 -> 开始");
 
-        CalcOrderPriceResponse orderPrice = ftOrderService.getOrderPrice(orderId);
-        logger.info("订单数据 ->" + orderPrice.toString());
+//        CalcOrderPriceResponse orderPrice = ftOrderService.getOrderPrice(orderId);
+        List<CalcOrderPriceResponse> orderPrices = ftOrderService.getOrderPrice(orderId);
+        logger.info("订单数据 {}", JSON.toJSONString(orderPrices));
 
-        int price = 0;
+        AtomicInteger price = new AtomicInteger();
 
-        String payMethod = orderPrice.getPayMethod();
-        BigDecimal waterPrice = orderPrice.getPrice();
-        BigDecimal runPrice = orderPrice.getRunPrice();
-        Integer buyNum = orderPrice.getBuyNum();
-        Integer waterNum = orderPrice.getWaterNum();
-        String deliveryType = orderPrice.getDeliveryType();
+        Set<String> types = orderPrices.stream().map(CalcOrderPriceResponse::getDeliveryType).collect(Collectors.toSet());
+        Set<String> methods = orderPrices.stream().map(CalcOrderPriceResponse::getPayMethod).collect(Collectors.toSet());
 
-        // 三种支付方式
-        switch (payMethod) {
-            case "wechat":
-                price = (int) (waterPrice.doubleValue() * 100) * buyNum;
-                break;
-            case "coupon":
-                logger.info(orderId + " -> 执行优惠券支付, 仍需计算配送费");
-                break;
-            case "mixed":
-                int newNum = buyNum - waterNum; // 优惠券抵扣后, 还需支付的水票数量
-                price += (int) (waterPrice.doubleValue() * 100) * newNum;
-                break;
-        }
+        orderPrices.forEach(orderPrice -> {
 
-        // 如果为上门配送, 则计算配送费
-        if ("goDoor".equals(deliveryType)) {
-            price += (int) (runPrice.doubleValue() * 100 * buyNum);
-        }
+            String payMethod = orderPrice.getPayMethod();
+            BigDecimal waterPrice = orderPrice.getPrice();
+            BigDecimal runPrice = orderPrice.getRunPrice();
+            Integer buyNum = orderPrice.getBuyNum();
+            Integer waterNum = orderPrice.getWaterNum();
+            String deliveryType = orderPrice.getDeliveryType();
+
+            // 三种支付方式
+            switch (payMethod) {
+                case "wechat":
+                    price.set((int) (waterPrice.doubleValue() * 100) * buyNum);
+                    break;
+                case "coupon":
+                    logger.info(orderId + " -> 执行优惠券支付, 仍需计算配送费");
+                    break;
+                case "mixed":
+                    int newNum = buyNum - waterNum; // 优惠券抵扣后, 还需支付的水票数量
+                    price.addAndGet((int) (waterPrice.doubleValue() * 100) * newNum);
+                    break;
+            }
+
+            // 如果为上门配送, 则计算配送费
+            if ("goDoor".equals(deliveryType)) {
+                price.addAndGet((int) (runPrice.doubleValue() * 100 * buyNum));
+            }
+        });
+
 
         logger.info("订单价格 ->" + price);
 
         // 回写金额到数据库
         FtOrder ftOrder = orderMapper.selectByPrimaryKey(orderId);
-        if (price == 0) {
+        if (price.get() == 0) {
             ftOrder.setTotal(BigDecimal.ZERO);
         } else {
-            ftOrder.setTotal(BigDecimal.valueOf(price * 1.0 / 100));
+            ftOrder.setTotal(BigDecimal.valueOf(price.get() * 1.0 / 100));
         }
         orderMapper.updateByPrimaryKeySelective(ftOrder);
 
-        if (price == 0 && "selfGet".equals(deliveryType)) {
+        //"selfGet".equals(deliveryType)
+        if (price.get() == 0 && types.contains("selfGet")) {
             logger.info("订单金额为0, 直接返回成功");
             return new JSONObject();
         }
@@ -146,7 +154,7 @@ public class JsApiPayServiceImpl implements JsApiPayService {
                 .put("notify_url", "https://water.asugar.cn/notify")
                 .put("out_trade_no", wx_no);
         rootNode.putObject("amount")
-                .put("total", price);
+                .put("total", price.get());
         rootNode.putObject("payer")
                 .put("openid", openId);
         objectMapper.writeValue(bos, rootNode);
@@ -159,7 +167,8 @@ public class JsApiPayServiceImpl implements JsApiPayService {
 
         JSONObject resData = new JSONObject();
         resData.put("prepay_id", jsonObject.get("prepay_id"));
-        resData.put("payMethod", payMethod);
+        // 支付方式
+        resData.put("payMethod", StringUtils.join(methods, ","));
         resData.put("wx_no", wx_no);
         return resData;
     }

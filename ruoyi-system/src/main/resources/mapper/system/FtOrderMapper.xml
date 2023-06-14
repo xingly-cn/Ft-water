@@ -289,11 +289,17 @@
     </select>
 
     <select id="getOrderPrice" resultMap="orderPrice">
-        SELECT fo.delivery_type, fo.user_id, oe.number buy_num, fg.price, fg.run_price, su.water_num, fo.pay_method
+        SELECT fo.delivery_type,
+               fo.user_id,
+               oe.number buy_num,
+               fg.price,
+               fg.run_price,
+               su.water_num,
+               fo.pay_method
         FROM `ft_order` fo
-        left JOIN order_elements oe ON fo.id = oe.order_id
-        LEFT JOIN ft_goods fg ON fg.id = oe.goods_id
-        LEFT JOIN sys_user su ON fo.user_id = su.user_id
+                 left JOIN order_elements oe ON fo.id = oe.order_id
+                 LEFT JOIN ft_goods fg ON fg.id = oe.goods_id
+                 LEFT JOIN sys_user su ON fo.user_id = su.user_id
         WHERE fo.id = #{orderId}
     </select>
 

@@ -199,7 +199,6 @@ public class FtOrderServiceImpl implements FtOrderService {
         SysUser user = userService.selectUserById(userId);
 //        log.info("user ->" + user);
 
-
         // 查出订单信息
         FtOrder ftOrder = selectByPrimaryKey(request.getOrderId());
         if (ftOrder == null) {
@@ -251,13 +250,13 @@ public class FtOrderServiceImpl implements FtOrderService {
                     AtomicInteger waterNum = new AtomicInteger();
                     goodsResponses.forEach(goodsResponse -> {
                         //校验
-                        if (number > goodsResponse.getMinNum() && number < goodsResponse.getMaxNum()) {
-                            log.info("套餐赠送水票 - number:{}", goodsResponse.getWaterNum());
+                        if (number >= goodsResponse.getMinNum() && number <= goodsResponse.getMaxNum()) {
+                            log.info("{} 套餐赠送水票 - number:{}", goodsResponse.getId(),goodsResponse.getWaterNum());
                             waterNum.set(goodsResponse.getWaterNum());
                         }
                     });
                     // 增加用户水票
-                    user.setWaterNum(user.getWaterNum() + waterNum.get());
+                    user.setWaterNum(user.getWaterNum() + waterNum.get() + number);
                     userService.updateUser(user);
                     break;
                 case 1:
@@ -608,7 +607,7 @@ public class FtOrderServiceImpl implements FtOrderService {
     }
 
     @Override
-    public CalcOrderPriceResponse getOrderPrice(Long orderId) {
+    public List<CalcOrderPriceResponse> getOrderPrice(Long orderId) {
         return ftOrderMapper.getOrderPrice(orderId);
     }
 

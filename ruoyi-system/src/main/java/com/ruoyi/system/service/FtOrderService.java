@@ -40,7 +40,7 @@ public interface FtOrderService {
 
     List<OrderHomeCountResponse> homeCount(Long userId);
 
-    CalcOrderPriceResponse getOrderPrice(Long orderId);
+    List<CalcOrderPriceResponse> getOrderPrice(Long orderId);
 
     String getGoodId(String orderId);
 
