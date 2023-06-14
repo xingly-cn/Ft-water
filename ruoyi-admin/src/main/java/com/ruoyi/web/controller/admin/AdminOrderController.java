@@ -7,6 +7,7 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;
+import com.ruoyi.system.utils.CommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,7 +54,7 @@ public class AdminOrderController extends BaseController {
     @GetMapping("createWxNoCQ")
     @ApiOperation("生成二维码")
     public AjaxResult createWxNoCQ(String wxNo, HttpServletRequest request) throws UnsupportedEncodingException {
-        String header = request.getHeader("version");
+        String header = request.getHeader("randomString");
         if (header == null) {
             return AjaxResult.error("非法访问, 已记录IP");
         }
@@ -61,7 +62,7 @@ public class AdminOrderController extends BaseController {
         String[] dict = {"DF", "WR", "OF", "VB", "PQ", "EX", "UM"};
         ConcurrentHashMap<String, Object> res = new ConcurrentHashMap<>(2);
         res.put("encBody", orderService.createWxNoCQ(wxNo));
-//        res.put("getCode", dict[index - 1] + "-" + String.);
+        res.put("getCode", dict[index - 1] + "-" + CommonUtils.stringToHex(wxNo));
         return AjaxResult.success(res);
     }
 

@@ -13,6 +13,7 @@ import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.response.CalcOrderPriceResponse;
 import com.ruoyi.system.service.FtOrderService;
 import com.ruoyi.system.service.JsApiPayService;
+import com.ruoyi.system.utils.CommonUtils;
 import com.ruoyi.system.utils.WxUtils;
 import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
 import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
@@ -167,6 +168,12 @@ public class JsApiPayServiceImpl implements JsApiPayService {
     @SneakyThrows
     @Transactional
     public JSONObject refund(String wxNo) {
+
+        logger.info("before refund ->" + wxNo);
+        //解密
+        wxNo = CommonUtils.hexToString(wxNo);
+
+        logger.info("after refund ->" + wxNo);
 
         Long userId = SecurityUtils.getUserId();
 

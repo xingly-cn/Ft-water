@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 
@@ -69,6 +70,25 @@ public class CommonUtils {
     public static String buildMessage(String phone, String message) {
         //todo
         return "";
+    }
+
+    public static String stringToHex(String input) {
+        char[] chars = input.toCharArray();
+        StringBuilder hex = new StringBuilder();
+        for (char ch : chars) {
+            hex.append(Integer.toHexString(ch));
+        }
+        return hex.toString();
+    }
+
+    public static String hexToString(String input) {
+        int len = input.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(input.charAt(i), 16) << 4)
+                    + Character.digit(input.charAt(i+1), 16));
+        }
+        return new String(data, StandardCharsets.UTF_8);
     }
 
 }
