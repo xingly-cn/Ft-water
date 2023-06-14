@@ -13,6 +13,7 @@ import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.response.CalcOrderPriceResponse;
+import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;
 import com.ruoyi.system.service.JsApiPayService;
 import com.ruoyi.system.utils.WxUtils;
@@ -186,6 +187,10 @@ public class JsApiPayServiceImpl implements JsApiPayService {
 
         Long userId = SecurityUtils.getUserId();
 
+        // 获取订单金额
+        OrderResponse orderResponse = orderMapper.selectOrderByWxNo(wxNo);
+        double refundPrice = orderResponse.getTotal().doubleValue();
+
         // 自动获取微信证书, 第一次获取证书绕过鉴权
         CloseableHttpClient httpClient = buildHttpClient();
 
@@ -204,8 +209,8 @@ public class JsApiPayServiceImpl implements JsApiPayService {
         logger.info(wxNo + "发起退款，退款单号：" + refundId);
         rootNode.put("reason", "空桶退款");
         rootNode.putObject("amount")
-                .put("refund", 1)
-                .put("total", 1)
+                .put("refund", (int) (refundPrice * 100))
+                .put("total", (int) (refundPrice * 100))
                 .put("currency", "CNY");
         objectMapper.writeValue(bos, rootNode);
         httpPost.setEntity(new StringEntity(bos.toString("UTF-8"), "UTF-8"));
