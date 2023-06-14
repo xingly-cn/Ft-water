@@ -69,9 +69,7 @@
             <if test="operateId != null and operateId != ''">
                 operate_id,
             </if>
-            <if test="createTime != null">
                 create_time,
-            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null and id != ''">
@@ -86,11 +84,10 @@
             <if test="operateId != null and operateId != ''">
                 #{operateId,jdbcType=VARCHAR},
             </if>
-            <if test="createTime != null">
-                #{createTime,jdbcType=TIMESTAMP},
-            </if>
+            now(),
         </trim>
     </insert>
+
     <update id="updateByPrimaryKeySelective" parameterType="com.ruoyi.system.domain.FtSale">
         <!--@mbg.generated-->
         update ft_sale
