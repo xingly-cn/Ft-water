@@ -555,4 +555,16 @@
             #{userId}
         </foreach>
     </select>
+
+    <update id="updateUserWater">
+        update sys_user
+        set water_num = #{newWaterNum}
+        where user_id = #{userId}
+    </update>
+
+    <update id="updateUserBarrenNum">
+        update sys_user
+        set barrel_number = #{barrelNum}
+        where user_id = #{userId}
+    </update>
 </mapper>

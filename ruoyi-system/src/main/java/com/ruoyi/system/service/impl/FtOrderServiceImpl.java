@@ -197,7 +197,6 @@ public class FtOrderServiceImpl implements FtOrderService {
         // 查询用户
         Long userId = SecurityUtils.getUserId();
         SysUser user = userService.selectUserById(userId);
-//        log.info("user ->" + user);
 
         // 查出订单信息
         FtOrder ftOrder = selectByPrimaryKey(request.getOrderId());
@@ -249,14 +248,16 @@ public class FtOrderServiceImpl implements FtOrderService {
                     addUserGoods(shopList, user.getUserId());
                     AtomicInteger waterNum = new AtomicInteger();
                     goodsResponses.forEach(goodsResponse -> {
+                        log.info(goodsResponse.getMinNum().toString());
+                        log.info(goodsResponse.getMaxNum().toString());
                         //校验
-                        if (number >= goodsResponse.getMinNum() && number <= goodsResponse.getMaxNum()) {
-                            log.info("{} 套餐赠送水票 - number:{}", goodsResponse.getId(),goodsResponse.getWaterNum());
+                        if (number > goodsResponse.getMinNum() && number < goodsResponse.getMaxNum()) {
+                            log.info("套餐赠送水票 - number:{}", goodsResponse.getWaterNum());
                             waterNum.set(goodsResponse.getWaterNum());
                         }
                     });
                     // 增加用户水票
-                    user.setWaterNum(user.getWaterNum() + waterNum.get() + number);
+                    user.setWaterNum(user.getWaterNum() + waterNum.get());
                     userService.updateUser(user);
                     break;
                 case 1:
@@ -269,7 +270,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                     } else if ("mixed".equals(ftOrder.getPayMethod())) {
                         user.setWaterNum(0);
                     }
-                    userService.updateUser(user);
+                    userService.updateUserWater(userId, user.getWaterNum());
 
                     //发送消息 给对应宿管
                     log.info("水 - number:{}", number);
@@ -304,8 +305,8 @@ public class FtOrderServiceImpl implements FtOrderService {
                     //发送消息 给对应宿管
                     log.info("桶 - number:{}", number);
                     // 增加用户空桶
-                    user.setBarrelNumber(user.getBarrelNumber() + number);
-                    userService.updateUser(user);
+                    int newBarrenNum = user.getBarrelNumber() + number;
+                    userService.updateUserBarrenNum(userId, newBarrenNum);
                     homeService.sendMessageAndNotices(homeId, user.getUserId(), false, 0, number, true, 2);
                     break;
                 default:
@@ -355,7 +356,6 @@ public class FtOrderServiceImpl implements FtOrderService {
         }
 
         OrderResponse response = ftOrderMapper.createOrderCQ(orderId);
-        //orderCQ.getHomeId() 俩种
         Long homeId = response.getHomeId();
         if (response.getDeliveryType().equals("goDoor")) {
             //配送
@@ -365,7 +365,9 @@ public class FtOrderServiceImpl implements FtOrderService {
         }
 
         // 生成二维码
-        String body = response.getId() + "_" + response.getUserId() + "_" + homeId + "_" + response.getNumber() + "_" + response.getGoodId() + "_" + LocalDateTimeUtil.now();        String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
+        String body = response.getId() + "_" + response.getUserId() + "_" + homeId + "_" + response.getNumber() + "_" + response.getGoodId() + "_" + LocalDateTimeUtil.now();
+
+        String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
         log.info("encBody:{}", encBody);
         return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(encBody, "UTF-8");
     }

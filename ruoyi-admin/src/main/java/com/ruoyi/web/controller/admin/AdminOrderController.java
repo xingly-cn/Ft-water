@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller.admin;
 
+import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
@@ -7,7 +8,6 @@ import com.ruoyi.common.core.page.TableDataInfo;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.service.FtOrderService;
-import com.ruoyi.system.utils.CommonUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -53,17 +54,13 @@ public class AdminOrderController extends BaseController {
 
     @GetMapping("createWxNoCQ")
     @ApiOperation("生成二维码")
-    public AjaxResult createWxNoCQ(String wxNo, HttpServletRequest request) throws UnsupportedEncodingException {
-        String header = request.getHeader("randomString");
-        if (header == null) {
+    public AjaxResult createWxNoCQ(HttpServletRequest request) throws UnsupportedEncodingException {
+        String wxNo = request.getHeader("randomString");
+        if (wxNo == null) {
             return AjaxResult.error("非法访问, 已记录IP");
         }
-        int index = Integer.parseInt(header.substring(0, 1));
-        String[] dict = {"DF", "WR", "OF", "VB", "PQ", "EX", "UM"};
-        ConcurrentHashMap<String, Object> res = new ConcurrentHashMap<>(2);
-        res.put("encBody", orderService.createWxNoCQ(wxNo));
-        res.put("getCode", dict[index - 1] + "-" + CommonUtils.stringToHex(wxNo));
-        return AjaxResult.success(res);
+        String encWxNo = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(wxNo);
+        return AjaxResult.success("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(encWxNo, "UTF-8"));
     }
 
     @GetMapping("/checkCQ")

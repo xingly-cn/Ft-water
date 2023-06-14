@@ -1,6 +1,5 @@
 package com.ruoyi.system.user;
 
-import com.alibaba.fastjson.JSON;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.system.service.JsApiPayService;
 import io.swagger.annotations.Api;

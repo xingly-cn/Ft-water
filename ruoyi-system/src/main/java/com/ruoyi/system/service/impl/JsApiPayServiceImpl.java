@@ -2,6 +2,7 @@ package com.ruoyi.system.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.crypto.SecureUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +15,6 @@ import com.ruoyi.system.mapper.FtOrderMapper;
 import com.ruoyi.system.response.CalcOrderPriceResponse;
 import com.ruoyi.system.service.FtOrderService;
 import com.ruoyi.system.service.JsApiPayService;
-import com.ruoyi.system.utils.CommonUtils;
 import com.ruoyi.system.utils.WxUtils;
 import com.wechat.pay.contrib.apache.httpclient.WechatPayHttpClientBuilder;
 import com.wechat.pay.contrib.apache.httpclient.auth.PrivateKeySigner;
@@ -139,7 +139,6 @@ public class JsApiPayServiceImpl implements JsApiPayService {
         }
         orderMapper.updateByPrimaryKeySelective(ftOrder);
 
-        //"selfGet".equals(deliveryType)
         if (price.get() == 0 && types.contains("selfGet")) {
             logger.info("订单金额为0, 直接返回成功");
             return new JSONObject();
@@ -179,8 +178,9 @@ public class JsApiPayServiceImpl implements JsApiPayService {
     public JSONObject refund(String wxNo) {
 
         logger.info("before refund ->" + wxNo);
+
         //解密
-        wxNo = CommonUtils.hexToString(wxNo);
+        wxNo = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).decryptStr(wxNo);
 
         logger.info("after refund ->" + wxNo);
 
@@ -217,7 +217,7 @@ public class JsApiPayServiceImpl implements JsApiPayService {
         logger.info("退款回调信息 ->" + res);
         JSONObject jsonObject = JSON.parseObject(res);
         Object status = jsonObject.get("status");
-        if ("SUCCESS".equals(status)) {
+        if ("SUCCESS".equals(status) || "PROCESSING".equals(status)) {
             logger.info("退款成功, 将空桶数量-1");
             SysUser sysUser = userService.selectUserById(userId);
             sysUser.setBarrelNumber(sysUser.getBarrelNumber() - 1);

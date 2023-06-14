@@ -162,4 +162,8 @@ public interface SysUserMapper {
                                    @Param("number") int number);
 
     List<SysUser> selectUsersByIds(@Param("ids") List<String> userIds);
+
+    void updateUserWater(@Param("userId") Long userId,@Param("newWaterNum") int newWaterNum);
+
+    void updateUserBarrenNum(@Param("userId")Long userId, @Param("barrelNum") int newBarrenNum);
 }
