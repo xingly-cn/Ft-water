@@ -111,7 +111,7 @@ public class JsApiPayServiceImpl implements JsApiPayService {
             // 三种支付方式
             switch (payMethod) {
                 case "wechat":
-                    price.set((int) (waterPrice.doubleValue() * 100) * buyNum);
+                    price.addAndGet((int) (waterPrice.doubleValue() * 100) * buyNum);
                     break;
                 case "coupon":
                     logger.info(orderId + " -> 执行优惠券支付, 仍需计算配送费");
