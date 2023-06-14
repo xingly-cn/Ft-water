@@ -19,6 +19,12 @@
         <result column="update_time" jdbcType="VARCHAR" property="updateTime"/>
     </resultMap>
 
+    <resultMap id="BaseNoticesResponseMap" type="com.ruoyi.system.response.NoticesResponse" extends="BaseResultMap">
+        <result column="schoolName" jdbcType="VARCHAR" property="schoolName"/>
+        <result column="homeName" jdbcType="VARCHAR" property="homeName"/>
+        <result column="userName" jdbcType="VARCHAR" property="userName"/>
+    </resultMap>
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
@@ -61,7 +67,7 @@
     </sql>
 
     <select id="selectByPrimaryKey" parameterType="java.lang.Long"
-            resultType="com.ruoyi.system.response.NoticesResponse">
+            resultMap="BaseNoticesResponseMap">
         <!--@mbg.generated-->
         <include refid="Base_Column_List_With_Home_User"/>
         where n.id = #{id,jdbcType=BIGINT}
@@ -222,7 +228,7 @@
         where id = #{id,jdbcType=BIGINT}
     </update>
 
-    <select id="selectList" resultType="com.ruoyi.system.response.NoticesResponse">
+    <select id="selectList" resultMap="BaseNoticesResponseMap">
         <!--  school home user  -->
         <include refid="Base_Column_List_With_Home_User"/>
         where n.deleted = 0
