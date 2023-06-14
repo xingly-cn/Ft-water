@@ -47,6 +47,7 @@
         <!--@mbg.generated-->
         id,
         status,
+        wxno,
         payed,
         user_id,
         home_id,
@@ -310,5 +311,14 @@
 
     <select id="getUseNum" resultType="java.lang.String">
         SELECT oe.number FROM `ft_order` fo left join order_elements oe on fo.id = oe.order_id where fo.id = #{orderId}
+    </select>
+
+    <select id="selectOrderByWxNo" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from ft_order
+        where wxno = #{wxno}
+          and deleted = 0
     </select>
 </mapper>

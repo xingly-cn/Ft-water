@@ -43,11 +43,26 @@ public class AdminOrderController extends BaseController {
         int index = Integer.parseInt(header.substring(0, 1));
         String[] dict = {"DF", "WR", "OF", "VB", "PQ", "EX", "UM"};
         ConcurrentHashMap<String, Object> res = new ConcurrentHashMap<>(2);
-        Integer goodId = Integer.valueOf(orderService.getGoodId(orderId));
-        Integer useNum = Integer.valueOf(orderService.getUseNum(orderId));
+        int goodId = Integer.parseInt(orderService.getGoodId(orderId));
+        int useNum = Integer.parseInt(orderService.getUseNum(orderId));
         res.put("encBody", orderService.createOrderCQ(orderId));
 //        String prefex = String.valueOf('f' + goodId + 't' + useNum);
         res.put("getCode", dict[index - 1] + "-" + Integer.toHexString(Integer.parseInt(orderId))  + "-" + Integer.toHexString(goodId) + "-" + Integer.toHexString(useNum));
+        return AjaxResult.success(res);
+    }
+
+    @GetMapping("createWxNoCQ")
+    @ApiOperation("生成二维码")
+    public AjaxResult createWxNoCQ(String wxNo, HttpServletRequest request) throws UnsupportedEncodingException {
+        String header = request.getHeader("version");
+        if (header == null) {
+            return AjaxResult.error("非法访问, 已记录IP");
+        }
+//        int index = Integer.parseInt(header.substring(0, 1));
+//        String[] dict = {"DF", "WR", "OF", "VB", "PQ", "EX", "UM"};
+        ConcurrentHashMap<String, Object> res = new ConcurrentHashMap<>(1);
+        res.put("encBody", orderService.createWxNoCQ(wxNo));
+//        String prefex = String.valueOf('f' + goodId + 't' + useNum);
         return AjaxResult.success(res);
     }
 

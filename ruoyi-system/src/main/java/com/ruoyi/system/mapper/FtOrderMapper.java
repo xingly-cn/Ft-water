@@ -41,4 +41,6 @@ public interface FtOrderMapper {
     String getGoodId(String orderId);
 
     String getUseNum(String orderId);
+
+    OrderResponse selectOrderByWxNo(String wxNo);
 }

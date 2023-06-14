@@ -45,4 +45,6 @@ public interface FtOrderService {
     String getGoodId(String orderId);
 
     String getUseNum(String orderId);
+
+    String createWxNoCQ(String wxNo) throws UnsupportedEncodingException;
 }
