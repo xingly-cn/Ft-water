@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -46,6 +48,8 @@ public class TokenService
     protected static final long MILLIS_MINUTE = 60 * MILLIS_SECOND;
 
     private static final Long MILLIS_MINUTE_TEN = 20 * 60 * 1000L;
+
+    private static final Logger logger = LoggerFactory.getLogger(TokenService.class);
 
     @Autowired
     private RedisCache redisCache;
@@ -129,6 +133,7 @@ public class TokenService
         long currentTime = System.currentTimeMillis();
         if (expireTime - currentTime <= MILLIS_MINUTE_TEN)
         {
+            logger.info("token过期时间小于20分钟，开始刷新缓存 : {}",loginUser.getUserId());
             refreshToken(loginUser);
         }
     }
