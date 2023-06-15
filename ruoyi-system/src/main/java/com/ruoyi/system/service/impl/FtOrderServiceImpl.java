@@ -247,22 +247,24 @@ public class FtOrderServiceImpl implements FtOrderService {
                     //async 水漂 其他 是 核销之后 入这个表
                     addUserGoods(shopList, user.getUserId());
                     AtomicInteger waterNum = new AtomicInteger();
+                    //加现在的水票
+                    waterNum.set(number);
                     goodsResponses.forEach(goodsResponse -> {
-                        log.info(goodsResponse.getMinNum().toString());
-                        log.info(goodsResponse.getMaxNum().toString());
+                        log.info("{}-{} -> number:{},minNum:{},maxNum:{}", goodsResponse.getId(),
+                                goodsResponse.getTitle(), number, goodsResponse.getMinNum(), goodsResponse.getMaxNum());
                         //校验
-                        if (number > goodsResponse.getMinNum() && number < goodsResponse.getMaxNum()) {
+                        if (number >= goodsResponse.getMinNum() && number <= goodsResponse.getMaxNum()) {
                             log.info("套餐赠送水票 - number:{}", goodsResponse.getWaterNum());
-                            waterNum.set(goodsResponse.getWaterNum());
+                            waterNum.addAndGet(goodsResponse.getWaterNum());
                         }
                     });
+                    log.info("需要增加的水票数为：{}", waterNum.get());
                     // 增加用户水票
                     user.setWaterNum(user.getWaterNum() + waterNum.get());
                     userService.updateUser(user);
                     break;
                 case 1:
                     //商品 = 水
-
                     // 如果为混合支付扣除用户水票
                     if ("coupon".equals(ftOrder.getPayMethod())) {
                         log.info("用户水票为：" + user.getWaterNum() + " 购买水数：" + number);
@@ -276,7 +278,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                     log.info("水 - number:{}", number);
                     homeService.sendMessageAndNotices(homeId, user.getUserId(), false, homeResponse.getNumber(), number, false, 1);
                     //消息订阅
-                    Map<String, Object> data = new HashMap<>();
+                    Map<String, Object> data = new HashMap<>(5);
 
                     //订单编号
                     data.put("character_string2", new HashMap<String, String>() {{
@@ -395,7 +397,6 @@ public class FtOrderServiceImpl implements FtOrderService {
         String orderId = null;  //ok
         String homeId = null;     // ok
 
-
         if ("code".equals(type)) {
             String[] split = encBody.split("-");
             orderId = String.valueOf(Integer.parseInt(split[1], 16));
@@ -434,7 +435,11 @@ public class FtOrderServiceImpl implements FtOrderService {
             typer = ftGoods.getTyper();
         }
 
-        String result = null;
+        if (typer == null || userId == null || orderId == null || homeId == null){
+            return "核销失败, 未找到该订单, 订单ID：" + orderId;
+        }
+
+        String result = "";
 
         //--------------------水商品 和 空桶商品 核销--------------------
         SysUser user = userService.selectUserById(Long.parseLong(userId));
@@ -498,7 +503,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             List<FtHome> homes = homeService.getHomes();
             String topName = homeService.getTopHome(homes, Long.valueOf(homeId)).getName();
             //消息订阅
-            Map<String, Object> data = new HashMap<>();
+            Map<String, Object> data = new HashMap<>(5);
 
             Integer finalTyper = typer;
             data.put("thing3", new HashMap<String, String>() {{

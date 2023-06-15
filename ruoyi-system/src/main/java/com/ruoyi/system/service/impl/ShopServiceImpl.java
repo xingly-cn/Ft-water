@@ -35,7 +35,7 @@ public class ShopServiceImpl implements ShopService {
         //先去查询是否已经存在该商品 存在 累加
         ShopResponse shopResponse = shopMapper.selectByGoodsId(userId,request.getGoodsId());
         if (shopResponse != null) {
-            log.info("已经存在该商品，累加数量");
+            log.info("已经存在该商品~~");
             request.setNumber(shopResponse.getNumber() + request.getNumber());
             request.setId(shopResponse.getId());
             return shopMapper.updateByPrimaryKeySelective(request) > 0;
