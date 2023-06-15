@@ -20,6 +20,7 @@ import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.response.UserResponse;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
+import com.ruoyi.system.utils.CommonUtils;
 import com.ruoyi.system.utils.WechatUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -513,6 +514,7 @@ public class SysUserServiceImpl implements ISysUserService {
             user.setPhonenumber(phone);
             user.setCreateTime(new Date());
             user.setRoleIds(new Long[]{2L});
+            user.setPassword(SecurityUtils.encryptPassword(CommonUtils.getPhoneLast6(phone)));
             insertUser(user);
         }
 

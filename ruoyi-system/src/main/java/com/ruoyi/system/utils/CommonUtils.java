@@ -3,6 +3,7 @@ package com.ruoyi.system.utils;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectRequest;
+import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.config.ApplicationContextProvider;
 import com.ruoyi.system.service.impl.SysConfigServiceImpl;
 import org.springframework.stereotype.Component;
@@ -86,9 +87,18 @@ public class CommonUtils {
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
             data[i / 2] = (byte) ((Character.digit(input.charAt(i), 16) << 4)
-                    + Character.digit(input.charAt(i+1), 16));
+                    + Character.digit(input.charAt(i + 1), 16));
         }
         return new String(data, StandardCharsets.UTF_8);
+    }
+
+    //截取手机号后6位
+    public static String getPhoneLast6(String phone) {
+        if (StringUtils.isEmpty(phone))
+            return phone;
+        if (phone.length() < 6)
+            return phone;
+        return phone.substring(phone.length() - 6);
     }
 
 }
