@@ -3,8 +3,11 @@ package com.ruoyi.system.utils;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.PutObjectRequest;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
 import com.ruoyi.system.config.ApplicationContextProvider;
+import com.ruoyi.system.domain.TextMessage;
+import com.ruoyi.system.mapper.TextMessageMapper;
 import com.ruoyi.system.service.impl.SysConfigServiceImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +36,8 @@ public class CommonUtils {
     private static final String MSG_APPSID;
     private static final String MSG_TOKEN;
 
+    private static final TextMessageMapper messageMapper;
+
     static {
         SysConfigServiceImpl configService = ApplicationContextProvider.getBean(SysConfigServiceImpl.class);
         ENDPOINT = configService.getCacheValue("ENDPOINT");
@@ -42,6 +47,7 @@ public class CommonUtils {
         MSG_APPID = configService.getCacheValue("MSG_APPID");
         MSG_APPSID = configService.getCacheValue("MSG_APPSID");
         MSG_TOKEN = configService.getCacheValue("MSG_TOKEN");
+        messageMapper = ApplicationContextProvider.getBean(TextMessageMapper.class);
     }
 
     /**
@@ -69,6 +75,11 @@ public class CommonUtils {
      * @return
      */
     public static String buildMessage(String phone, String message) {
+        TextMessage textMessage = new TextMessage();
+        textMessage.setPhone(phone);
+        textMessage.setUserId(SecurityUtils.getUserId());
+        textMessage.setCode("验证码");
+        messageMapper.insertTextMessage(textMessage);
         //todo
         return "";
     }

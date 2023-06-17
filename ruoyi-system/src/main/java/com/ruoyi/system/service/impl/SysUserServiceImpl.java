@@ -73,6 +73,9 @@ public class SysUserServiceImpl implements ISysUserService {
     @Autowired
     private FtHomeServiceImpl homeService;
 
+    @Autowired
+    private TextMessageMapper textMessageMapper;
+
     /**
      * 根据条件分页查询用户列表
      *

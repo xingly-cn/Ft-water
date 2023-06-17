@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TextMessageMapper">
+
+    <resultMap type="com.ruoyi.system.domain.TextMessage" id="TextMessageResult">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="code" column="code"/>
+        <result property="phone" column="phone"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <insert id="insertTextMessage">
+        insert into text_message (user_id, code, phone, create_time)
+        values (#{userId}, #{code}, #{phone}, now())
+    </insert>
+
+</mapper>

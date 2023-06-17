@@ -479,12 +479,12 @@
     <update id="updateOpenIdByPhone">
         update sys_user
         set open_id = #{openId}
-        where phone = #{phone}
+        where phonenumber = #{phone}
     </update>
 
     <update id="updatePhoneById">
         update sys_user
-        set phone = #{phonenumber}
+        set phonenumber = #{phonenumber}
         where user_id = #{userId}
     </update>
 
