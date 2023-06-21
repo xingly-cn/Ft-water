@@ -16,7 +16,6 @@ import com.ruoyi.system.mapper.*;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.request.WechatUserInfo;
-import com.ruoyi.system.response.OrderResponse;
 import com.ruoyi.system.response.UserResponse;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
@@ -26,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -287,7 +285,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
-    @CacheEvict(value = "user", key = "#user.userId")
+//    @CacheEvict(value = "user", key = "#user.userId")
     public int updateUser(SysUser user) {
         // 新增用户与角色管理
         insertUserRole(user);
@@ -332,7 +330,7 @@ public class SysUserServiceImpl implements ISysUserService {
      * @return 结果
      */
     @Override
-    @CacheEvict(value = "user", key = "#user.userId")
+//    @CacheEvict(value = "user", key = "#user.userId")
     public int updateUserProfile(SysUser user) {
         return userMapper.updateUser(user);
     }
@@ -380,7 +378,7 @@ public class SysUserServiceImpl implements ISysUserService {
      */
     @Override
     @Transactional
-    @CacheEvict(value = "user", allEntries = true)
+//    @CacheEvict(value = "user", allEntries = true)
     public int deleteUserByIds(Long[] userIds) {
         for (Long userId : userIds) {
             checkUserAllowed(new SysUser(userId));
@@ -454,7 +452,7 @@ public class SysUserServiceImpl implements ISysUserService {
         Long userId = SecurityUtils.getUserId();
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.setUserId(userId);
-        List<OrderResponse> ftOrders = ftOrderMapper.selectList(orderRequest);
+//        List<OrderResponse> ftOrders = ftOrderMapper.selectList(orderRequest);
 //        int totalNum = ftOrders.stream().mapToInt(FtOrder::getNum).sum();
         SysUser user = userMapper.selectUserById(userId);
         Integer waterNum = user.getWaterNum();
@@ -521,6 +519,10 @@ public class SysUserServiceImpl implements ISysUserService {
             insertUser(user);
         }
 
+        if (!user.getPhonenumber().equals(phone)){
+            throw new ServiceException("该微信号已经和其它手机号关联吧");
+        }
+
         LoginUser loginUser = new LoginUser();
         loginUser.setUser(user);
         loginUser.setUserId(user.getUserId());
@@ -541,6 +543,10 @@ public class SysUserServiceImpl implements ISysUserService {
     public String changeUserPhone(UserRequest request) {
         Long userId = SecurityUtils.getUserId();
         log.info("changeUserPhone userId:{}", userId);
+        SysUser sysUser = userMapper.selectUserByPhone(request.getPhonenumber());
+        if (sysUser != null) {
+            throw new ServiceException("该手机号已被注册");
+        }
         SysUser user = userMapper.selectUserById(userId);
 
         // 从redis校验验证码是否正确，这里先写死，因为甲方还没有购买短信

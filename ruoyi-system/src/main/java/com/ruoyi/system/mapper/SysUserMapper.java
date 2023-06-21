@@ -166,4 +166,6 @@ public interface SysUserMapper {
     void updateUserWater(@Param("userId") Long userId,@Param("newWaterNum") int newWaterNum);
 
     void updateUserBarrenNum(@Param("userId")Long userId, @Param("barrelNum") int newBarrenNum);
+
+    SysUser selectUserByPhone(@Param("phone") String phoneNumber);
 }

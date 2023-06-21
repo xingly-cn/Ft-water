@@ -103,7 +103,11 @@ public class CommonUtils {
         return new String(data, StandardCharsets.UTF_8);
     }
 
-    //截取手机号后6位
+    /**
+     * 获取手机号后6位
+     * @param phone 手机号
+     * @return 后6位
+     */
     public static String getPhoneLast6(String phone) {
         if (StringUtils.isEmpty(phone))
             return phone;

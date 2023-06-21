@@ -567,4 +567,13 @@
         set barrel_number = #{barrelNum}
         where user_id = #{userId}
     </update>
+
+    <select id="selectUserByPhone" resultMap="BaseUserResult">
+        select user_id,
+               user_name,
+               phonenumber
+        from sys_user
+        where phonenumber = #{phone}
+          and del_flag = '0'
+    </select>
 </mapper>
