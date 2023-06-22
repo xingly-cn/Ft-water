@@ -1,9 +1,11 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.constant.UserConstants;
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
+import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.common.exception.ServiceException;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.common.utils.StringUtils;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validator;
 import java.util.*;
@@ -73,6 +76,9 @@ public class SysUserServiceImpl implements ISysUserService {
 
     @Autowired
     private TextMessageMapper textMessageMapper;
+
+    @Resource
+    private RedisCache redisCache;
 
     /**
      * 根据条件分页查询用户列表
@@ -540,7 +546,7 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     @Override
-    public String changeUserPhone(UserRequest request) {
+    public AjaxResult changeUserPhone(UserRequest request) {
         Long userId = SecurityUtils.getUserId();
         log.info("changeUserPhone userId:{}", userId);
         SysUser sysUser = userMapper.selectUserByPhone(request.getPhonenumber());
@@ -550,12 +556,13 @@ public class SysUserServiceImpl implements ISysUserService {
         SysUser user = userMapper.selectUserById(userId);
 
         // 从redis校验验证码是否正确，这里先写死，因为甲方还没有购买短信
-        if ("666666".equals(request.getCode())) {
+        String rCode = redisCache.getCacheObject("sms:" + request.getPhonenumber());
+        if (rCode != null && rCode.equals(request.getCode())) {
             user.setPhonenumber(request.getPhonenumber());
             userMapper.updatePhoneById(user);
-            return userMapper.updatePhoneById(user) > 0 ? "修改手机号成功" : "修改手机号失败";
+            return userMapper.updatePhoneById(user) > 0 ? AjaxResult.success("修改手机号成功") : AjaxResult.error("修改手机号失败");
         }
-        return "验证码错误";
+        return AjaxResult.error("验证码错误");
     }
 
     @Override

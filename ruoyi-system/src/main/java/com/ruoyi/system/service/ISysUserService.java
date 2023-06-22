@@ -1,5 +1,6 @@
 package com.ruoyi.system.service;
 
+import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.request.WechatUserInfo;
@@ -214,7 +215,7 @@ public interface ISysUserService {
 
     String getPhone(UserRequest request);
 
-    String changeUserPhone(UserRequest request);
+    AjaxResult changeUserPhone(UserRequest request);
 
     SysUser getUserInfo(HttpServletRequest rq);
 

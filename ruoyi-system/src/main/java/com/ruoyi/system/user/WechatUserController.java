@@ -54,7 +54,7 @@ public class WechatUserController {
     @PostMapping("/updatePhone")
     @ApiOperation("更新用户手机")
     public AjaxResult changeUserPhone(@RequestBody UserRequest request) {
-        return AjaxResult.success(userService.changeUserPhone(request));
+        return userService.changeUserPhone(request);
     }
 
     @GetMapping("/getUserInfo")
