@@ -35,4 +35,7 @@ public class FtHome extends BaseEntity {
 
     @ApiModelProperty(value = "纬度")
     private Double latitude;
+
+    @ApiModelProperty(value = "是否配送")
+    private Boolean isDelivery;
 }

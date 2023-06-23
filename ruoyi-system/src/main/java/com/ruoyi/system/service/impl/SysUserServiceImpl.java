@@ -13,7 +13,10 @@ import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserRole;
-import com.ruoyi.system.mapper.*;
+import com.ruoyi.system.mapper.SysPostMapper;
+import com.ruoyi.system.mapper.SysRoleMapper;
+import com.ruoyi.system.mapper.SysUserMapper;
+import com.ruoyi.system.mapper.SysUserRoleMapper;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.request.WechatUserInfo;
@@ -65,16 +68,10 @@ public class SysUserServiceImpl implements ISysUserService {
     protected Validator validator;
 
     @Autowired
-    private FtOrderMapper ftOrderMapper;
-
-    @Autowired
     private TokenService tokenService;
 
     @Autowired
     private FtHomeServiceImpl homeService;
-
-    @Autowired
-    private TextMessageMapper textMessageMapper;
 
     @Resource
     private RedisCache redisCache;

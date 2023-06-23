@@ -186,6 +186,12 @@
         <if test="goods.title != null and goods.title != ''">
             and title like concat('%', #{goods.title}, '%')
         </if>
+        <if test="goods.typer != null">
+            and typer = #{goods.typer}
+        </if>
+        <if test="goods.opener != null">
+            and opener = #{goods.opener}
+        </if>
         order by id desc
     </select>
 
