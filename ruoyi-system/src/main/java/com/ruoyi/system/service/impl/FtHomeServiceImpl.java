@@ -78,7 +78,9 @@ public class FtHomeServiceImpl implements FtHomeService {
     public List<HomeResponse> homeTree(Boolean isDelivery) {
         List<HomeResponse> responses = Lists.newArrayList();
 
-        List<FtHome> homes = getHomes(isDelivery);
+        log.info("homeTree isDelivery:{}", isDelivery);
+//        List<FtHome> homes = getHomes(isDelivery);
+        List<FtHome> homes = getHomes();
         if (CollectionUtils.isEmpty(homes)) {
             return responses;
         }
@@ -190,12 +192,12 @@ public class FtHomeServiceImpl implements FtHomeService {
         return homeMapper.selectList(null);
     }
 
-    @Cacheable(value = "home_isDelivery", unless = "#result == null")
-    public List<FtHome> getHomes(Boolean isDelivery) {
-        HomeRequest request = new HomeRequest();
-        request.setIsDelivery(isDelivery);
-        return homeMapper.selectList(request);
-    }
+//    @Cacheable(value = "home_isDelivery", unless = "#result == null")
+//    public List<FtHome> getHomes(Boolean isDelivery) {
+//        HomeRequest request = new HomeRequest();
+//        request.setIsDelivery(isDelivery);
+//        return homeMapper.selectList(request);
+//    }
 
     /**
      * 一个树通过一个下级id如何找到最上级的id
@@ -381,9 +383,7 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         notices.setCreateBy(userId.toString());
         notices.setUpdateBy(userId.toString());
-        notices.setCreateTime(new
-
-                Date());
+        notices.setCreateTime(new Date());
         return noticesService.insertSelective(notices) > 0;
     }
 }
