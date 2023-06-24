@@ -11,6 +11,7 @@
         <result column="longitude" jdbcType="DOUBLE" property="longitude"/>
         <result column="latitude" jdbcType="DOUBLE" property="latitude"/>
         <result column="number" jdbcType="INTEGER" property="number"/>
+        <result column="is_delivery" jdbcType="BOOLEAN" property="isDelivery"/>
         <result column="deleted" jdbcType="BOOLEAN" property="deleted"/>
     </resultMap>
 
@@ -23,6 +24,7 @@
         longitude,
         latitude,
         `number`,
+        is_delivery,
         deleted
     </sql>
 
@@ -62,9 +64,11 @@
             <if test="longitude !=null">
                 longitude,
             </if>
-
             <if test="number != null">
                 `number`,
+            </if>
+            <if test="isDelivery != null">
+                is_delivery,
             </if>
             <if test="deleted != null">
                 deleted,
@@ -88,6 +92,9 @@
             </if>
             <if test="number != null">
                 #{number,jdbcType=INTEGER},
+            </if>
+            <if test="isDelivery != null">
+                #{isDelivery,jdbcType=BOOLEAN},
             </if>
             <if test="deleted != null">
                 #{deleted,jdbcType=BOOLEAN},
@@ -119,6 +126,9 @@
             </if>
             <if test="deleted != null">
                 deleted = #{deleted,jdbcType=BOOLEAN},
+            </if>
+            <if test="isDelivery != null">
+                is_delivery = #{isDelivery,jdbcType=BOOLEAN},
             </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
@@ -160,6 +170,9 @@
         </if>
         <if test="number != null">
             and `number` = #{number,jdbcType=INTEGER}
+        </if>
+        <if test="isDelivery != null">
+            and is_delivery = #{isDelivery,jdbcType=BOOLEAN}
         </if>
     </select>
 

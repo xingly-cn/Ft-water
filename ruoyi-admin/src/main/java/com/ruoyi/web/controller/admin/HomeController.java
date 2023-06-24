@@ -1,8 +1,8 @@
 package com.ruoyi.web.controller.admin;
 
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.system.request.HomeRequest;
 import com.ruoyi.system.domain.FtHome;
+import com.ruoyi.system.request.HomeRequest;
 import com.ruoyi.system.service.FtHomeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,8 +32,8 @@ public class HomeController {
 
     @GetMapping("/tree")
     @ApiOperation("树")
-    public AjaxResult homeTree() {
-        return AjaxResult.success(homeService.homeTree());
+    public AjaxResult homeTree(@RequestParam(required = false) Boolean isDelivery) {
+        return AjaxResult.success(homeService.homeTree(isDelivery));
     }
 
     @PostMapping("/insert")

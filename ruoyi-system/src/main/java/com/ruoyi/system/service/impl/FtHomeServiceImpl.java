@@ -6,7 +6,6 @@ import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.FtMessage;
 import com.ruoyi.system.domain.FtNotices;
 import com.ruoyi.system.domain.UserHome;
-import com.ruoyi.system.exception.ServiceException;
 import com.ruoyi.system.mapper.FtHomeMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.mapper.UserHomeMapper;
@@ -76,9 +75,11 @@ public class FtHomeServiceImpl implements FtHomeService {
     }
 
     @Override
-    public List<HomeResponse> homeTree() {
+    public List<HomeResponse> homeTree(Boolean isDelivery) {
         List<HomeResponse> responses = Lists.newArrayList();
 
+        log.info("homeTree isDelivery:{}", isDelivery);
+//        List<FtHome> homes = getHomes(isDelivery);
         List<FtHome> homes = getHomes();
         if (CollectionUtils.isEmpty(homes)) {
             return responses;
@@ -133,14 +134,13 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         //查询该宿舍楼下面的管理员 最多俩个
         List<UserHome> userHomes = userHomeMapper.selectByHomeId(request.getId());
-        if (userHomes.size() >= 2) {
-            throw new SecurityException("该宿舍楼下面已经有两个管理员了，不能再添加了");
-        }
 
-        //查询该用户是否已经是管理员
-        userHomes.stream().filter(u -> u.getUserId().equals(request.getUserId())).findAny().ifPresent(u -> {
-            throw new SecurityException("该用户已经是该宿舍楼管理员了");
-        });
+        if (CollectionUtils.isNotEmpty(userHomes)) {
+            //查询该用户是否已经是管理员
+            userHomes.stream().filter(u -> u.getUserId().equals(request.getUserId())).findAny().ifPresent(u -> {
+                throw new SecurityException("该用户已经是该宿舍楼管理员了");
+            });
+        }
 
         //添加管理员
         user.setRoleIds(new Long[]{7L});
@@ -191,6 +191,13 @@ public class FtHomeServiceImpl implements FtHomeService {
     public List<FtHome> getHomes() {
         return homeMapper.selectList(null);
     }
+
+//    @Cacheable(value = "home_isDelivery", unless = "#result == null")
+//    public List<FtHome> getHomes(Boolean isDelivery) {
+//        HomeRequest request = new HomeRequest();
+//        request.setIsDelivery(isDelivery);
+//        return homeMapper.selectList(request);
+//    }
 
     /**
      * 一个树通过一个下级id如何找到最上级的id
@@ -376,9 +383,7 @@ public class FtHomeServiceImpl implements FtHomeService {
 
         notices.setCreateBy(userId.toString());
         notices.setUpdateBy(userId.toString());
-        notices.setCreateTime(new
-
-                Date());
+        notices.setCreateTime(new Date());
         return noticesService.insertSelective(notices) > 0;
     }
 }

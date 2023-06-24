@@ -3,8 +3,8 @@ package com.ruoyi.web.controller.admin;
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.page.TableDataInfo;
-import com.ruoyi.system.request.GoodRequest;
 import com.ruoyi.system.domain.FtGoods;
+import com.ruoyi.system.request.GoodRequest;
 import com.ruoyi.system.response.GoodsResponse;
 import com.ruoyi.system.service.FtGoodsService;
 import io.swagger.annotations.Api;
@@ -35,7 +35,7 @@ public class GoodsController extends BaseController {
 
 
     @GetMapping("/page")
-    @ApiOperation("商品列表-已上架")
+    @ApiOperation("商品列表")
     public TableDataInfo getGoodsList(GoodRequest goodRequest) {
         startPage();
         List<GoodsResponse> responses = goodsService.selectGoodsList(goodRequest);

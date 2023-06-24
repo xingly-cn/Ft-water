@@ -1,7 +1,6 @@
 package com.ruoyi.system.service.impl;
 
 import com.ruoyi.common.constant.UserConstants;
-import com.ruoyi.common.core.domain.AjaxResult;
 import com.ruoyi.common.core.domain.entity.SysRole;
 import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.core.domain.model.LoginUser;
@@ -14,7 +13,10 @@ import com.ruoyi.common.utils.spring.SpringUtils;
 import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.SysPost;
 import com.ruoyi.system.domain.SysUserRole;
-import com.ruoyi.system.mapper.*;
+import com.ruoyi.system.mapper.SysPostMapper;
+import com.ruoyi.system.mapper.SysRoleMapper;
+import com.ruoyi.system.mapper.SysUserMapper;
+import com.ruoyi.system.mapper.SysUserRoleMapper;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.request.UserRequest;
 import com.ruoyi.system.request.WechatUserInfo;
@@ -66,16 +68,10 @@ public class SysUserServiceImpl implements ISysUserService {
     protected Validator validator;
 
     @Autowired
-    private FtOrderMapper ftOrderMapper;
-
-    @Autowired
     private TokenService tokenService;
 
     @Autowired
     private FtHomeServiceImpl homeService;
-
-    @Autowired
-    private TextMessageMapper textMessageMapper;
 
     @Resource
     private RedisCache redisCache;
@@ -525,7 +521,7 @@ public class SysUserServiceImpl implements ISysUserService {
             insertUser(user);
         }
 
-        if (!user.getPhonenumber().equals(phone)){
+        if (!user.getPhonenumber().equals(phone)) {
             throw new ServiceException("该微信号已经和其它手机号关联吧");
         }
 
@@ -546,7 +542,7 @@ public class SysUserServiceImpl implements ISysUserService {
     }
 
     @Override
-    public AjaxResult changeUserPhone(UserRequest request) {
+    public String changeUserPhone(UserRequest request) {
         Long userId = SecurityUtils.getUserId();
         log.info("changeUserPhone userId:{}", userId);
         SysUser sysUser = userMapper.selectUserByPhone(request.getPhonenumber());
@@ -559,10 +555,9 @@ public class SysUserServiceImpl implements ISysUserService {
         String rCode = redisCache.getCacheObject("sms:" + request.getPhonenumber());
         if (rCode != null && rCode.equals(request.getCode())) {
             user.setPhonenumber(request.getPhonenumber());
-            userMapper.updatePhoneById(user);
-            return userMapper.updatePhoneById(user) > 0 ? AjaxResult.success("修改手机号成功") : AjaxResult.error("修改手机号失败");
+            return userMapper.updatePhoneById(user) > 0 ? "修改手机号成功" : "修改手机号失败";
         }
-        return AjaxResult.error("验证码错误");
+        throw new ServiceException("验证码错误");
     }
 
     @Override
