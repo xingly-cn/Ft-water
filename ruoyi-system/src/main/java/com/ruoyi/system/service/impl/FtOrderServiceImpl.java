@@ -71,6 +71,9 @@ public class FtOrderServiceImpl implements FtOrderService {
     private FtHomeMapper ftHomeMapper;
 
     @Resource
+    private FtStatisticsMapper ftStatisticsMapper;
+
+    @Resource
     private FtGoodsMapper ftGoodsMapper;
 
     @Autowired
@@ -204,6 +207,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             throw new ServiceException("订单不存在");
         }
 
+
         // 设置订单状态为已支付
         ftOrder.setStatus(1);
 
@@ -233,6 +237,10 @@ public class FtOrderServiceImpl implements FtOrderService {
         Set<Long> shopGoodsIds = shops.stream().map(Shop::getGoodsId).collect(Collectors.toSet());
         List<GoodsResponse> goods = goodsService.selectGoodsByIds(shopGoodsIds);
         Map<Integer, List<GoodsResponse>> goodsMap = goods.stream().collect(Collectors.groupingBy(GoodsResponse::getTyper));
+
+        // 统计对象
+        FtStatistics ftStatistics = new FtStatistics();
+
         goodsMap.keySet().forEach(type -> {
             List<GoodsResponse> goodsResponses = goodsMap.get(type);
             List<Shop> shopList = shops.stream().filter(s -> goodsResponses.stream().map(GoodsResponse::getId).collect(Collectors.toList())
@@ -243,6 +251,14 @@ public class FtOrderServiceImpl implements FtOrderService {
                 case 0:
                     // 套餐 = 水票
                     log.info("套餐 - number:{}", number);
+
+
+                    // 数据统计
+                    ftStatistics.setTotal(number);
+                    ftStatistics.setTp(0);
+                    ftStatistics.setFloorId(ftOrder.getHomeId().intValue());
+                    
+
                     ftOrder.setStatus(2);
                     //async 水漂 其他 是 核销之后 入这个表
                     addUserGoods(shopList, user.getUserId());
@@ -265,6 +281,12 @@ public class FtOrderServiceImpl implements FtOrderService {
                     break;
                 case 1:
                     //商品 = 水
+
+                    // 数据统计
+                    ftStatistics.setTotal(number);
+                    ftStatistics.setTp(1);
+                    ftStatistics.setFloorId(ftOrder.getHomeId().intValue());
+
                     // 如果为混合支付扣除用户水票
                     if ("coupon".equals(ftOrder.getPayMethod())) {
                         log.info("用户水票为：" + user.getWaterNum() + " 购买水数：" + number);
@@ -304,6 +326,12 @@ public class FtOrderServiceImpl implements FtOrderService {
                     break;
                 case 2:
                     // 空桶
+
+                    // 数据统计
+                    ftStatistics.setTotal(number);
+                    ftStatistics.setTp(2);
+                    ftStatistics.setFloorId(ftOrder.getHomeId().intValue());
+
                     //发送消息 给对应宿管
                     log.info("桶 - number:{}", number);
                     // 增加用户空桶
@@ -314,6 +342,9 @@ public class FtOrderServiceImpl implements FtOrderService {
                 default:
                     break;
             }
+
+            // 统计数据插入
+            ftStatisticsMapper.myInsert(ftStatistics);
         });
 
         ftOrder.setPayed(true);

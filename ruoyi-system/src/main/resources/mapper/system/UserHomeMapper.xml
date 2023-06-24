@@ -43,4 +43,16 @@
         select user_id, home_id
         from user_home
     </select>
+
+    <select id="selectHomeIdByUserId" resultType="java.lang.Integer">
+        select home_id from user_home where user_id = #{userId}
+    </select>
+
+    <select id="selectAllHomeId" resultType="java.lang.Integer">
+        select distinct home_id from user_home
+    </select>
+
+    <select id="selectAllUserId" resultType="java.lang.Integer">
+        select distinct user_id from user_home
+    </select>
 </mapper>

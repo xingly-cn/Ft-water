@@ -335,4 +335,8 @@
         set status = #{status}
         where wxno = #{wxNo}
     </update>
+
+    <select id="getPriceByHomeId" resultType="java.math.BigDecimal">
+        select sum(total) from ft_order where home_id = #{homeId} and payed = 1 and (status = 1 or status = 2)
+    </select>
 </mapper>

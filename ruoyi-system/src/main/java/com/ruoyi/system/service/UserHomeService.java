@@ -1,5 +1,7 @@
 package com.ruoyi.system.service;
 
+import java.util.List;
+
 /**
  * Created by IntelliJ IDEA.
  *
@@ -9,4 +11,10 @@ package com.ruoyi.system.service;
 public interface UserHomeService {
 
     Boolean deleteUserHomeByUserIdAndHomeId(Long userId, Long homeId);
+
+    List<Integer> selectHomeIdByUserId(Long userId);
+
+    List<Integer> selectAllHomeId();
+
+    List<Integer> selectAllUserId();
 }

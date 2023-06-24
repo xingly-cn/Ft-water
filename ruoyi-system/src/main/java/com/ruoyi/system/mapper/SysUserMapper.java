@@ -14,6 +14,9 @@ import java.util.Set;
  * @author ruoyi
  */
 public interface SysUserMapper {
+
+    List<Integer> selectAllUser();
+
     /**
      * 根据条件分页查询用户列表
      *

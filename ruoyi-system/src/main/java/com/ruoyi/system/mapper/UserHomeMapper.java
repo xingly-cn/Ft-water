@@ -27,4 +27,10 @@ public interface UserHomeMapper {
     List<UserHome> selectByUserId(Long userId);
 
     List<UserHome> getUserHomes();
+
+    List<Integer> selectHomeIdByUserId(Long userId);
+
+    List<Integer> selectAllHomeId();
+
+    List<Integer> selectAllUserId();
 }

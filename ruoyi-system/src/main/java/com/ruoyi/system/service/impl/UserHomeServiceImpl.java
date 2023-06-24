@@ -48,4 +48,19 @@ public class UserHomeServiceImpl implements UserHomeService {
         }
         return userHomeMapper.deleteUserHomeByUserIdAndHomeId(userId, homeId);
     }
+
+    @Override
+    public List<Integer> selectHomeIdByUserId(Long userId) {
+        return userHomeMapper.selectHomeIdByUserId(userId);
+    }
+
+    @Override
+    public List<Integer> selectAllHomeId() {
+        return userHomeMapper.selectAllHomeId();
+    }
+
+    @Override
+    public List<Integer> selectAllUserId() {
+        return userHomeMapper.selectAllUserId();
+    }
 }

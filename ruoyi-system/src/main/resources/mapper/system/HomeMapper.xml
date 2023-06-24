@@ -223,4 +223,8 @@
             </foreach>
         </if>
     </select>
+
+    <select id="selectFtHomeByHomeId" resultMap="BaseResultMap">
+        select * from ft_home where id = #{homeId}
+    </select>
 </mapper>

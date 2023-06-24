@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.FtStatisticsMapper">
+
+
+    <insert id="myInsert">
+        insert into ft_statistics ( floor_id, tp, total, create_time) values (#{floorId}, #{tp}, #{total}, now())
+    </insert>
+
+    <select id="getWaterNum" resultType="java.lang.Integer">
+        select sum(total) from ft_statistics where floor_id = #{homeId} and tp = 1
+    </select>
+
+    <select id="getBottomNum" resultType="java.lang.Integer">
+        select sum(total) from ft_statistics where floor_id = #{homeId} and tp = 2
+    </select>
+
+
+
+    <select id="getCouponNum" resultType="java.lang.Integer">
+        select sum(total) from ft_statistics where floor_id = #{homeId} and tp = 0
+    </select>
+
+    <select id="getOrderNum" resultType="java.lang.Integer">
+        select count(*) from ft_statistics where floor_id = #{homeId}
+    </select>
+
+
+</mapper>

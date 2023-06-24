@@ -20,6 +20,8 @@ public interface FtHomeMapper {
 
     int deleteByPrimaryKey(Long id);
 
+    FtHome selectFtHomeByHomeId(Long homeId);
+
     int insertSelective(FtHome record);
 
     FtHome selectByPrimaryKey(Long id);

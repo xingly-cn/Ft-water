@@ -7,6 +7,7 @@ import com.ruoyi.system.response.OrderResponse;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -19,6 +20,8 @@ import java.util.List;
 public interface FtOrderMapper {
 
     int deleteByPrimaryKey(Long id);
+
+    BigDecimal getPriceByHomeId(Long homeId);
 
     int insert(FtOrder order);
 
