@@ -12,6 +12,10 @@
         <foreach collection="homeIds" item="homeId" index="index" open="(" separator="," close=")">
             #{homeId}
         </foreach>
+        and user_id in
+        <foreach collection="userIds" item="userId" index="index" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
         <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
             and create_time between #{startTime} and #{endTime}
         </if>
@@ -23,10 +27,20 @@
         <foreach collection="homeIds" item="homeId" index="index" open="(" separator="," close=")">
             #{homeId}
         </foreach>
+        and user_id in
+        <foreach collection="userIds" item="userId" index="index" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
         <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
             and create_time between #{startTime} and #{endTime}
         </if>
         group by floor_id
     </select>
 
+    <select id="getUserIdsByHomeIds" resultType="java.lang.Long">
+        select distinct user_id from ft_statistics where floor_id in
+        <foreach collection="homeIds" item="homeId" index="index" open="(" separator="," close=")">
+            #{homeId}
+        </foreach>
+    </select>
 </mapper>

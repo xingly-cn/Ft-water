@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,7 +22,7 @@ public interface FtOrderMapper {
 
     int deleteByPrimaryKey(Long id);
 
-    List<CountResponse> getPriceByHomeIds(@Param("homeIds")List<Long> homeIds,
+    List<CountResponse> getPriceByHomeIds(@Param("homeIds") Set<Long> homeIds,
                                           @Param("startTime")String startTime,
                                           @Param("endTime")String endTime);
 

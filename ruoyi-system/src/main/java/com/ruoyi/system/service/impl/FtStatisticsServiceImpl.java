@@ -1,5 +1,6 @@
 package com.ruoyi.system.service.impl;
 
+import com.ruoyi.common.core.domain.entity.SysUser;
 import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.system.domain.FtHome;
 import com.ruoyi.system.domain.UserHome;
@@ -14,7 +15,7 @@ import com.ruoyi.system.service.FtStatisticsService;
 import com.ruoyi.system.service.UserHomeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.BeanUtils;
+import org.apache.commons.compress.utils.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,16 +59,16 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
         LinkedHashMap<Integer, Map<Long, Object>> countNumberMap;
         Long userId = SecurityUtils.getUserId();
         List<SaleCountResponse> saleCountResponses = new ArrayList<>();
-
+        Set<Long> homeIds;
         switch (type) {
             case "weixin":
                 // 查询当前用户的数据
                 String userName = SecurityUtils.getUsername();
-                List<Long> homeIds = userHomeService.selectHomeIdByUserId(userId);
+                homeIds = userHomeService.selectHomeIdByUserId(userId);
                 if (CollectionUtils.isEmpty(homeIds)) {
                     return res;
                 }
-                countNumberMap = getCountNumberMap(homeIds,startTime,endTime);
+                countNumberMap = getCountNumberMap(homeIds,startTime,endTime, Sets.newHashSet(userId));
 //                saleData.addAll(myMethod(userId, userName,countNumberMap));
                 getSaleList(saleData, myMethod(userId, userName, countNumberMap));
                 res.put("saleData", saleData);
@@ -82,14 +83,20 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
                 }
                 // 查询所有的数据
                 List<UserHome> userHomes = userHomeService.selectAllUserHomes(flag,userId);
+                homeIds = userHomes.stream().map(UserHome::getHomeId).collect(Collectors.toSet());
+
+                //todo 宿管/配送员
+                Set<Long> userIds = ftStatisticsMapper.getUserIdsByHomeIds(homeIds);
 //                saleData.add(getTemp(Long.valueOf(homeId)));
 
-                if (CollectionUtils.isNotEmpty(userHomes)) {
-                    countNumberMap = getCountNumberMap(userHomes.stream().map(UserHome::getHomeId).collect(Collectors.toList()), startTime, endTime);
-                    Map<Long, String> userMap = userHomes.stream().collect(Collectors.toMap(UserHome::getUserId, UserHome::getUserName, (k1, k2) -> k1));
-                    userMap.forEach((k, v) -> {
-                        saleCountResponses.addAll(myMethod(k, v, countNumberMap));
-                        List<OrderHomeCountResponse> orderHomeCountResponses = ftOrderService.homeCount(k, startTime, endTime);
+                if (CollectionUtils.isNotEmpty(userIds)) {
+                    countNumberMap = getCountNumberMap(homeIds, startTime, endTime,userIds);
+//                    Map<Long, String> userMap = userHomes.stream().collect(Collectors.toMap(UserHome::getUserId, UserHome::getUserName, (k1, k2) -> k1));
+                    List<SysUser> users = userMapper.selectUsersByIds(userIds.stream().map(String::valueOf).collect(Collectors.toList()));
+
+                    users.forEach(user->{
+                        saleCountResponses.addAll(myMethod(user.getUserId(), user.getUserName(), countNumberMap));
+                        List<OrderHomeCountResponse> orderHomeCountResponses = ftOrderService.homeCount(user.getUserId(), startTime, endTime);
                         orderData.addAll(orderHomeCountResponses);
                     });
                     getSaleList(saleData, saleCountResponses);
@@ -104,7 +111,7 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
 
     public List<SaleCountResponse> myMethod(Long userId, String userName, LinkedHashMap<Integer, Map<Long, Object>> countNumberMap) {
         List<SaleCountResponse> res = new LinkedList<>();
-        List<Long> homeIds = userHomeService.selectHomeIdByUserId(userId);
+        Set<Long> homeIds = userHomeService.selectHomeIdByUserId(userId);
         if (CollectionUtils.isEmpty(homeIds)) {
             return res;
         }
@@ -157,15 +164,16 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
     }
 
 
-    private LinkedHashMap<Integer, Map<Long, Object>> getCountNumberMap(List<Long> homeIds,String startTime,String endTime) {
-        List<CountResponse> orderList = ftStatisticsMapper.getOrderNum(homeIds,startTime,endTime);
+    private LinkedHashMap<Integer, Map<Long, Object>> getCountNumberMap(Set<Long> homeIds,String startTime,String endTime,Set<Long> userIds) {
+        List<CountResponse> orderList = ftStatisticsMapper.getOrderNum(homeIds,userIds,startTime,endTime);
         Map<Long, Object> orderMap = assembleMap(orderList, 1);
-        List<CountResponse> CouponList = ftStatisticsMapper.getStatisticsNumByHomeIdsAndType(homeIds, 0,startTime,endTime);
+        List<CountResponse> CouponList = ftStatisticsMapper.getStatisticsNumByHomeIdsAndType(homeIds, 0,userIds,startTime,endTime);
         Map<Long, Object> couponMap = assembleMap(CouponList, 1);
-        List<CountResponse> WaterList = ftStatisticsMapper.getStatisticsNumByHomeIdsAndType(homeIds, 1,startTime,endTime);
+        List<CountResponse> WaterList = ftStatisticsMapper.getStatisticsNumByHomeIdsAndType(homeIds, 1,userIds,startTime,endTime);
         Map<Long, Object> waterMap = assembleMap(WaterList, 1);
-        List<CountResponse> BottomList = ftStatisticsMapper.getStatisticsNumByHomeIdsAndType(homeIds, 2,startTime,endTime);
+        List<CountResponse> BottomList = ftStatisticsMapper.getStatisticsNumByHomeIdsAndType(homeIds, 2,userIds,startTime,endTime);
         Map<Long, Object> bottomMap = assembleMap(BottomList, 1);
+        //todo user 金额
         List<CountResponse> orderPriceList = ftOrderMapper.getPriceByHomeIds(homeIds,startTime,endTime);
         Map<Long, Object> orderPriceMap = assembleMap(orderPriceList, 2);
         return new LinkedHashMap<Integer,Map<Long, Object>>(5) {
@@ -185,9 +193,16 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
             Set<Long> keys = saleCountHomeMap.keySet();
             keys.forEach(k->{
                 SaleCountResponse response = new SaleCountResponse();
-                BeanUtils.copyProperties(saleCountHomeMap.get(k).get(0),response);
-                response.setUserId(null);
-                response.setUserName(null);
+                SaleCountResponse countResponse = saleCountHomeMap.get(k).get(0);
+                response.setHomeId(countResponse.getHomeId());
+                response.setHomeName(countResponse.getHomeName());
+
+                response.setOrderNum(saleCountHomeMap.get(k).stream().mapToInt(SaleCountResponse::getOrderNum).sum());
+                response.setTotalPrice(saleCountHomeMap.get(k).stream().map(SaleCountResponse::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
+                response.setCouponNum(saleCountHomeMap.get(k).stream().mapToInt(SaleCountResponse::getCouponNum).sum());
+                response.setWaterNum(saleCountHomeMap.get(k).stream().mapToInt(SaleCountResponse::getWaterNum).sum());
+                response.setBottomNum(saleCountHomeMap.get(k).stream().mapToInt(SaleCountResponse::getBottomNum).sum());
+
                 response.setUsers(saleCountHomeMap.get(k));
                 saleData.add(response);
             });

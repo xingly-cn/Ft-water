@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -50,7 +51,7 @@ public class UserHomeServiceImpl implements UserHomeService {
     }
 
     @Override
-    public List<Long> selectHomeIdByUserId(Long userId) {
+    public Set<Long> selectHomeIdByUserId(Long userId) {
         return userHomeMapper.selectHomeIdByUserId(userId);
     }
 

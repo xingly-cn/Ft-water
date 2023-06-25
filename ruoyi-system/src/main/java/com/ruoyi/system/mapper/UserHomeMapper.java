@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,7 +29,7 @@ public interface UserHomeMapper {
 
     List<UserHome> getUserHomes();
 
-    List<Long> selectHomeIdByUserId(Long userId);
+    Set<Long> selectHomeIdByUserId(Long userId);
 
     List<UserHome> selectAllUserHomes(@Param("flag") Boolean flag,
                                       @Param("userId") Long userId);
