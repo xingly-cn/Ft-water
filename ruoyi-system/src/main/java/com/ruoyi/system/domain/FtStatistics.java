@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -33,6 +32,9 @@ public class FtStatistics  implements Serializable {
 
     @ApiModelProperty(value = "数量")
     private int total;
+
+    @ApiModelProperty(value = "核销人ID")
+    private int userId;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;

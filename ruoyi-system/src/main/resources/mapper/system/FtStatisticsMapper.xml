@@ -3,7 +3,7 @@
 <mapper namespace="com.ruoyi.system.mapper.FtStatisticsMapper">
 
     <insert id="myInsert">
-        insert into ft_statistics ( floor_id, tp, total, create_time) values (#{floorId}, #{tp}, #{total}, now())
+        insert into ft_statistics ( floor_id, tp, total, create_time, user_id) values (#{floorId}, #{tp}, #{total}, now(), #{userId})
     </insert>
 
     <select id="getStatisticsNumByHomeIdsAndType" resultType="com.ruoyi.system.response.CountResponse">

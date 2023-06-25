@@ -124,7 +124,6 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
     public SaleCountResponse getTemp(Long homeId, Long userId, String userName, Integer orderNum, Integer couponNum, Integer waterNum, Integer bottomNum, BigDecimal totalPrice) {
 
         // 递归获取完整楼栋名称
-//        FtHome home = ftHomeMapper.selectFtHomeByHomeId(homeId);
         FtHome home = homeService.selectByPrimaryKey(homeId);
         Long parentId = home.getParentId();
         String homeName = "";

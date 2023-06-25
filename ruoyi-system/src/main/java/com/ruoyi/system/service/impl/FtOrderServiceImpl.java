@@ -238,8 +238,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         List<GoodsResponse> goods = goodsService.selectGoodsByIds(shopGoodsIds);
         Map<Integer, List<GoodsResponse>> goodsMap = goods.stream().collect(Collectors.groupingBy(GoodsResponse::getTyper));
 
-        // 统计对象
-        FtStatistics ftStatistics = new FtStatistics();
+
 
         goodsMap.keySet().forEach(type -> {
             List<GoodsResponse> goodsResponses = goodsMap.get(type);
@@ -251,11 +250,6 @@ public class FtOrderServiceImpl implements FtOrderService {
                 case 0:
                     // 套餐 = 水票
                     log.info("套餐 - number:{}", number);
-
-                    // 数据统计
-                    ftStatistics.setTotal(number);
-                    ftStatistics.setTp(0);
-                    ftStatistics.setFloorId(ftOrder.getHomeId().intValue());
 
                     ftOrder.setStatus(2);
                     //async 水漂 其他 是 核销之后 入这个表
@@ -279,11 +273,6 @@ public class FtOrderServiceImpl implements FtOrderService {
                     break;
                 case 1:
                     //商品 = 水
-
-                    // 数据统计
-                    ftStatistics.setTotal(number);
-                    ftStatistics.setTp(1);
-                    ftStatistics.setFloorId(ftOrder.getHomeId().intValue());
 
                     // 如果为混合支付扣除用户水票
                     if ("coupon".equals(ftOrder.getPayMethod())) {
@@ -324,11 +313,6 @@ public class FtOrderServiceImpl implements FtOrderService {
                     break;
                 case 2:
                     // 空桶
-                    // 数据统计
-                    ftStatistics.setTotal(number);
-                    ftStatistics.setTp(2);
-                    ftStatistics.setFloorId(ftOrder.getHomeId().intValue());
-
                     //发送消息 给对应宿管
                     log.info("桶 - number:{}", number);
                     // 增加用户空桶
@@ -339,9 +323,6 @@ public class FtOrderServiceImpl implements FtOrderService {
                 default:
                     break;
             }
-
-            // 统计数据插入
-            ftStatisticsMapper.myInsert(ftStatistics);
         });
 
         ftOrder.setPayed(true);
@@ -459,6 +440,9 @@ public class FtOrderServiceImpl implements FtOrderService {
         SysUser user = userService.selectUserById(Long.parseLong(userId));
         FtHome ftHome = ftHomeMapper.selectByPrimaryKey(Long.parseLong(homeId));
 
+        // 统计对象
+        FtStatistics ftStatistics = new FtStatistics();
+
         switch (typer) {
             case 0:
                 return "该订单为水票券, 不需要核销, 订单ID：" + orderId;
@@ -488,6 +472,14 @@ public class FtOrderServiceImpl implements FtOrderService {
                 ftOrderMapper.updateByPrimaryKey(ftOrder);
 
                 result = "核销水成功, 用户ID：" + usedNum + ", 数量：" + usedNum + ", 订单ID：" + orderId + "&" + usedNum;
+
+                // 数据统计
+                ftStatistics.setTotal(usedNum);
+                ftStatistics.setTp(1);
+                ftStatistics.setFloorId(ftOrder.getHomeId().intValue());
+                ftStatistics.setUserId(operatorId.intValue());
+
+
                 break;
             case 2:
                 // 空桶核销
@@ -510,8 +502,18 @@ public class FtOrderServiceImpl implements FtOrderService {
                 ftOrderMapper.updateByPrimaryKey(ftOrder1);
 
                 result = "核销空桶成功, 用户ID：" + userId + ", 数量：" + usedNum + ", 订单ID：" + orderId + "&" + usedNum;
+
+                // 数据统计
+                ftStatistics.setTotal(usedNum);
+                ftStatistics.setTp(2);
+                ftStatistics.setFloorId(ftOrder1.getHomeId().intValue());
+                ftStatistics.setUserId(operatorId.intValue());
+
                 break;
         }
+
+        // 统计数据插入
+        ftStatisticsMapper.myInsert(ftStatistics);
 
         if (typer == 1 || typer == 2) {
             List<FtHome> homes = homeService.getHomes();
