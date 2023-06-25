@@ -8,11 +8,13 @@ import com.ruoyi.system.mapper.FtStatisticsMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
 import com.ruoyi.system.response.CountResponse;
 import com.ruoyi.system.response.OrderHomeCountResponse;
+import com.ruoyi.system.response.SaleCountResponse;
 import com.ruoyi.system.service.FtOrderService;
 import com.ruoyi.system.service.FtStatisticsService;
 import com.ruoyi.system.service.UserHomeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,10 +53,11 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
     @Override
     public Map<String, Object> getDashBoardData(String type,String startTime,String endTime) {
         Map<String, Object> res = new HashMap<>();
-        List<Object> saleData = new LinkedList<>();
+        List<SaleCountResponse> saleData = new LinkedList<>();
         Set<OrderHomeCountResponse> orderData = new HashSet<>();
         LinkedHashMap<Integer, Map<Long, Object>> countNumberMap;
         Long userId = SecurityUtils.getUserId();
+        List<SaleCountResponse> saleCountResponses = new ArrayList<>();
 
         switch (type) {
             case "weixin":
@@ -65,7 +68,8 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
                     return res;
                 }
                 countNumberMap = getCountNumberMap(homeIds,startTime,endTime);
-                saleData.add(myMethod(userId, userName,countNumberMap));
+//                saleData.addAll(myMethod(userId, userName,countNumberMap));
+                getSaleList(saleData, myMethod(userId, userName, countNumberMap));
                 res.put("saleData", saleData);
                 res.put("orderData", ftOrderService.homeCount(userId,startTime,endTime));
                 break;
@@ -84,10 +88,11 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
                     countNumberMap = getCountNumberMap(userHomes.stream().map(UserHome::getHomeId).collect(Collectors.toList()), startTime, endTime);
                     Map<Long, String> userMap = userHomes.stream().collect(Collectors.toMap(UserHome::getUserId, UserHome::getUserName, (k1, k2) -> k1));
                     userMap.forEach((k, v) -> {
-                        saleData.add(myMethod(k, v, countNumberMap));
+                        saleCountResponses.addAll(myMethod(k, v, countNumberMap));
                         List<OrderHomeCountResponse> orderHomeCountResponses = ftOrderService.homeCount(k, startTime, endTime);
                         orderData.addAll(orderHomeCountResponses);
                     });
+                    getSaleList(saleData, saleCountResponses);
                 }
 
                 res.put("saleData", saleData);
@@ -97,27 +102,26 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
         return res;
     }
 
-    public List<Object> myMethod(Long userId, String userName, LinkedHashMap<Integer, Map<Long, Object>> countNumberMap) {
-        List<Object> res = new LinkedList<>();
+    public List<SaleCountResponse> myMethod(Long userId, String userName, LinkedHashMap<Integer, Map<Long, Object>> countNumberMap) {
+        List<SaleCountResponse> res = new LinkedList<>();
         List<Long> homeIds = userHomeService.selectHomeIdByUserId(userId);
         if (CollectionUtils.isEmpty(homeIds)) {
             return res;
         }
 
         homeIds.forEach(id -> {
-            Map<Object, Object> temp = getTemp(id, userId, userName,
+            SaleCountResponse response = getTemp(id, userId, userName,
                     countNumberMap.get(1).get(id) != null ? (int) countNumberMap.get(1).get(id) : 0,
                     countNumberMap.get(2).get(id) != null ? (int) countNumberMap.get(2).get(id) : 0,
                     countNumberMap.get(3).get(id) != null ? (int) countNumberMap.get(3).get(id) : 0,
                     countNumberMap.get(4).get(id) != null ? (int) countNumberMap.get(4).get(id) : 0,
                     countNumberMap.get(5).get(id) != null ? (BigDecimal) countNumberMap.get(5).get(id) : BigDecimal.ZERO);
-            res.add(temp);
+            res.add(response);
         });
         return res;
     }
 
-    public Map<Object, Object> getTemp(Long homeId, Long userId, String userName, Integer orderNum, Integer couponNum, Integer waterNum, Integer bottomNum, BigDecimal totalPrice) {
-        Map<Object, Object> temp = new HashMap<>();
+    public SaleCountResponse getTemp(Long homeId, Long userId, String userName, Integer orderNum, Integer couponNum, Integer waterNum, Integer bottomNum, BigDecimal totalPrice) {
 
         // 递归获取完整楼栋名称
 //        FtHome home = ftHomeMapper.selectFtHomeByHomeId(homeId);
@@ -130,16 +134,17 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
         }
         homeName += home.getName();
 
-        temp.put("orderNum", orderNum);
-        temp.put("homeId", homeId);
-        temp.put("userId", userId);
-        temp.put("userName", userName);
-        temp.put("couponNum", couponNum);
-        temp.put("waterNum", waterNum);
-        temp.put("bottomNum", bottomNum);
-        temp.put("homeName", homeName);
-        temp.put("totalPrice", totalPrice);
-        return temp;
+        return SaleCountResponse.builder()
+                .homeId(homeId)
+                .homeName(homeName)
+                .userId(userId)
+                .userName(userName)
+                .orderNum(orderNum)
+                .totalPrice(totalPrice)
+                .couponNum(couponNum)
+                .waterNum(waterNum)
+                .bottomNum(bottomNum)
+                .build();
     }
 
     private Map<Long, Object> assembleMap(List<CountResponse> waitHandleList, Integer type) {
@@ -173,6 +178,21 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
                 put(5, orderPriceMap);
             }
         };
+    }
+
+    private void getSaleList(List<SaleCountResponse> saleData,List<SaleCountResponse> saleCountResponses){
+        if (CollectionUtils.isNotEmpty(saleCountResponses)) {
+            Map<Long, List<SaleCountResponse>> saleCountHomeMap = saleCountResponses.stream().collect(Collectors.groupingBy(SaleCountResponse::getHomeId));
+            Set<Long> keys = saleCountHomeMap.keySet();
+            keys.forEach(k->{
+                SaleCountResponse response = new SaleCountResponse();
+                BeanUtils.copyProperties(saleCountHomeMap.get(k).get(0),response);
+                response.setUserId(null);
+                response.setUserName(null);
+                response.setUsers(saleCountHomeMap.get(k));
+                saleData.add(response);
+            });
+        }
     }
 
 }
