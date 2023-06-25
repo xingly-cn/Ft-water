@@ -82,11 +82,12 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
 
                 if (CollectionUtils.isNotEmpty(userHomes)) {
                     countNumberMap = getCountNumberMap(userHomes.stream().map(UserHome::getHomeId).collect(Collectors.toList()), startTime, endTime);
-                    for (UserHome userHome : userHomes) {
-                        saleData.add(myMethod(userHome.getUserId(), userHome.getUserName(), countNumberMap));
-                        List<OrderHomeCountResponse> orderHomeCountResponses = ftOrderService.homeCount(userHome.getUserId(), startTime, endTime);
+                    Map<Long, String> userMap = userHomes.stream().collect(Collectors.toMap(UserHome::getUserId, UserHome::getUserName, (k1, k2) -> k1));
+                    userMap.forEach((k, v) -> {
+                        saleData.add(myMethod(k, v, countNumberMap));
+                        List<OrderHomeCountResponse> orderHomeCountResponses = ftOrderService.homeCount(k, startTime, endTime);
                         orderData.addAll(orderHomeCountResponses);
-                    }
+                    });
                 }
 
                 res.put("saleData", saleData);
