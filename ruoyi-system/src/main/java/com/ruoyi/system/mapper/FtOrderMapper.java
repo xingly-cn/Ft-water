@@ -3,11 +3,11 @@ package com.ruoyi.system.mapper;
 import com.ruoyi.system.domain.FtOrder;
 import com.ruoyi.system.request.OrderRequest;
 import com.ruoyi.system.response.CalcOrderPriceResponse;
+import com.ruoyi.system.response.CountResponse;
 import com.ruoyi.system.response.OrderResponse;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -21,7 +21,9 @@ public interface FtOrderMapper {
 
     int deleteByPrimaryKey(Long id);
 
-    BigDecimal getPriceByHomeId(Long homeId);
+    List<CountResponse> getPriceByHomeIds(@Param("homeIds")List<Long> homeIds,
+                                          @Param("startTime")String startTime,
+                                          @Param("endTime")String endTime);
 
     int insert(FtOrder order);
 
@@ -39,7 +41,9 @@ public interface FtOrderMapper {
 
     List<CalcOrderPriceResponse> getOrderPrice(Long orderId);
 
-    List<FtOrder> homeCount(Long userId);
+    List<FtOrder> homeCount(@Param("userId") Long userId,
+                            @Param("startTime") String startTime,
+                            @Param("endTime") String endTime);
 
     String getGoodId(String orderId);
 

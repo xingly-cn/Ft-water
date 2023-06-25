@@ -6,6 +6,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -25,8 +26,11 @@ public class StatisticsController {
 
     @GetMapping("show")
     @ApiOperation("数据大屏")
-    public AjaxResult data(String type) {
-        return AjaxResult.success(ftStatisticsService.getDashBoardData(type));
+    public AjaxResult data(String type,
+                           @RequestParam(required = false) String startTime,
+                           @RequestParam(required = false) String endTime)
+    {
+        return AjaxResult.success(ftStatisticsService.getDashBoardData(type,startTime,endTime));
     }
 
 

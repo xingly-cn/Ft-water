@@ -252,12 +252,10 @@ public class FtOrderServiceImpl implements FtOrderService {
                     // 套餐 = 水票
                     log.info("套餐 - number:{}", number);
 
-
                     // 数据统计
                     ftStatistics.setTotal(number);
                     ftStatistics.setTp(0);
                     ftStatistics.setFloorId(ftOrder.getHomeId().intValue());
-                    
 
                     ftOrder.setStatus(2);
                     //async 水漂 其他 是 核销之后 入这个表
@@ -326,7 +324,6 @@ public class FtOrderServiceImpl implements FtOrderService {
                     break;
                 case 2:
                     // 空桶
-
                     // 数据统计
                     ftStatistics.setTotal(number);
                     ftStatistics.setTp(2);
@@ -352,7 +349,6 @@ public class FtOrderServiceImpl implements FtOrderService {
         OrderRequest orderRequest = new OrderRequest();
         BeanUtils.copyProperties(ftOrder, orderRequest);
         //支付之后
-
         return updateOrder(orderRequest);
     }
 
@@ -406,19 +402,6 @@ public class FtOrderServiceImpl implements FtOrderService {
     }
 
     @Override
-    public String createWxNoCQ(String wxNo) throws UnsupportedEncodingException {
-        OrderResponse orderResponse = ftOrderMapper.selectOrderByWxNo(wxNo);
-        if (orderResponse == null) {
-            return "未找到订单";
-        }
-        // 生成二维码
-        String body = orderResponse.getWxNo() + "_" + LocalDateTimeUtil.now();
-        String encBody = SecureUtil.aes("aEsva0zDHECg47P8SuPzmw==".getBytes()).encryptBase64(body);
-        log.info("encBody:{}", encBody);
-        return "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + URLEncoder.encode(encBody, "UTF-8");
-    }
-
-    @Override
     public String checkOrderCQ(String encBody, String type) {
         // 判断核销类型 二维码/提货码
         Integer typer = null;
@@ -466,7 +449,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             typer = ftGoods.getTyper();
         }
 
-        if (typer == null || userId == null || orderId == null || homeId == null){
+        if (typer == null || userId == null || orderId == null || homeId == null) {
             return "核销失败, 未找到该订单, 订单ID：" + orderId;
         }
 
@@ -564,9 +547,9 @@ public class FtOrderServiceImpl implements FtOrderService {
     }
 
     @Override
-    public List<OrderHomeCountResponse> homeCount(Long userId) {
+    public List<OrderHomeCountResponse> homeCount(Long userId, String startTime, String endTime) {
         //找到素有的楼栋
-        List<FtOrder> orders = ftOrderMapper.homeCount(userId);
+        List<FtOrder> orders = ftOrderMapper.homeCount(userId, startTime, endTime);
         if (CollectionUtils.isEmpty(orders)) {
             return Collections.emptyList();
         }
@@ -585,8 +568,9 @@ public class FtOrderServiceImpl implements FtOrderService {
         //待入库的水的数量 栋楼的水的数量
         List<FtHome> waterCountList = homeMapper.waterCount(homeIds);
         Map<Long, Integer> waterCountMap = waterCountList.stream().collect(Collectors.toMap(FtHome::getId, FtHome::getNumber));
-        List<FtMessage> waterWaiteCountList = messageService.waterWaiteCount(userId);
-        Map<Long, Integer> waterWaiteCountMap = waterWaiteCountList.stream().collect(Collectors.toMap(FtMessage::getHomeId, FtMessage::getNumber));
+        List<FtMessage> waterWaiteCountList = messageService.waterWaiteCount(userId, startTime, endTime);
+        Map<Long, Integer> waterWaiteCountMap = CollectionUtils.isEmpty(waterWaiteCountList) ?
+                new HashMap<>() : waterWaiteCountList.stream().collect(Collectors.toMap(FtMessage::getHomeId, FtMessage::getNumber));
 
         Map<String, List<FtOrder>> orderMap = orders.stream().collect(Collectors.groupingBy(FtOrder::getDeliveryType));
         orderMap.forEach((k, v) -> {
@@ -594,7 +578,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                 //自提
                 Map<Long, List<FtOrder>> orderHomeMap = v.stream().collect(Collectors.groupingBy(FtOrder::getHomeId));
                 orderHomeMap.forEach((ok, ov) -> {
-                    assembleHomeCountResponse(responses, homes, ov, ok, waterCountMap, waterWaiteCountMap);
+                    assembleHomeCountResponse(responses, homes, ov, ok, waterCountMap, waterWaiteCountMap,userId);
                 });
 
             } else if (k.equals("goDoor")) {
@@ -606,7 +590,7 @@ public class FtOrderServiceImpl implements FtOrderService {
                     }
                     Long homeId = addresses.stream().filter(h -> h.getId().equals(ok)).findFirst().orElse(new Address()).getHomeId();
 
-                    assembleHomeCountResponse(responses, homes, ov, homeId, waterCountMap, waterWaiteCountMap);
+                    assembleHomeCountResponse(responses, homes, ov, homeId, waterCountMap, waterWaiteCountMap,userId);
                 });
             }
         });
@@ -618,7 +602,8 @@ public class FtOrderServiceImpl implements FtOrderService {
                                            List<FtOrder> ov,
                                            Long homeId,
                                            Map<Long, Integer> waterCountMap,
-                                           Map<Long, Integer> waterWaiteCountMap) {
+                                           Map<Long, Integer> waterWaiteCountMap,
+                                           Long userId) {
         if (CollectionUtils.isNotEmpty(responses)) {
             if (responses.stream().anyMatch(r -> r.getHomeId().equals(homeId))) {
                 responses.stream()
@@ -636,6 +621,7 @@ public class FtOrderServiceImpl implements FtOrderService {
         String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
         responses.add(OrderHomeCountResponse.builder()
                 .homeId(homeId)
+                .userId(userId)
                 .homeName(topName + "/" + name)
                 .waitCount((int) ov.stream().filter(o -> o.getStatus().equals(1)).count())
                 .count((int) ov.stream().filter(o -> o.getStatus().equals(2)).count())

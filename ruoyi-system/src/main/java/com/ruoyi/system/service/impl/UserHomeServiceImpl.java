@@ -50,17 +50,12 @@ public class UserHomeServiceImpl implements UserHomeService {
     }
 
     @Override
-    public List<Integer> selectHomeIdByUserId(Long userId) {
+    public List<Long> selectHomeIdByUserId(Long userId) {
         return userHomeMapper.selectHomeIdByUserId(userId);
     }
 
     @Override
-    public List<Integer> selectAllHomeId() {
-        return userHomeMapper.selectAllHomeId();
-    }
-
-    @Override
-    public List<Integer> selectAllUserId() {
-        return userHomeMapper.selectAllUserId();
+    public List<UserHome> selectAllUserHomes(Boolean flag,Long userId) {
+        return userHomeMapper.selectAllUserHomes(flag,userId);
     }
 }

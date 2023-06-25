@@ -5,6 +5,7 @@
 <mapper namespace="com.ruoyi.system.mapper.UserHomeMapper">
     <resultMap type="com.ruoyi.system.domain.UserHome" id="UserHomeResult">
         <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
         <result property="homeId" column="home_id"/>
     </resultMap>
 
@@ -44,12 +45,19 @@
         from user_home
     </select>
 
-    <select id="selectHomeIdByUserId" resultType="java.lang.Integer">
+    <select id="selectHomeIdByUserId" resultType="java.lang.Long">
         select home_id from user_home where user_id = #{userId}
     </select>
 
-    <select id="selectAllHomeId" resultType="java.lang.Integer">
-        select distinct home_id from user_home
+    <select id="selectAllUserHomes" resultMap="UserHomeResult">
+        SELECT uh.home_id,
+               uh.user_id,
+               su.user_name
+        FROM user_home uh
+                 INNER JOIN sys_user su ON uh.user_id = su.user_id
+        <if test="flag == false ">
+            where uh.user_id = #{userId}
+        </if>
     </select>
 
     <select id="selectAllUserId" resultType="java.lang.Integer">

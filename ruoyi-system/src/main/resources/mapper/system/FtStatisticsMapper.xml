@@ -2,28 +2,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.system.mapper.FtStatisticsMapper">
 
-
     <insert id="myInsert">
         insert into ft_statistics ( floor_id, tp, total, create_time) values (#{floorId}, #{tp}, #{total}, now())
     </insert>
 
-    <select id="getWaterNum" resultType="java.lang.Integer">
-        select sum(total) from ft_statistics where floor_id = #{homeId} and tp = 1
+    <select id="getStatisticsNumByHomeIdsAndType" resultType="com.ruoyi.system.response.CountResponse">
+        select sum(total) number,floor_id homeId from ft_statistics
+        where tp = #{type} and floor_id in
+        <foreach collection="homeIds" item="homeId" index="index" open="(" separator="," close=")">
+            #{homeId}
+        </foreach>
+        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+            and create_time between #{startTime} and #{endTime}
+        </if>
+        group by floor_id
     </select>
 
-    <select id="getBottomNum" resultType="java.lang.Integer">
-        select sum(total) from ft_statistics where floor_id = #{homeId} and tp = 2
+    <select id="getOrderNum" resultType="com.ruoyi.system.response.CountResponse">
+        select count(*) number,floor_id homeId from ft_statistics where floor_id in
+        <foreach collection="homeIds" item="homeId" index="index" open="(" separator="," close=")">
+            #{homeId}
+        </foreach>
+        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+            and create_time between #{startTime} and #{endTime}
+        </if>
+        group by floor_id
     </select>
-
-
-
-    <select id="getCouponNum" resultType="java.lang.Integer">
-        select sum(total) from ft_statistics where floor_id = #{homeId} and tp = 0
-    </select>
-
-    <select id="getOrderNum" resultType="java.lang.Integer">
-        select count(*) from ft_statistics where floor_id = #{homeId}
-    </select>
-
 
 </mapper>

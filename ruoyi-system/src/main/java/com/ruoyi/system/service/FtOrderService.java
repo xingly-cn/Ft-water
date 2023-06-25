@@ -38,13 +38,11 @@ public interface FtOrderService {
 
     String checkOrderCQ(String encBody, String type);
 
-    List<OrderHomeCountResponse> homeCount(Long userId);
+    List<OrderHomeCountResponse> homeCount(Long userId, String startTime, String endTime);
 
     List<CalcOrderPriceResponse> getOrderPrice(Long orderId);
 
     String getGoodId(String orderId);
 
     String getUseNum(String orderId);
-
-    String createWxNoCQ(String wxNo) throws UnsupportedEncodingException;
 }

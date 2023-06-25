@@ -311,6 +311,9 @@
         where status in (1, 2)
           and find_in_set(#{userId}, manage_user_id)
           and deleted = 0
+        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+            and create_time between #{startTime} and #{endTime}
+        </if>
     </select>
 
     <select id="getGoodId" resultType="java.lang.String">
@@ -336,7 +339,19 @@
         where wxno = #{wxNo}
     </update>
 
-    <select id="getPriceByHomeId" resultType="java.math.BigDecimal">
-        select sum(total) from ft_order where home_id = #{homeId} and payed = 1 and (status = 1 or status = 2)
+    <select id="getPriceByHomeIds" resultType="com.ruoyi.system.response.CountResponse">
+        select sum(total) price,
+               home_id homeId
+        from ft_order
+        where home_id in
+        <foreach collection="homeIds" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        and payed = 1
+        and (status = 1 or status = 2)
+        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+            and create_time between #{startTime} and #{endTime}
+        </if>
+        group by home_id
     </select>
 </mapper>

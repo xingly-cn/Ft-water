@@ -352,6 +352,10 @@
         where deleted = 0
           and confirm = 0
           and order_type = 1
-          and find_in_set(#{userId}, user_id) GROUP BY home_id
+          and find_in_set(#{userId}, user_id)
+        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+            and create_time between #{startTime} and #{endTime}
+        </if>
+        GROUP BY home_id
     </select>
 </mapper>

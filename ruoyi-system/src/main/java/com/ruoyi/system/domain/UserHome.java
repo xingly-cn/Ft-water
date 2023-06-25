@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.annotations.Api;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,9 @@ public class UserHome {
     private Long userId;
 
     private Long homeId;
+
+    @JsonInclude
+    private String userName;
 
     @Tolerate
     public UserHome() {}

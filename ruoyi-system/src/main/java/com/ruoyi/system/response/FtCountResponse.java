@@ -11,6 +11,8 @@ import lombok.ToString;
 @Data
 @ToString
 public class FtCountResponse {
+
     private Integer type;
+
     private Integer num;
 }

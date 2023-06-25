@@ -171,4 +171,6 @@ public interface SysUserMapper {
     void updateUserBarrenNum(@Param("userId")Long userId, @Param("barrelNum") int newBarrenNum);
 
     SysUser selectUserByPhone(@Param("phone") String phoneNumber);
+
+    List<String> selectRoleByUserId(Long userId);
 }

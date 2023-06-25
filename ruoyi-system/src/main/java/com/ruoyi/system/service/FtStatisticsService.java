@@ -8,5 +8,5 @@ import java.util.Map;
  * @Date 2023-06-24 22:52
  **/
 public interface FtStatisticsService {
-    Map<String, Object> getDashBoardData(String type);
+    Map<String, Object> getDashBoardData(String type,String startTime,String endTime);
 }

@@ -175,7 +175,7 @@ public class FtMessageServiceImpl implements FtMessageService {
         }
     }
 
-    public List<FtMessage> waterWaiteCount(Long userId) {
-        return ftMessageMapper.waterWaiteCount(userId);
+    public List<FtMessage> waterWaiteCount(Long userId,String startTime,String endTime) {
+        return ftMessageMapper.waterWaiteCount(userId,startTime,endTime);
     }
 }

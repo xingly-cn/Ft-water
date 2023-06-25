@@ -20,6 +20,8 @@ public class OrderHomeCountResponse {
 
     private String homeName;
 
+    private Long userId;
+
     private Integer count;
 
     private Integer waitCount;

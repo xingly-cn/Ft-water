@@ -1,5 +1,7 @@
 package com.ruoyi.system.service;
 
+import com.ruoyi.system.domain.UserHome;
+
 import java.util.List;
 
 /**
@@ -12,9 +14,7 @@ public interface UserHomeService {
 
     Boolean deleteUserHomeByUserIdAndHomeId(Long userId, Long homeId);
 
-    List<Integer> selectHomeIdByUserId(Long userId);
+    List<Long> selectHomeIdByUserId(Long userId);
 
-    List<Integer> selectAllHomeId();
-
-    List<Integer> selectAllUserId();
+    List<UserHome> selectAllUserHomes(Boolean flag,Long userId);
 }

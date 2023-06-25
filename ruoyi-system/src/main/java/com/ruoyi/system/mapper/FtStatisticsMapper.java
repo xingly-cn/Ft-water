@@ -2,15 +2,21 @@ package com.ruoyi.system.mapper;
 
 
 import com.ruoyi.system.domain.FtStatistics;
+import com.ruoyi.system.response.CountResponse;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface FtStatisticsMapper {
 
     int myInsert(FtStatistics ftStatistics);
 
-    Integer getOrderNum(Long homeId);
-    Integer getCouponNum(Long homeId);
-    Integer getWaterNum(Long homeId);
-    Integer getBottomNum(Long homeId);
+    List<CountResponse> getStatisticsNumByHomeIdsAndType(@Param("homeIds") List<Long> homeIds,
+                                                         @Param("type") Integer type,
+                                                         @Param("startTime") String startTime,
+                                                         @Param("endTime") String endTime);
 
-
+    List<CountResponse> getOrderNum(@Param("homeIds") List<Long> homeIds,
+                                    @Param("startTime") String startTime,
+                                    @Param("endTime") String endTime);
 }
