@@ -69,10 +69,10 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
                     return res;
                 }
                 countNumberMap = getCountNumberMap(homeIds,startTime,endTime, Sets.newHashSet(userId));
-//                saleData.addAll(myMethod(userId, userName,countNumberMap));
                 getSaleList(saleData, myMethod(userId, userName, countNumberMap));
                 res.put("saleData", saleData);
                 res.put("orderData", ftOrderService.homeCount(userId,startTime,endTime));
+                log.info("saledata {}", saleData);
                 break;
             case "pc":
                 //权限判断 如果是管理员  查询所有的数据  如果是普通用户  查询当前用户的数据
@@ -87,11 +87,9 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
 
                 //todo 宿管/配送员
                 Set<Long> userIds = ftStatisticsMapper.getUserIdsByHomeIds(homeIds);
-//                saleData.add(getTemp(Long.valueOf(homeId)));
 
                 if (CollectionUtils.isNotEmpty(userIds)) {
                     countNumberMap = getCountNumberMap(homeIds, startTime, endTime,userIds);
-//                    Map<Long, String> userMap = userHomes.stream().collect(Collectors.toMap(UserHome::getUserId, UserHome::getUserName, (k1, k2) -> k1));
                     List<SysUser> users = userMapper.selectUsersByIds(userIds.stream().map(String::valueOf).collect(Collectors.toList()));
 
                     users.forEach(user->{
@@ -153,6 +151,7 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
                 .build();
     }
 
+    //todo
     private Map<Long, Object> assembleMap(List<CountResponse> waitHandleList, Integer type) {
         if (CollectionUtils.isEmpty(waitHandleList)) {
             return new HashMap<>();
@@ -175,6 +174,7 @@ public class FtStatisticsServiceImpl implements FtStatisticsService {
         Map<Long, Object> bottomMap = assembleMap(BottomList, 1);
         //todo user 金额
         List<CountResponse> orderPriceList = ftOrderMapper.getPriceByHomeIds(homeIds,startTime,endTime);
+
         Map<Long, Object> orderPriceMap = assembleMap(orderPriceList, 2);
         return new LinkedHashMap<Integer,Map<Long, Object>>(5) {
             {

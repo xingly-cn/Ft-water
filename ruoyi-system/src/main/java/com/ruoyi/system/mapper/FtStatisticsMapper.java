@@ -25,4 +25,6 @@ public interface FtStatisticsMapper {
 
     Set<Long> getUserIdsByHomeIds(@Param("homeIds") Set<Long> homeIds);
 
+    Integer getUserPrice (Long userId);
+
 }

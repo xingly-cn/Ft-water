@@ -116,12 +116,16 @@ public class FtOrderServiceImpl implements FtOrderService {
         if (CollectionUtils.isEmpty(request.getShops())) {
             throw new ServiceException("商品不能为空");
         }
+        // todo 查出来的数据，楼栋库存number是null
         HomeResponse homeResponse = homeService.selectByPrimaryKey(user.getHomeId());
         if (homeResponse == null) {
             throw new ServiceException("宿舍不存在");
         }
         //校验库存
+        log.info(homeResponse.getNumber() + "  库存数量");
         checkGoodsNumber(request.getShops(), homeResponse.getNumber());
+
+
         //生成订单
         request.setUserId(userId);
 
@@ -663,10 +667,11 @@ public class FtOrderServiceImpl implements FtOrderService {
                 throw new ServiceException(goodsResponse.getTitle() + "已下架，请重新选择");
             }
             if (goodsResponse.getTyper().equals(1)) {
-                //水需要校验库存
+                //水需要校验库存 num是购买数量，number是库存数量
                 Integer num = goodsMap.get(goodsResponse.getId());
+                log.info("current 库存 is {},has 购买 is {}", number, num);
                 if (num > number) {
-                    log.info("current number is {},has number is {}", number, num);
+                    log.info("current 库存 is {},has 购买 is {}", number, num);
                     throw new ServiceException(goodsResponse.getTitle() + "，库存不足");
                 }
             }

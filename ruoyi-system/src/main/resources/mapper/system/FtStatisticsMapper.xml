@@ -43,4 +43,8 @@
             #{homeId}
         </foreach>
     </select>
+
+    <select id="getUserPrice" resultType="java.lang.Integer">
+        select count(*) from ft_statistics where user_id = #{userId}
+    </select>
 </mapper>

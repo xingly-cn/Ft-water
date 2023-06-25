@@ -73,9 +73,9 @@ public class WechatUtil {
 
         // 把code放到请求体中
         JSONObject jsonObject = new JSONObject();
-//        jsonObject.put("code", code);
+        jsonObject.put("code", code);
         httpPost.setEntity(new StringEntity(jsonObject.toJSONString(), "UTF-8"));
-//        logger.info("【小程序获取手机号】: code={}", code);
+        logger.info("【小程序获取手机号】: code={}", code);
 
         CloseableHttpClient httpClient = HttpClients.createDefault();
         try (CloseableHttpResponse response = httpClient.execute(httpPost)) {
