@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +42,9 @@ public class FtHomeServiceImpl implements FtHomeService {
     private FtHomeMapper homeMapper;
 
     @Autowired
+    private FtHomeServiceImpl homeService;
+
+    @Autowired
     private SysUserServiceImpl userService;
 
     @Autowired
@@ -56,19 +60,19 @@ public class FtHomeServiceImpl implements FtHomeService {
     private FtNoticesServiceImpl noticesService;
 
     @Override
-    @CacheEvict(value = "home", allEntries = true)
+    @CacheEvict(value = "home", key = "#id")
     public Boolean deleteByPrimaryKey(Long id) {
         return homeMapper.deleteByPrimaryKey(id) > 0;
     }
 
     @Override
-    @CacheEvict(value = "home", allEntries = true)
+    @CachePut(value = "home", key = "#record.id")
     public Boolean addHome(FtHome record) {
         return homeMapper.insertSelective(record) > 0;
     }
 
     @Override
-    @CacheEvict(value = "home", allEntries = true)
+    @CacheEvict(value = "home", key = "#record.id")
     public Boolean updateHome(FtHome record) {
         return homeMapper.updateByPrimaryKeySelective(record) > 0;
     }
@@ -108,7 +112,7 @@ public class FtHomeServiceImpl implements FtHomeService {
     }
 
     @Override
-    @Cacheable(value = "home", key = "#id")
+//    @Cacheable(value = "home", key = "#id")
     public HomeResponse selectByPrimaryKey(Long id) {
         FtHome home = homeMapper.selectByPrimaryKey(id);
         if (home != null) {
@@ -191,13 +195,6 @@ public class FtHomeServiceImpl implements FtHomeService {
         return homeMapper.selectList(null);
     }
 
-//    @Cacheable(value = "home_isDelivery", unless = "#result == null")
-//    public List<FtHome> getHomes(Boolean isDelivery) {
-//        HomeRequest request = new HomeRequest();
-//        request.setIsDelivery(isDelivery);
-//        return homeMapper.selectList(request);
-//    }
-
     /**
      * 一个树通过一个下级id如何找到最上级的id
      *
@@ -226,6 +223,28 @@ public class FtHomeServiceImpl implements FtHomeService {
         }
         return getTopHome(homes, home.getParentId());
     }
+
+    /**
+     * 递归获取所有的上级
+     *
+     * @param homes 宿舍楼树
+     * @param id    子节点编号
+     * @return 所有上级
+     */
+    public List<FtHome> getTopHomes(List<FtHome> homes, Long id) {
+        FtHome home = homes.stream().filter(h -> h.getId().equals(id)).findAny().orElse(null);
+        if (home == null) {
+            return null;
+        }
+        if (home.getParentId().equals(0L)) {
+            return homes.stream().filter(h -> h.getId().equals(id)).collect(Collectors.toList());
+        }
+        List<FtHome> topHomes = getTopHomes(homes, home.getParentId());
+//        log.info("topHomes:{}", topHomes);
+        topHomes.add(home);
+        return topHomes;
+    }
+
 
     private List<HomeResponse> buildTree(List<FtHome> homes, Long parentId, Map<Long, List<SysUser>> userMap) {
         List<HomeResponse> responses = Lists.newArrayList();
@@ -340,10 +359,8 @@ public class FtHomeServiceImpl implements FtHomeService {
                         }});
                     }
 
-                    String name = homes.stream().filter(h -> h.getId().equals(homeId)).findFirst().orElse(new FtHome()).getName();
-                    String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
                     data.put(type == 1 ? "thing6" : "thing22", new HashMap<String, String>() {{
-                        put("value", topName + "/" + name); // 替换为具体值
+                        put("value", homeService.getTopHomes(homes, homeId).stream().map(FtHome::getName).collect(Collectors.joining("/"))); // 替换为具体值
                     }});
                     data.put(type == 1 ? "time3" : "date2", new HashMap<String, String>() {{
                         put("value", DateUtils.getCurrentDate()); // 替换为具体值
@@ -385,4 +402,5 @@ public class FtHomeServiceImpl implements FtHomeService {
         notices.setCreateTime(new Date());
         return noticesService.insertSelective(notices) > 0;
     }
+
 }

@@ -61,7 +61,7 @@ public class HomeController {
     }
 
     @PostMapping("/addNumber")
-    @ApiOperation("添加水漂数量")
+    @ApiOperation("加水")
     public AjaxResult addNumber(@RequestBody HomeRequest request) {
         return AjaxResult.success(homeService.addNumber(request));
     }

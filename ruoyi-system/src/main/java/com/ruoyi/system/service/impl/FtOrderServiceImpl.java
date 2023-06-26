@@ -188,8 +188,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             responses.forEach(response -> {
                 if (response.getDeliveryType().equals("selfGet")) {
                     //自提
-                    String name = homes.stream().filter(f -> f.getId().equals(response.getHomeId())).findFirst().orElse(new FtHome()).getName();
-                    response.setHomeName(homeService.getTopHome(homes, response.getHomeId()).getName() + "/" + name);
+                    response.setHomeName(homeService.getTopHomes(homes,response.getHomeId()).stream().map(FtHome::getName).collect(Collectors.joining("/")));
                 }
             });
         }
@@ -525,7 +524,7 @@ public class FtOrderServiceImpl implements FtOrderService {
 
         if (typer == 1 || typer == 2) {
             List<FtHome> homes = homeService.getHomes();
-            String topName = homeService.getTopHome(homes, Long.valueOf(homeId)).getName();
+//            String topName = homeService.getTopHome(homes, Long.valueOf(homeId)).getName();
             //消息订阅
             Map<String, Object> data = new HashMap<>(5);
 
@@ -538,8 +537,9 @@ public class FtOrderServiceImpl implements FtOrderService {
                 put("value", "您的订单已送达");
             }});
 
+            String finalHomeId = homeId;
             data.put("thing9", new HashMap<String, String>() {{
-                put("value", topName + "/" + ftHome.getName());
+                put("value", homeService.getTopHomes(homes, Long.valueOf(finalHomeId)).stream().map(FtHome::getName).collect(Collectors.joining("/")));
             }});
 
             //说明
@@ -626,13 +626,10 @@ public class FtOrderServiceImpl implements FtOrderService {
             }
         }
 
-        String name = homes.stream().filter(h -> h.getId().equals(homeId)).findFirst().orElse(new FtHome()).getName();
-        Long topId = homeService.getTopId(homes, homeId);
-        String topName = homes.stream().filter(h -> h.getId().equals(topId)).findFirst().orElse(new FtHome()).getName();
         responses.add(OrderHomeCountResponse.builder()
                 .homeId(homeId)
                 .userId(userId)
-                .homeName(topName + "/" + name)
+                .homeName(homeService.getTopHomes(homes, homeId).stream().map(FtHome::getName).collect(Collectors.joining("/")))
                 .waitCount((int) ov.stream().filter(o -> o.getStatus().equals(1)).count())
                 .count((int) ov.stream().filter(o -> o.getStatus().equals(2)).count())
                 .waterCount(waterCountMap.get(homeId) != null ? waterCountMap.get(homeId) : 0)

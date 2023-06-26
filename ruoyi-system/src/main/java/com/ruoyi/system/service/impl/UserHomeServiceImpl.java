@@ -8,6 +8,7 @@ import com.ruoyi.system.service.UserHomeService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class UserHomeServiceImpl implements UserHomeService {
             //需要删除用户与角色的关系
             SysUserRole userRole = new SysUserRole();
             userRole.setUserId(userId);
-            userRole.setRoleId(7l);
+            userRole.setRoleId(7L);
             roleService.deleteAuthUser(userRole);
         }
         return userHomeMapper.deleteUserHomeByUserIdAndHomeId(userId, homeId);
@@ -73,9 +74,9 @@ public class UserHomeServiceImpl implements UserHomeService {
         return userHomeMapper.selectByHomeId(id);
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "userHome_userId", key = "#userHome.userId"),
-            @CacheEvict(value = "userHome_id", key = "#userHome.homeId")
+    @Caching(put = {
+            @CachePut(value = "userHome_userId", key = "#userHome.userId"),
+            @CachePut(value = "userHome_id", key = "#userHome.homeId")
     })
     public void insert(UserHome userHome) {
         userHomeMapper.insert(userHome);

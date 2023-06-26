@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by IntelliJ IDEA.
@@ -161,11 +162,7 @@ public class FtMessageServiceImpl implements FtMessageService {
     }
 
     private void getMessageHomeName(List<FtHome> homes, MessageResponse message,List<SysUser> users) {
-        FtHome home = homeServiceImpl.getTopHome(homes, message.getHomeId());
-        if (home != null) {
-            String homeName = homes.stream().filter(h -> h.getId().equals(message.getHomeId())).findFirst().orElse(new FtHome()).getName();
-            message.setHomeName(home.getName() + "/" + homeName);
-        }
+        message.setHomeName(homeServiceImpl.getTopHomes(homes, message.getHomeId()).stream().map(FtHome::getName).collect(Collectors.joining("/")));
         if (CollectionUtils.isNotEmpty(users)) {
             StringBuilder userName = new StringBuilder();
             for (String s : message.getUserId().split(",")) {
