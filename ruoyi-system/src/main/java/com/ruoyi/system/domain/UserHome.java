@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Tolerate;
 
+import java.io.Serializable;
+
 /**
  * Created by IntelliJ IDEA.
  * @Author : 镜像
@@ -16,7 +18,9 @@ import lombok.experimental.Tolerate;
 @ToString
 @Api("用户楼栋管理")
 @Builder
-public class UserHome {
+public class UserHome implements Serializable {
+
+    private static final long serialVersionUID = 7802128654790973740L;
 
     private Long userId;
 

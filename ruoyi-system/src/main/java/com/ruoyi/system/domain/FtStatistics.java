@@ -20,21 +20,24 @@ import java.util.Date;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class FtStatistics  implements Serializable {
+public class FtStatistics implements Serializable {
+
     @ApiModelProperty(value = "id")
-    private int id;
+    private Long id;
 
     @ApiModelProperty(value = "楼层ID")
-    private int floorId;
+    private Long floorId;
 
     @ApiModelProperty(value = "商品类型 0水票 1水 2桶")
-    private int tp;
+    private Integer tp;
 
     @ApiModelProperty(value = "数量")
-    private int total;
+    private Integer total;
 
     @ApiModelProperty(value = "核销人ID")
-    private int userId;
+    private Long userId;
+
+    private Long orderId;
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;

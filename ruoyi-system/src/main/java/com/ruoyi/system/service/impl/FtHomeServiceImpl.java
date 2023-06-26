@@ -8,7 +8,6 @@ import com.ruoyi.system.domain.FtNotices;
 import com.ruoyi.system.domain.UserHome;
 import com.ruoyi.system.mapper.FtHomeMapper;
 import com.ruoyi.system.mapper.SysUserMapper;
-import com.ruoyi.system.mapper.UserHomeMapper;
 import com.ruoyi.system.request.HomeRequest;
 import com.ruoyi.system.response.HomeResponse;
 import com.ruoyi.system.service.FtHomeService;
@@ -48,7 +47,7 @@ public class FtHomeServiceImpl implements FtHomeService {
     private SysUserMapper userMapper;
 
     @Autowired
-    private UserHomeMapper userHomeMapper;
+    private UserHomeServiceImpl userHomeService;
 
     @Autowired
     private FtMessageServiceImpl messageService;
@@ -133,7 +132,7 @@ public class FtHomeServiceImpl implements FtHomeService {
         }
 
         //查询该宿舍楼下面的管理员 最多俩个
-        List<UserHome> userHomes = userHomeMapper.selectByHomeId(request.getId());
+        List<UserHome> userHomes = userHomeService.selectByHomeId(request.getId());
 
         if (CollectionUtils.isNotEmpty(userHomes)) {
             //查询该用户是否已经是管理员
@@ -148,7 +147,7 @@ public class FtHomeServiceImpl implements FtHomeService {
                 .homeId(request.getId())
                 .userId(request.getUserId())
                 .build();
-        userHomeMapper.insert(userHome);
+        userHomeService.insert(userHome);
         return userService.updateUser(user) > 0;
     }
 
@@ -248,7 +247,7 @@ public class FtHomeServiceImpl implements FtHomeService {
 
     private Map<Long, List<SysUser>> getUserMap() {
         //找到所有的用户
-        List<UserHome> userHomes = userHomeMapper.getUserHomes();
+        List<UserHome> userHomes = userHomeService.getUserHomes();
         Map<Long, List<SysUser>> userMap = new ConcurrentHashMap<>();
         if (CollectionUtils.isNotEmpty(userHomes)) {
             Set<Long> userIds = userHomes.stream().map(UserHome::getUserId).collect(Collectors.toSet());
@@ -278,7 +277,7 @@ public class FtHomeServiceImpl implements FtHomeService {
      */
     public Boolean sendMessageAndNotices(Long homeId, Long userId, Boolean operator, Integer sourceNumber, Integer number, Boolean flag, Integer orderType) {
         //找该楼下面的管理员 发送消息
-        List<UserHome> userHomes = userHomeMapper.selectByHomeId(homeId);
+        List<UserHome> userHomes = userHomeService.selectByHomeId(homeId);
 
         if (CollectionUtils.isEmpty(userHomes)) {
             throw new SecurityException("该宿舍楼下没有管理员");
@@ -323,7 +322,7 @@ public class FtHomeServiceImpl implements FtHomeService {
         }
 
         if (type == 1 || type == 2) {
-            List<UserHome> userHomes = userHomeMapper.selectByHomeId(homeId);
+            List<UserHome> userHomes = userHomeService.selectByHomeId(homeId);
             if (CollectionUtils.isNotEmpty(userHomes)) {
                 List<String> userIds = userHomes.stream().map(UserHome::getUserId).map(String::valueOf).collect(Collectors.toList());
                 List<SysUser> users = userMapper.selectUsersByIds(userIds);

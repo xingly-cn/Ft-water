@@ -19,8 +19,12 @@ public class CountResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer number;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long homeId;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private BigDecimal price;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long userId;
 }

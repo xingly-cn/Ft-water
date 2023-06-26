@@ -80,7 +80,7 @@ public class FtOrderServiceImpl implements FtOrderService {
     private SysConfigServiceImpl configService;
 
     @Autowired
-    private UserHomeMapper userHomeMapper;
+    private UserHomeServiceImpl userHomeService;
 
     @Autowired
     private AddressMapper addressMapper;
@@ -134,7 +134,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             if (request.getHomeId() == null) {
                 throw new ServiceException("自提地址不能为空");
             }
-            List<UserHome> userHomes = userHomeMapper.selectByHomeId(request.getHomeId());
+            List<UserHome> userHomes = userHomeService.selectByHomeId(request.getHomeId());
             if (CollectionUtils.isEmpty(userHomes)) {
                 throw new ServiceException("自提地址不存在管理员");
             }
@@ -149,7 +149,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             if (address == null) {
                 throw new ServiceException("配送地址不存在");
             }
-            List<UserHome> userHomes = userHomeMapper.selectByHomeId(address.getHomeId());
+            List<UserHome> userHomes = userHomeService.selectByHomeId(address.getHomeId());
             if (CollectionUtils.isEmpty(userHomes)) {
                 throw new ServiceException("配送地址不存在管理员");
             }
@@ -387,6 +387,7 @@ public class FtOrderServiceImpl implements FtOrderService {
     }
 
     @Override
+    @Transactional
     public String checkOrderCQ(String encBody, String type) {
         // 判断核销类型 二维码/提货码
         Integer typer = null;
@@ -395,11 +396,13 @@ public class FtOrderServiceImpl implements FtOrderService {
         String userId = null;   //ok
         String orderId = null;  //ok
         String homeId = null;     // ok
+        Long goodsId = null;    // ok
 
         if ("code".equals(type)) {
             String[] split = encBody.split("-");
             orderId = String.valueOf(Integer.parseInt(split[1], 16));
-            int goodId = Integer.parseInt(split[2], 16);
+//            int goodId = Integer.parseInt(split[2], 16);
+            goodsId = (long) Integer.parseInt(split[2], 16);
             FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(Long.valueOf(orderId));
             userId = ftOrder.getUserId().toString();
             homeId = ftOrder.getHomeId().toString();
@@ -412,7 +415,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             }
 
             // 获取核销类型
-            FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey((long) goodId);
+            FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey(goodsId);
             typer = ftGoods.getTyper();
 
         } else if ("scan".equals(type)) {
@@ -422,7 +425,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             orderId = split[0];
             homeId = split[2];
             usedNum = Integer.parseInt(split[3]);
-
+            goodsId = Long.parseLong(split[4]);
             // 核销校验-是否已核销
             FtSale f = ftSaleMapper.checkExist(orderId);
             if (f != null) {
@@ -430,7 +433,7 @@ public class FtOrderServiceImpl implements FtOrderService {
             }
 
             // 获取核销类型
-            FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey(Long.parseLong(split[4]));
+            FtGoods ftGoods = ftGoodsMapper.selectByPrimaryKey(goodsId);
             typer = ftGoods.getTyper();
         }
 
@@ -444,12 +447,12 @@ public class FtOrderServiceImpl implements FtOrderService {
         SysUser user = userService.selectUserById(Long.parseLong(userId));
         FtHome ftHome = ftHomeMapper.selectByPrimaryKey(Long.parseLong(homeId));
 
-        // 统计对象
-        FtStatistics ftStatistics = new FtStatistics();
 
         switch (typer) {
             case 0:
-                return "该订单为水票券, 不需要核销, 订单ID：" + orderId;
+//                ftStatistics.setTotal(usedNum);
+                result =  "该订单为水票券, 不需要核销, 订单ID：" + orderId;
+                break;
             case 1: // 水核销
                 // 当前楼库存查询
                 Integer LocalNumber = ftHome.getNumber();
@@ -462,27 +465,19 @@ public class FtOrderServiceImpl implements FtOrderService {
                 FtSale ftSale = new FtSale(userId, Integer.parseInt(orderId), operatorId.toString());
                 ftSaleMapper.insertSelective(ftSale);
 
-                // 插入user_goods表
-                UserGoods userGoods = new UserGoods(Long.parseLong(userId), Long.parseLong(orderId), usedNum, false);
-                userGoodsMapper.insert(userGoods);
-
                 // 当前楼栋水库存更新
                 ftHome.setNumber(LocalNumber - usedNum);
                 ftHomeMapper.updateByPrimaryKeySelective(ftHome);
 
                 // 订单状态更新
-                FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(Long.parseLong(orderId));
-                ftOrder.setStatus(2);
-                ftOrderMapper.updateByPrimaryKey(ftOrder);
+//                FtOrder ftOrder = ftOrderMapper.selectByPrimaryKey(Long.parseLong(orderId));
+//                ftOrder.setStatus(2);
+                ftOrderMapper.updateStatusByOrderId(Long.parseLong(orderId),2);
 
                 result = "核销水成功, 用户ID：" + usedNum + ", 数量：" + usedNum + ", 订单ID：" + orderId + "&" + usedNum;
 
                 // 数据统计
-                ftStatistics.setTotal(usedNum);
-                ftStatistics.setTp(1);
-                ftStatistics.setFloorId(ftOrder.getHomeId().intValue());
-                ftStatistics.setUserId(operatorId.intValue());
-
+//                ftStatistics.setTotal(usedNum);
 
                 break;
             case 2:
@@ -492,8 +487,8 @@ public class FtOrderServiceImpl implements FtOrderService {
                 ftSaleMapper.insertSelective(ftSale1);
 
                 // 插入user_goods表
-                UserGoods userGoods1 = new UserGoods(Long.parseLong(userId), Long.parseLong(orderId), Integer.parseInt(homeId), false);
-                userGoodsMapper.insert(userGoods1);
+//                UserGoods userGoods1 = new UserGoods(Long.parseLong(userId), Long.parseLong(orderId), Integer.parseInt(homeId), false);
+//                userGoodsMapper.insert(userGoods1);
 
                 // 当前用户空桶数量更新
                 Integer waterNum = user.getWaterNum();
@@ -501,21 +496,30 @@ public class FtOrderServiceImpl implements FtOrderService {
                 userService.updateUser(user);
 
                 // 订单状态更新
-                FtOrder ftOrder1 = ftOrderMapper.selectByPrimaryKey(Long.parseLong(orderId));
-                ftOrder1.setStatus(2);
-                ftOrderMapper.updateByPrimaryKey(ftOrder1);
+//                FtOrder ftOrder1 = ftOrderMapper.selectByPrimaryKey(Long.parseLong(orderId));
+//                ftOrder1.setStatus(2);
+//                ftOrderMapper.updateByPrimaryKey(ftOrder1);
+                ftOrderMapper.updateStatusByOrderId(Long.parseLong(orderId),2);
 
                 result = "核销空桶成功, 用户ID：" + userId + ", 数量：" + usedNum + ", 订单ID：" + orderId + "&" + usedNum;
 
                 // 数据统计
-                ftStatistics.setTotal(usedNum);
-                ftStatistics.setTp(2);
-                ftStatistics.setFloorId(ftOrder1.getHomeId().intValue());
-                ftStatistics.setUserId(operatorId.intValue());
+//                ftStatistics.setTotal(usedNum);
 
                 break;
         }
 
+        // 插入user_goods表
+        UserGoods userGoods = new UserGoods(Long.parseLong(userId),goodsId, usedNum, false);
+        userGoodsMapper.insert(userGoods);
+
+        // 统计对象
+        FtStatistics ftStatistics = new FtStatistics();
+        ftStatistics.setOrderId(Long.parseLong(orderId));
+        ftStatistics.setUserId(operatorId);
+        ftStatistics.setFloorId(Long.parseLong(homeId));
+        ftStatistics.setTp(typer);
+        ftStatistics.setTotal(usedNum);
         // 统计数据插入
         ftStatisticsMapper.myInsert(ftStatistics);
 

@@ -25,6 +25,9 @@ public interface FtStatisticsMapper {
 
     Set<Long> getUserIdsByHomeIds(@Param("homeIds") Set<Long> homeIds);
 
-    Integer getUserPrice (Long userId);
+    List<CountResponse> getUserPrice (@Param("homeIds") Set<Long> homeIds,
+                                      @Param("userIds") Set<Long> userIds,
+                                      @Param("startTime") String startTime,
+                                      @Param("endTime") String endTime);
 
 }

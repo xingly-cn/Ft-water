@@ -354,4 +354,10 @@
         </if>
         group by home_id
     </select>
+
+    <update id="updateStatusByOrderId">
+        update ft_order
+        set status = #{status}
+        where id = #{orderId}
+    </update>
 </mapper>

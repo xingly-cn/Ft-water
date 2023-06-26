@@ -7,6 +7,9 @@ import com.ruoyi.system.mapper.UserHomeMapper;
 import com.ruoyi.system.service.UserHomeService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +31,10 @@ public class UserHomeServiceImpl implements UserHomeService {
     private SysRoleServiceImpl roleService;
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "userHome_userId", key = "#userId"),
+            @CacheEvict(value = "userHome_id", key = "#homeId")
+    })
     public Boolean deleteUserHomeByUserIdAndHomeId(Long userId, Long homeId) {
         //检查这个用户是几个宿舍的管理员
         List<UserHome> userHomes = userHomeMapper.selectByUserId(userId);
@@ -51,6 +58,7 @@ public class UserHomeServiceImpl implements UserHomeService {
     }
 
     @Override
+    @Cacheable(value = "userHome_userId", key = "#userId")
     public Set<Long> selectHomeIdByUserId(Long userId) {
         return userHomeMapper.selectHomeIdByUserId(userId);
     }
@@ -58,5 +66,22 @@ public class UserHomeServiceImpl implements UserHomeService {
     @Override
     public List<UserHome> selectAllUserHomes(Boolean flag,Long userId) {
         return userHomeMapper.selectAllUserHomes(flag,userId);
+    }
+
+    @Cacheable(value = "userHome_id", key = "#id")
+    public List<UserHome> selectByHomeId(Long id) {
+        return userHomeMapper.selectByHomeId(id);
+    }
+
+    @Caching(evict = {
+            @CacheEvict(value = "userHome_userId", key = "#userHome.userId"),
+            @CacheEvict(value = "userHome_id", key = "#userHome.homeId")
+    })
+    public void insert(UserHome userHome) {
+        userHomeMapper.insert(userHome);
+    }
+
+    public List<UserHome> getUserHomes() {
+        return userHomeMapper.getUserHomes();
     }
 }

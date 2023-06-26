@@ -3,7 +3,8 @@
 <mapper namespace="com.ruoyi.system.mapper.FtStatisticsMapper">
 
     <insert id="myInsert">
-        insert into ft_statistics ( floor_id, tp, total, create_time, user_id) values (#{floorId}, #{tp}, #{total}, now(), #{userId})
+        insert into ft_statistics (floor_id, tp, total, create_time, user_id, order_id)
+        values (#{floorId}, #{tp}, #{total}, now(), #{userId}, #{orderId})
     </insert>
 
     <select id="getStatisticsNumByHomeIdsAndType" resultType="com.ruoyi.system.response.CountResponse">
@@ -44,7 +45,23 @@
         </foreach>
     </select>
 
-    <select id="getUserPrice" resultType="java.lang.Integer">
-        select count(*) from ft_statistics where user_id = #{userId}
+    <select id="getUserPrice" resultType="com.ruoyi.system.response.CountResponse">
+        SELECT SUM(fo.total) price,
+               fs.floor_id   homeId,
+               fs.user_id    userId
+        FROM ft_statistics fs
+                 INNER JOIN ft_order fo ON fs.order_id = fo.id
+        where fs.user_id in
+        <foreach collection="userIds" item="userId" index="index" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+        and fs.floor_id in
+        <foreach collection="homeIds" item="homeId" index="index" open="(" separator="," close=")">
+            #{homeId}
+        </foreach>
+        <if test="startTime != null and startTime != '' and endTime != null and endTime != ''">
+            and fs.create_time between #{startTime} and #{endTime}
+        </if>
+        GROUP BY fs.floor_id, fs.user_id
     </select>
 </mapper>

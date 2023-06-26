@@ -54,4 +54,7 @@ public interface FtOrderMapper {
 
     void updateStatusByWxNo(@Param("wxNo") String wxNo,
                             @Param("status") int status);
+
+    void updateStatusByOrderId(@Param("orderId") Long orderId,
+                               @Param("status") int status);
 }
